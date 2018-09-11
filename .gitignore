@@ -14,3 +14,7 @@
 *.so
 *.pgm
 *.swp
+*.exe
+ASP/x64
+ASP/ipch
+ASP/ASP/x64
