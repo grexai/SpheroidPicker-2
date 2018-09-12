@@ -643,10 +643,6 @@ std::string strval = "A string";
 test_enum enumval = Item2;
 Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
-void randx() {
-	int x = 5;  int b = 10;
-	std::cout << x + b;
-}
 Unit *pRootUnit;
 Unit *pStageUnit;
 int main(int /* argc */, char ** /* argv */) {
@@ -711,23 +707,52 @@ int main(int /* argc */, char ** /* argv */) {
 					int y =0;
 					int step=1;
 					gui->addVariable("stepsize", step)->setSpinnable(true);
-					gui->addButton("X- button", []() { std::cout << "stageX- pressed." << std::endl; });
-					gui->addButton("X+ button", [step,y]() { std::cout << "stageX+ pressed." << std::endl;
+					gui->addButton("X- button", [step]() {
+						std::cout << "stageX- pressed." << std::endl; 
+						Stage stage(pStageUnit);
+						iop::int32 xx = stage.XAxis().getCurrentPosition();
+						std::cout << "x pos:" << xx << std::endl;
+						iop::int32 yy = stage.YAxis().getCurrentPosition();
+						std::cout << "y pos:" << yy << std::endl;
+						iop::int32 mv = (iop::int32)step -xx;
+						stage.XAxis().moveToAsync(mv);
+					
+					
+					});
+					gui->addButton("X+ button", [step]() {
+						std::cout << "stageX+ pressed." << std::endl;
 						Stage stage(pStageUnit);
 						iop::int32 xx = stage.XAxis().getCurrentPosition();
 						std::cout << "x pos:" << xx << std::endl;
 						iop::int32 yy = stage.YAxis().getCurrentPosition();
 						std::cout << "y pos:" << yy << std::endl; 
-						iop::int32 xp = (iop::int32)step;
-						iop::int32 mv = xp + xx;
+						iop::int32 mv = (iop::int32)step + xx;
 						stage.XAxis().moveToAsync(mv);
 						
 					});
 					
 				
 					// search necessary units:
-					gui->addButton("Y- button", []() { std::cout << "stageY- pressed." << std::endl; });
-					gui->addButton("Y+ button", []() { std::cout << "stageY+ pressed." << std::endl;
+					gui->addButton("Y- button", [step]() { 
+						std::cout << "stageY- pressed." << std::endl;
+						Stage stage(pStageUnit);
+						iop::int32 xx = stage.XAxis().getCurrentPosition();
+						std::cout << "x pos:" << xx << std::endl;
+						iop::int32 yy = stage.YAxis().getCurrentPosition();
+						std::cout << "y pos:" << yy << std::endl;
+						iop::int32 mv = (iop::int32)step - xx;
+						stage.YAxis().moveToAsync(mv);
+					});
+					gui->addButton("Y+ button", [step]() { 
+						std::cout << "stageY+ pressed." << std::endl;
+						std::cout << "stageY- pressed." << std::endl;
+						Stage stage(pStageUnit);
+						iop::int32 xx = stage.XAxis().getCurrentPosition();
+						std::cout << "x pos:" << xx << std::endl;
+						iop::int32 yy = stage.YAxis().getCurrentPosition();
+						std::cout << "y pos:" << yy << std::endl;
+						iop::int32 mv = (iop::int32)step + xx;
+						stage.YAxis().moveToAsync(mv);
 					
 					});
 					ref<Window> PC = gui->addWindow(Eigen::Vector2i(10, 320), "Pressure Controller");
