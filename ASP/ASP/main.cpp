@@ -336,6 +336,7 @@ public:
 	bool isDirectedAsyncVelSupported() const {
 		return m_pDirectedControlValueAsyncVelocity != 0;
 	}
+
 	bool eventsSupported() const {
 		return m_pEventSource != 0;
 	}
@@ -642,17 +643,108 @@ std::string strval = "A string";
 test_enum enumval = Item2;
 Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
-
-
-
-
+void randx() {
+	int x = 5;  int b = 10;
+	std::cout << x + b;
+}
+Unit *pRootUnit;
+Unit *pStageUnit;
 int main(int /* argc */, char ** /* argv */) {
 	try {
 		if (theHardwareModel) {
-			Unit *pRootUnit = theHardwareModel()->getUnit("");
+			pRootUnit = theHardwareModel()->getUnit("");
 			if (pRootUnit) {
-				std::cout << "ITK HYDRA IS INITAILAZED READY TO FUCK " << std::endl;
-				//pRootUnit->dispose();
+				pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+
+
+				if (!pStageUnit) {
+					std::cout << "stage_sample: no stage found!" << std::endl;
+					return 0;
+				}
+				pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+				Stage stage(pStageUnit);
+				stage.printWhatIsSupported();
+			
+
+				std::cout << "ITK HYDRA IS INITAILAZED, READY TO FUCK " << std::endl;
+				nanogui::init();
+				
+				/* scoped variables */ {
+					bool use_gl_4_1 = false;// Set to true to create an OpenGL 4.1 context.
+					Screen *screen = nullptr;
+
+					if (use_gl_4_1) {
+						// NanoGUI presents many options for you to utilize at your discretion.
+						// See include/nanogui/screen.h for what all of these represent.
+						screen = new Screen(Vector2i(350, 500), "ASP_Controller [GL 4.1]",
+							/*resizable*/true, /*fullscreen*/false, /*colorBits*/8,
+							/*alphaBits*/8, /*depthBits*/24, /*stencilBits*/8,
+							/*nSamples*/0, /*glMajor*/4, /*glMinor*/1);
+					}
+					else {
+						screen = new Screen(Vector2i(350, 500), "ASP_Controller");
+					}
+					bool enabled = true;
+					FormHelper *gui = new FormHelper(screen);
+					ref<Window> asd = gui->addWindow(Eigen::Vector2i(10, 10), "Pipette Controller");
+
+					gui->addVariable("setX", ivar)->setSpinnable(true);
+					gui->addVariable("setY", ivar)->setSpinnable(true);
+					gui->addVariable("setZ", ivar)->setSpinnable(true);
+
+					gui->addButton("X- button", []() { std::cout << "pipetteX- pressed." << std::endl; });
+					gui->addButton("X+ button", []() { std::cout << "pipetteX+ pressed." << std::endl; });
+					gui->addButton("Y- button", []() { std::cout << "pipetteY- pressed." << std::endl; });
+					gui->addButton("Y+ button", []() { std::cout << "pipetteY+ pressed." << std::endl; });
+					gui->addButton("Z- button", []() { std::cout << "pipetteZ- pressed." << std::endl; });
+					gui->addButton("Z+ button", []() { std::cout << "pipetteZ+ pressed." << std::endl;
+						
+					
+					});
+
+
+					ref<Window> window = gui->addWindow(Eigen::Vector2i(175, 10), "Stage Controller");
+					//		gui->addGroup("");
+					gui->addVariable("setX", ivar)->setSpinnable(true);
+					gui->addVariable("setY", ivar)->setSpinnable(true);
+					int x=0;
+					int y =0;
+					int step=1;
+					gui->addVariable("stepsize", step)->setSpinnable(true);
+					gui->addButton("X- button", []() { std::cout << "stageX- pressed." << std::endl; });
+					gui->addButton("X+ button", [step,y]() { std::cout << "stageX+ pressed." << std::endl;
+						Stage stage(pStageUnit);
+						iop::int32 xx = stage.XAxis().getCurrentPosition();
+						std::cout << "x pos:" << xx << std::endl;
+						iop::int32 yy = stage.YAxis().getCurrentPosition();
+						std::cout << "y pos:" << yy << std::endl; 
+						iop::int32 xp = (iop::int32)step;
+						iop::int32 mv = xp + xx;
+						stage.XAxis().moveToAsync(mv);
+						
+					});
+					
+				
+					// search necessary units:
+					gui->addButton("Y- button", []() { std::cout << "stageY- pressed." << std::endl; });
+					gui->addButton("Y+ button", []() { std::cout << "stageY+ pressed." << std::endl;
+					
+					});
+					ref<Window> PC = gui->addWindow(Eigen::Vector2i(10, 320), "Pressure Controller");
+					gui->addVariable("Requested pressure (mBar)", ivar)->setSpinnable(true);
+					gui->addButton("atmosphere", []() { std::cout << "atmosphere pressed" << std::endl; });
+
+
+
+					screen->setVisible(true);
+					screen->performLayout();
+					nanogui::mainloop();
+				}
+
+				nanogui::shutdown();
+				
+				
+				//
 			}
 			else {
 				std::cout << "NOOOOOOOOOOOOOOOOOOOOOOOOOOOOO";
@@ -667,61 +759,6 @@ int main(int /* argc */, char ** /* argv */) {
 		getchar();
 
 	}
-	
-	
-	nanogui::init();
-	/* scoped variables */ {
-		bool use_gl_4_1 = false;// Set to true to create an OpenGL 4.1 context.
-		Screen *screen = nullptr;
 
-		if (use_gl_4_1) {
-			// NanoGUI presents many options for you to utilize at your discretion.
-			// See include/nanogui/screen.h for what all of these represent.
-			screen = new Screen(Vector2i(350, 500), "ASP_Controller [GL 4.1]",
-				/*resizable*/true, /*fullscreen*/false, /*colorBits*/8,
-				/*alphaBits*/8, /*depthBits*/24, /*stencilBits*/8,
-				/*nSamples*/0, /*glMajor*/4, /*glMinor*/1);
-		}
-		else {
-			screen = new Screen(Vector2i(350, 500), "ASP_Controller");
-		}
-
-		bool enabled = true;
-		FormHelper *gui = new FormHelper(screen);
-		ref<Window> asd = gui->addWindow(Eigen::Vector2i(10, 10), "Pipette Controller");
-
-		gui->addVariable("setX", ivar)->setSpinnable(true);
-		gui->addVariable("setY", ivar)->setSpinnable(true);
-		gui->addVariable("setZ", ivar)->setSpinnable(true);
-		
-		gui->addButton("X- button", []() { std::cout << "pipetteX- pressed." << std::endl; });
-		gui->addButton("X+ button", []() { std::cout << "pipetteX+ pressed." << std::endl; });
-		gui->addButton("Y- button", []() { std::cout << "pipetteY- pressed." << std::endl; });
-		gui->addButton("Y+ button", []() { std::cout << "pipetteY+ pressed." << std::endl; });
-		gui->addButton("Z- button", []() { std::cout << "pipetteY- pressed." << std::endl; });
-		gui->addButton("Z+ button", []() { std::cout << "pipetteY+ pressed." << std::endl; });
-
-
-		ref<Window> window = gui->addWindow(Eigen::Vector2i(175, 10), "Stage Controller");
-//		gui->addGroup("");
-		gui->addVariable("setX", ivar)->setSpinnable(true);
-		gui->addVariable("setY", ivar)->setSpinnable(true);
-
-		gui->addButton("X- button", []() { std::cout << "stageX- pressed." << std::endl; });
-		gui->addButton("X+ button", []() { std::cout << "stageX+ pressed." << std::endl; });
-		gui->addButton("Y- button", []() { std::cout << "stageY- pressed." << std::endl; });
-		gui->addButton("Y+ button", []() { std::cout << "stageY+ pressed." << std::endl; });
-		ref<Window> PC = gui->addWindow(Eigen::Vector2i(10, 320), "Pressure Controller");
-		gui->addVariable("Requested pressure (mBar)", ivar)->setSpinnable(true);
-		gui->addButton("atmosphere", []() { std::cout << "atmosphere pressed" << std::endl; });
-
-
-
-		screen->setVisible(true);
-		screen->performLayout();
-		nanogui::mainloop();
-	}
-
-	nanogui::shutdown();
 	return 0;
 }
