@@ -2,6 +2,12 @@
 
 #include <nanogui/nanogui.h>
 #include <iostream>
+#include <stdlib.h>
+#include "opencv2/opencv.hpp"
+
+#include <thread>
+
+
 
 #include <string>
 #include <strstream>
@@ -13,10 +19,12 @@
 #include <reuse/proptools.h>
 #include <windows.h>
 
+
+
 //using namespace std;
+using namespace cv;
 using namespace nanogui;
 using namespace ahm;
-
 
 // ITK HYDRA
 
@@ -645,7 +653,32 @@ Color colval(0.5f, 0.5f, 0.7f, 1.f);
 
 Unit *pRootUnit;
 Unit *pStageUnit;
+bool cam = false;
+VideoCapture cap(1);
+
+void cameraloop() {
+	while (1) {
+		Mat frame;
+		cap >> frame;
+		imshow("Camera Live", frame);
+		waitKey(1);
+	}
+}
+
+void spawnThreadAndLaunch() {
+	if(!cam){
+		cam = true;
+		if (!cap.isOpened()) { 
+			std::cout << "camera not found "; }
+		std::cout << "making threads";
+		std::thread t1(cameraloop);
+		std::cout << "starting loop";
+		t1.detach();
+	}
+}
+
 int main(int /* argc */, char ** /* argv */) {
+	int step = 1000;
 	try {
 		if (theHardwareModel) {
 			pRootUnit = theHardwareModel()->getUnit("");
@@ -683,11 +716,20 @@ int main(int /* argc */, char ** /* argv */) {
 					bool enabled = true;
 					FormHelper *gui = new FormHelper(screen);
 					ref<Window> asd = gui->addWindow(Eigen::Vector2i(10, 10), "Pipette Controller");
-
+				/*	auto stepb= asd->add<IntBox<int>>();
+					stepb->setEditable(true);
+					stepb->setCallback([step] {
+					//	step = stepb->value();
+					});*/
+					gui->addButton("Camera", []() { 
+						std::cout << "camera opened" << std::endl;
+						spawnThreadAndLaunch(); });
+					
+					
 					gui->addVariable("setX", ivar)->setSpinnable(true);
 					gui->addVariable("setY", ivar)->setSpinnable(true);
 					gui->addVariable("setZ", ivar)->setSpinnable(true);
-
+				
 					gui->addButton("X- button", []() { std::cout << "pipetteX- pressed." << std::endl; });
 					gui->addButton("X+ button", []() { std::cout << "pipetteX+ pressed." << std::endl; });
 					gui->addButton("Y- button", []() { std::cout << "pipetteY- pressed." << std::endl; });
@@ -705,18 +747,18 @@ int main(int /* argc */, char ** /* argv */) {
 					gui->addVariable("setY", ivar)->setSpinnable(true);
 					int x=0;
 					int y =0;
-					int step=1;
+				
 					gui->addVariable("stepsize", step)->setSpinnable(true);
-					gui->addButton("X- button", [step]() {
+					gui->addButton("X- button", [&,step,y]() {
 						std::cout << "stageX- pressed." << std::endl; 
 						Stage stage(pStageUnit);
 						iop::int32 xx = stage.XAxis().getCurrentPosition();
 						std::cout << "x pos:" << xx << std::endl;
 						iop::int32 yy = stage.YAxis().getCurrentPosition();
 						std::cout << "y pos:" << yy << std::endl;
-						iop::int32 mv = (iop::int32)step -xx;
+						iop::int32 mv = xx -  (iop::int32)step ;
 						stage.XAxis().moveToAsync(mv);
-					
+						int y = 10; 
 					
 					});
 					gui->addButton("X+ button", [step]() {
@@ -726,7 +768,7 @@ int main(int /* argc */, char ** /* argv */) {
 						std::cout << "x pos:" << xx << std::endl;
 						iop::int32 yy = stage.YAxis().getCurrentPosition();
 						std::cout << "y pos:" << yy << std::endl; 
-						iop::int32 mv = (iop::int32)step + xx;
+						iop::int32 mv = xx+ (iop::int32)step ;
 						stage.XAxis().moveToAsync(mv);
 						
 					});
@@ -740,18 +782,17 @@ int main(int /* argc */, char ** /* argv */) {
 						std::cout << "x pos:" << xx << std::endl;
 						iop::int32 yy = stage.YAxis().getCurrentPosition();
 						std::cout << "y pos:" << yy << std::endl;
-						iop::int32 mv = (iop::int32)step - xx;
+						iop::int32 mv = yy -(iop::int32)step ;
 						stage.YAxis().moveToAsync(mv);
 					});
 					gui->addButton("Y+ button", [step]() { 
 						std::cout << "stageY+ pressed." << std::endl;
-						std::cout << "stageY- pressed." << std::endl;
 						Stage stage(pStageUnit);
 						iop::int32 xx = stage.XAxis().getCurrentPosition();
 						std::cout << "x pos:" << xx << std::endl;
 						iop::int32 yy = stage.YAxis().getCurrentPosition();
 						std::cout << "y pos:" << yy << std::endl;
-						iop::int32 mv = (iop::int32)step + xx;
+						iop::int32 mv = yy + (iop::int32)step;
 						stage.YAxis().moveToAsync(mv);
 					
 					});
@@ -763,6 +804,7 @@ int main(int /* argc */, char ** /* argv */) {
 
 					screen->setVisible(true);
 					screen->performLayout();
+					
 					nanogui::mainloop();
 				}
 

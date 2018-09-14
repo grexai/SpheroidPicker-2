@@ -28,23 +28,24 @@ int main(){
   port.set_option( PARITY );
   port.set_option( STOP );
 
-  unsigned char input;
-  char c;
+  unsigned char input[100];
+  char c[100];
   while(1){
     // Send -------------------------------------------------------------------
     // What to send
+    // Receive response -------------------------------------------------------
+    read(port,buffer(&c,1));
+    cout << c << endl;
     cin >> input;
 
     // Output buffer
-    unsigned char command[1] = {0};
+    unsigned char command[6] = {0};
 
     // Convert and send
     command[0] = static_cast<unsigned char>( input );
     write(port, buffer(command, 1));
 
-    // Receive response -------------------------------------------------------
-    read(port,buffer(&c,1));
-    cout << c << endl;
+ 
   }
 
   return 0;
