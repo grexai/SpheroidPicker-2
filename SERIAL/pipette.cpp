@@ -9,7 +9,7 @@ using namespace::boost::asio;
 using namespace std;
 
 // ADD THE PORT 
-#define PORT "/dev/ttyUSB0"
+#define PORT "/dev/ttyACM1"
 
 // Set up
 serial_port_base::baud_rate BAUD(115200);
