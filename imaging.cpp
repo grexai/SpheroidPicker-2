@@ -1,17 +1,26 @@
 #include "imaging.h"
-
+#include <thread>
 
 imaging::imaging()
 {
 
 }
 
-
-void imaging::cameraloop() {
-    while (1) {
-        Mat frame;
-        cap >> frame;
-        imshow("Camera Live", frame);
-        waitKey(1);
-    }
+Mat imaging::getframe()
+{
+    return this->frame;
 }
+
+
+Mat imaging::setframe(Mat &input){
+   return this->frame= input;
+}
+
+VideoCapture imaging::getCamera(){
+    return 1;
+}
+
+void imaging::setvideodevice(int devn){
+
+}
+

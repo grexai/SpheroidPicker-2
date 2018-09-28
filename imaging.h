@@ -10,10 +10,18 @@ class imaging
 {
 public:
     imaging();
-    void cameraloop();
+//    ~imaging();
+
+
+ //   void cameraloop();
+//    void SpawnThreadAndLaunch();
+    Mat getframe();
+    Mat setframe(Mat &input);
+    VideoCapture getCamera();
+    void setvideodevice(int devn);
+
 private:
-    VideoCapture cap;
-    bool cam = false;
+    Mat frame;
 
 
 };

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1372</width>
-    <height>677</height>
+    <width>1071</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>150</y>
+      <y>180</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -34,7 +34,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>150</y>
+      <y>180</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -42,12 +42,18 @@
     <property name="text">
      <string>X-</string>
     </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="default">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton_3">
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>100</y>
+      <y>130</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -60,7 +66,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>200</y>
+      <y>230</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -152,15 +158,15 @@
      <rect>
       <x>350</x>
       <y>20</y>
-      <width>1001</width>
-      <height>591</height>
+      <width>701</width>
+      <height>491</height>
      </rect>
     </property>
    </widget>
    <widget class="QSpinBox" name="spinBox">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>290</x>
       <y>30</y>
       <width>43</width>
       <height>22</height>
@@ -196,24 +202,63 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>60</y>
+      <x>40</x>
+      <y>90</y>
       <width>47</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Steps</string>
+     <string>Steps size</string>
     </property>
    </widget>
    <widget class="QSpinBox" name="spinBox_2">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>60</y>
+      <x>100</x>
+      <y>90</y>
       <width>43</width>
       <height>22</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Campushbtn">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>30</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Camera</string>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>300</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>24</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>30</y>
+      <width>47</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Steps size</string>
     </property>
    </widget>
   </widget>
@@ -222,10 +267,25 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1372</width>
+     <width>1071</width>
      <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFIle">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuTheme">
+    <property name="title">
+     <string>Theme</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionDark_Mode"/>
+   </widget>
+   <addaction name="menuFIle"/>
+   <addaction name="menuTheme"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -236,6 +296,16 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionDark_Mode">
+   <property name="text">
+    <string>Dark Mode</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
