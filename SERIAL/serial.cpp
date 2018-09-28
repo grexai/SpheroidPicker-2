@@ -9,7 +9,7 @@ using namespace::boost::asio;
 using namespace std;
 
 // ADD THE PORT 
-#define PORT "/dev/ttyUSB0"
+#define PORT "/dev/ttyACM0"
 
 // Set up
 serial_port_base::baud_rate BAUD(115200);
@@ -41,18 +41,13 @@ int main(){
 	// io obejct creation
 	io_service io;
 	//creating a port object
-cout << "lofas	";
 	serial_port port( io, PORT );
 
 	//set the serial ports basic settings
 	port.set_option( BAUD );
-cout<< "asdasdas";
 	port.set_option( FLOW );
-cout<< "asdasdas1";
 	port.set_option( PARITY );
-cout<< "asdasdas2";
 	port.set_option( STOP );
-cout<< "asdasdas3	";
 	// create varriables
 	unsigned char command[100];
 	char c;
