@@ -16,6 +16,7 @@
 *.swp
 *.exe
 *.app
+*.autosave
 ASP/x64
 ASP/ipch
 ASP/ASP/x64
