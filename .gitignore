@@ -15,6 +15,7 @@
 *.pgm
 *.swp
 *.exe
+*.app
 ASP/x64
 ASP/ipch
 ASP/ASP/x64

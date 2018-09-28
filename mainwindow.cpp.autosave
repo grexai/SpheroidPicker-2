@@ -61,9 +61,7 @@ void MainWindow::update_window()
     cap.read( cframe);
     cvtColor(cframe,cframe,CV_BGR2RGB,0);
     imaging.setframe(cframe);
-
-
-
+    
     auto scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888)));
