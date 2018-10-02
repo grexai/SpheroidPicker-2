@@ -21,19 +21,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
-
+QT += serialport
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
     main.cpp \
     mainwindow.cpp \
     imaging.cpp \
-    stagecontroller.cpp
+    stagecontroller.cpp \
+    pipettercontroller.cpp \
+    serialcom.cpp
 
 HEADERS += \
         mainwindow.h \
     mainwindow.h \
-    imaging.h
+    imaging.h \
+    pipettercontroller.h \
+    serialcom.h
 
 FORMS += \
         mainwindow.ui
@@ -80,5 +84,4 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341d
 else:unix: LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
 
-#INCLUDEPATH += $$PWD/../../../Libraries/OpenCV/opencv/build/include
-#DEPENDPATH += $$PWD/../../../Libraries/OpenCV/opencv/build/include
+

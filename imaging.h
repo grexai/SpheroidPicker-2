@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv/highgui.h>
 
-using namespace cv;
+
 
 
 class imaging
@@ -15,13 +15,13 @@ public:
 
  //   void cameraloop();
 //    void SpawnThreadAndLaunch();
-    Mat getframe();
-    Mat setframe(Mat &input);
-    VideoCapture getCamera();
+    cv::Mat getframe();
+    cv::Mat setframe(cv::Mat &input);
+    cv::VideoCapture getCamera();
     void setvideodevice(int devn);
 
 private:
-    Mat frame;
+    cv::Mat frame;
 
 
 };

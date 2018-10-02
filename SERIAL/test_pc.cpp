@@ -13,7 +13,7 @@ serial_port_base::stop_bits STOP( serial_port_base::stop_bits::one );
 
 int main(){
 	io_service io;
-	serial_port port( io, "/dev/ttyACM1" );
+	serial_port port( io, "/dev/ttyACM0" );
 	ArduinoPressureController pc(port);
 	cout << "PC created." << endl;
 	string command;

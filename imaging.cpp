@@ -1,22 +1,23 @@
 #include "imaging.h"
 #include <thread>
 
+
 imaging::imaging()
 {
 
 }
 
-Mat imaging::getframe()
+cv::Mat imaging::getframe()
 {
     return this->frame;
 }
 
 
-Mat imaging::setframe(Mat &input){
+cv::Mat imaging::setframe(cv::Mat &input){
    return this->frame= input;
 }
 
-VideoCapture imaging::getCamera(){
+cv::VideoCapture imaging::getCamera(){
     return 1;
 }
 
