@@ -3,6 +3,7 @@
 #include "imaging.h"
 #include <thread>
 #include <QStyleFactory>
+#include <serialcom.h>
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
@@ -119,27 +120,33 @@ void MainWindow::on_Home_pip_clicked()
 
 void MainWindow::on_Con_pc_clicked()
 {
-
-     qsp_pc.setPortName("COM10");
+    serialcom sp(qsp_pc);
+    bool ispipopened= sp.openport("COM10");
+    /*
+      qsp_pc.setPortName("COM10");
       qsp_pc.setBaudRate(QSerialPort::Baud115200);
       qsp_pc.setDataBits(QSerialPort::Data8);
       qsp_pc.setParity(QSerialPort::NoParity);
       qsp_pc.setStopBits(QSerialPort::OneStop);
       qsp_pc.setFlowControl(QSerialPort::NoFlowControl);
-
-     if (qsp_pc.open(QIODevice::ReadWrite))
+*/
+     if (ispipopened)
      {
          ui->pc_stat->setText("status:  connected");
      }
      else{
          ui->pc_stat->setText("status: Fila");
      }
+
      (qsp_pc.flush());;
 }
 
 void MainWindow::on_Con_pip_clicked()
 {
 
+    serialcom sp(qsp_pip);
+    bool ispcopened = sp.openport("COM13");
+    /*
     qsp_pip.setPortName("COM13");
      qsp_pip.setBaudRate(QSerialPort::Baud115200);
      qsp_pip.setDataBits(QSerialPort::Data8);
@@ -147,13 +154,15 @@ void MainWindow::on_Con_pip_clicked()
      qsp_pip.setStopBits(QSerialPort::OneStop);
      qsp_pip.setFlowControl(QSerialPort::NoFlowControl);
       ui->pip_stat->setText("status: connecting");
-    if (qsp_pip.open(QIODevice::ReadWrite))
+      */
+    if (ispcopened)
     {
         ui->pip_stat->setText("status: connected");
     }
     else{
         ui->pip_stat->setText("Fila");
     }
+
      qsp_pip.flush();
 }
 

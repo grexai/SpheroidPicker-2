@@ -1,6 +1,7 @@
 #ifndef SERIALCOM_H
 #define SERIALCOM_H
 #include <QtSerialPort/QSerialPort>
+#include <iostream>
 
 class serialcom
 {
@@ -12,7 +13,7 @@ public:
     serialcom(QSerialPort& i_sp): sp(i_sp){
 
     }
-    void openport();
+    bool openport(std::string com);
     void pflush();
     void sendHOME();
 };

@@ -20,19 +20,20 @@ public:
     void SpawnThreadAndLaunch();
 
     void porttest();
- QSerialPort qsp_pip;
- QSerialPort qsp_pc;
+    QSerialPort qsp_pip;
+    QSerialPort qsp_pc;
 public slots:
 
 private slots:
      void on_Campushbtn_clicked();
+
      void update_window();
+
      void on_actionDark_Mode_triggered();
-     void on_Home_pip_clicked();
 
      void on_actionExit_triggered();
 
-
+     void on_Home_pip_clicked();
 
      void on_Con_pc_clicked();
 
