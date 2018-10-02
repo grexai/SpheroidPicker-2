@@ -96,69 +96,76 @@ void porttest(){
 
 
 }
-void MainWindow::on_pushButton_13_clicked()
-{
 
-    ui->label_3->setText("connecting0");
-     qsp.setPortName("COM10");
-    ui->label_3->setText("connecting1");
-      qsp.setBaudRate(QSerialPort::Baud115200);
-      qsp.setDataBits(QSerialPort::Data8);
-      qsp.setParity(QSerialPort::NoParity);
-      qsp.setStopBits(QSerialPort::OneStop);
-      qsp.setFlowControl(QSerialPort::NoFlowControl);
-      ui->label_3->setText("connecting");
-     if (qsp.open(QIODevice::ReadWrite))
-     {
-         ui->label_3->setText("connected");
-     }
-     else{
-         ui->label_3->setText("Fila");
-     }
-     (qsp.flush());
-     QByteArray s;
-
-     QString command = "9,-100,10;";
-     QByteArray s1;
-     s1 = qsp.readAll();
-     qsp.waitForReadyRead(1000);
-
-     QByteArray x =command.toLocal8Bit();
-     qsp.write(x);
-
-
-}
 
 void MainWindow::on_actionExit_triggered()
 {
     QCoreApplication::exit(0);
 }
 
-void MainWindow::on_pushButton_11_clicked()
+void MainWindow::on_Home_pip_clicked()
 {
-    ui->label_3->setText("connecting0");
-     qsp.setPortName("COM13");
-    ui->label_3->setText("connecting1");
-      qsp.setBaudRate(QSerialPort::Baud115200);
-      qsp.setDataBits(QSerialPort::Data8);
-      qsp.setParity(QSerialPort::NoParity);
-      qsp.setStopBits(QSerialPort::OneStop);
-      qsp.setFlowControl(QSerialPort::NoFlowControl);
-       ui->label_3->setText("connecting");
-     if (qsp.open(QIODevice::ReadWrite))
-     {
-         ui->label_3->setText("connected");
-     }
-     else{
-         ui->label_3->setText("Fila");
-     }
-     (qsp.flush());
+
      QByteArray s;
-     s = qsp.readAll();
-     qsp.waitForReadyRead(1000);
+     s =  qsp_pip.readAll();
+      qsp_pip.waitForReadyRead(1000);
            ui->label_3->setText(s);
      QString command = "G28\r\n";
 
      QByteArray x =command.toLocal8Bit();
-     qsp.write(x);
+      qsp_pip.write(x);
+}
+
+
+void MainWindow::on_Con_pc_clicked()
+{
+
+     qsp_pc.setPortName("COM10");
+      qsp_pc.setBaudRate(QSerialPort::Baud115200);
+      qsp_pc.setDataBits(QSerialPort::Data8);
+      qsp_pc.setParity(QSerialPort::NoParity);
+      qsp_pc.setStopBits(QSerialPort::OneStop);
+      qsp_pc.setFlowControl(QSerialPort::NoFlowControl);
+
+     if (qsp_pc.open(QIODevice::ReadWrite))
+     {
+         ui->pc_stat->setText("status:  connected");
+     }
+     else{
+         ui->pc_stat->setText("status: Fila");
+     }
+     (qsp_pc.flush());;
+}
+
+void MainWindow::on_Con_pip_clicked()
+{
+
+    qsp_pip.setPortName("COM13");
+     qsp_pip.setBaudRate(QSerialPort::Baud115200);
+     qsp_pip.setDataBits(QSerialPort::Data8);
+     qsp_pip.setParity(QSerialPort::NoParity);
+     qsp_pip.setStopBits(QSerialPort::OneStop);
+     qsp_pip.setFlowControl(QSerialPort::NoFlowControl);
+      ui->pip_stat->setText("status: connecting");
+    if (qsp_pip.open(QIODevice::ReadWrite))
+    {
+        ui->pip_stat->setText("status: connected");
+    }
+    else{
+        ui->pip_stat->setText("Fila");
+    }
+     qsp_pip.flush();
+}
+
+void MainWindow::on_SetPressure_clicked()
+{
+    QByteArray s;
+
+    QString command = "9,-100,10;";
+    QByteArray s1;
+    s1 = qsp_pc.readAll();
+    qsp_pc.waitForReadyRead(1000);
+
+    QByteArray x =command.toLocal8Bit();
+    qsp_pc.write(x);
 }

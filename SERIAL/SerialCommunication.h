@@ -17,6 +17,7 @@ class SerialCommunication
 	  SEND = TCOFLUSH,
 	  BOTH = TCIOFLUSH
 	};
+
 	SerialCommunication(boost::asio::serial_port& input_port) : port(input_port) { }
  	void send(const std::string& msg);
 	std::string* sendAndReceive(const std::string& msg);
