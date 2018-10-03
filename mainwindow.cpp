@@ -129,7 +129,7 @@ void MainWindow::on_Con_pc_clicked()
       qsp_pc.setParity(QSerialPort::NoParity);
       qsp_pc.setStopBits(QSerialPort::OneStop);
       qsp_pc.setFlowControl(QSerialPort::NoFlowControl);
-*/
+    */
      if (ispipopened)
      {
          ui->pc_stat->setText("status:  connected");

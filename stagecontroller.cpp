@@ -527,7 +527,6 @@ void stage_sample(ahm::Unit *pRootUnit) {
         std::cout << "stage_sample: no stage found!" << std::endl;
         return;
     }
-
     Stage stage(pStageUnit);
     stage.printWhatIsSupported();
 
@@ -541,6 +540,7 @@ void stage_sample(ahm::Unit *pRootUnit) {
     iop::int32 y0 = stage.YAxis().getMinPosition();
     iop::int32 y1 = stage.YAxis().getMaxPosition();
     std::cout << "moving to minimum" << std::endl;
+
     stage.moveToAsync(x0, y0, true); // move to min corner and wait
 
     std::cout << "current position: " << stage.XAxis().toMicrons(stage.XAxis().getCurrentPosition()) << ";" << stage.YAxis().toMicrons(stage.YAxis().getCurrentPosition()) << std::endl;
