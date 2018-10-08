@@ -34,8 +34,8 @@ std::string* SerialCommunication::sendAndReceive(
 	while (answer->length() < ansendlen || (answer->compare(answer->length()-ansendlen, ansendlen, ansEnd)!=0)) 
 	{
 //		std::cout << "Reading char." << std::endl;
-		//boost::asio::read(port, buf);
-		boost::asio::read(this->port, boost::asio::buffer(&c, sizeof(unsigned char)), ec);
+        //boost::asio::read(port, buf);
+        boost::asio::read(this->port, boost::asio::buffer(&c, sizeof(unsigned char)), ec);
 		if (ec == boost::asio::error::eof) {
 			std::cout << "EOF received " << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -105,7 +105,8 @@ void SerialCommunication::flush(
   boost::system::error_code& error)
 {
 	std::lock_guard<std::mutex> lock(comm_mutex);
-	if (0 == tcflush(this->port.lowest_layer().native_handle(), type))
+    /*
+    if (0 == tcflush(this->port.lowest_layer().native_handle(), type))
 	{
 		error = boost::system::error_code();
 //		std::cout << "Error1 value: " << error << std::endl;
@@ -115,6 +116,7 @@ void SerialCommunication::flush(
 		error = boost::system::error_code(errno,
 			boost::asio::error::get_system_category());
 //		std::cout << "Error2 value: " << error << std::endl;
-	}
+    }
+    */
 }
 	

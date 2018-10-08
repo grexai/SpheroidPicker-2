@@ -3,7 +3,7 @@
 #include "imaging.h"
 #include <thread>
 #include <QStyleFactory>
-#include <serialcom.h>
+#include <pipettercontroller.h>
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
@@ -21,11 +21,11 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
     darkPalette.setColor(QPalette::ToolTipText, Qt::white);
     darkPalette.setColor(QPalette::Text, Qt::white);
-
+    //darkPalette.setColor(QPalette::)
     darkPalette.setColor(QPalette::Button, QColor(0,0,0));
 
     darkPalette.setBrush(QPalette::Button,QColor(40,40,40));
-    darkPalette.setColor(QPalette::ButtonText, Qt::black);
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
 
     darkPalette.setColor(QPalette::BrightText, Qt::red);
     darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
@@ -40,12 +40,15 @@ void setdarkstyle(){
 
 }
 
+QString port = "COM10";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-     timer = new QTimer(this);
+    timer = new QTimer(this);
 }
 
 MainWindow::~MainWindow()
@@ -59,7 +62,7 @@ void MainWindow::displayImage(){
 
 void MainWindow::update_window()
 {
-
+    //sp->openport("asd");
     cv::Mat cframe;
     cap.read( cframe);
     cvtColor(cframe,cframe,CV_BGR2RGB,0);
@@ -117,64 +120,74 @@ void MainWindow::on_Home_pip_clicked()
       qsp_pip.write(x);
 }
 
+// QSerialPort qsp_pc;
+// serialcom sp(qsp_pc);
 
 void MainWindow::on_Con_pc_clicked()
 {
-    serialcom sp(qsp_pc);
-    bool ispipopened= sp.openport("COM10");
-    /*
-      qsp_pc.setPortName("COM10");
-      qsp_pc.setBaudRate(QSerialPort::Baud115200);
-      qsp_pc.setDataBits(QSerialPort::Data8);
-      qsp_pc.setParity(QSerialPort::NoParity);
-      qsp_pc.setStopBits(QSerialPort::OneStop);
-      qsp_pc.setFlowControl(QSerialPort::NoFlowControl);
-    */
-     if (ispipopened)
-     {
-         ui->pc_stat->setText("status:  connected");
-     }
-     else{
-         ui->pc_stat->setText("status: Fila");
-     }
+    acp = new arduinopressurecontroller(qsp_pc,port);
+    if (acp->isconnected)
+    {
+        ui->pc_stat->setText(con_str);
+    }
+    else{
+        ui->pc_stat->setText(fail_str);
 
-     (qsp_pc.flush());;
+    }
+
+
 }
 
 void MainWindow::on_Con_pip_clicked()
 {
-
-    serialcom sp(qsp_pip);
-    bool ispcopened = sp.openport("COM13");
-    /*
-    qsp_pip.setPortName("COM13");
-     qsp_pip.setBaudRate(QSerialPort::Baud115200);
-     qsp_pip.setDataBits(QSerialPort::Data8);
-     qsp_pip.setParity(QSerialPort::NoParity);
-     qsp_pip.setStopBits(QSerialPort::OneStop);
-     qsp_pip.setFlowControl(QSerialPort::NoFlowControl);
-      ui->pip_stat->setText("status: connecting");
-      */
+   // serialcom sp(qsp_pip);
+    bool ispcopened = false;
+            //sp->openport("COM13");
     if (ispcopened)
     {
-        ui->pip_stat->setText("status: connected");
+        ui->pip_stat->setText(con_str);
+        qsp_pip.flush();
     }
     else{
-        ui->pip_stat->setText("Fila");
+        ui->pip_stat->setText(fail_str);
     }
 
-     qsp_pip.flush();
+ //   acp->breakIn(10,30);
+//  acp->acp_sc->openport("COM10");
+//  float p = acp->getPipettePressure();
 }
 
 void MainWindow::on_SetPressure_clicked()
 {
+    acp->breakIn(10,30);
+   // acp= new arduinopressurecontroller(sppc);
+    //arduinopressurecontroller aacp(sppc);
+
+    /*
+    QString cmd = "9,-100,10;";
+    QString ans;
+    sp->send(cmd);
+    */
+
+ //   arduinopressurecontroller asp(qsp_pipette);
+
+   // ans = sp->recive();
+
+
+ //   ui->label_3->setText(ans);
+/*
     QByteArray s;
 
     QString command = "9,-100,10;";
+
     QByteArray s1;
+
     s1 = qsp_pc.readAll();
+
     qsp_pc.waitForReadyRead(1000);
 
     QByteArray x =command.toLocal8Bit();
+
     qsp_pc.write(x);
+*/
 }

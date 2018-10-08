@@ -2,20 +2,24 @@
 #define SERIALCOM_H
 #include <QtSerialPort/QSerialPort>
 #include <iostream>
+#include <QtSerialPort>
 
 class serialcom
 {
 
+    std::mutex comm_mutex;
 
-   // ~serialcom(){}
 public:
+    serialcom(QSerialPort& i_sp): sp(i_sp){}
+     ~serialcom(){}
     QSerialPort& sp;
-    serialcom(QSerialPort& i_sp): sp(i_sp){
 
-    }
-    bool openport(std::string com);
-    void pflush();
-    void sendHOME();
+    bool openport(QString& com);
+    void send(QString& command);
+    QByteArray recive();
+    QByteArray sendAndReceive(const QString& msg, const QString& ansEnd);
+    void sp_flush();
+
 };
 
 #endif // SERIALCOM_H

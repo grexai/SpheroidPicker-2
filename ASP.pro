@@ -30,14 +30,16 @@ SOURCES += \
     imaging.cpp \
     stagecontroller.cpp \
     pipettercontroller.cpp \
-    serialcom.cpp
+    serialcom.cpp \
+    arduinopressurecontroller.cpp \
 
 HEADERS += \
         mainwindow.h \
     mainwindow.h \
     imaging.h \
     pipettercontroller.h \
-    serialcom.h
+    serialcom.h \
+    arduinopressurecontroller.h \
 
 FORMS += \
         mainwindow.ui

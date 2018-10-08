@@ -5,29 +5,29 @@
 #include <mutex>
 #include <iostream>
 
+
 class SerialCommunication
 {
 	static const std::string EOM;
 	boost::asio::serial_port& port;
 	std::mutex comm_mutex; // mutex for communication over serial port
-	public:
-	enum FLUSH
-	{
-	  RECEIVE = TCIFLUSH,
-	  SEND = TCOFLUSH,
-	  BOTH = TCIOFLUSH
-	};
-
+    public:
+    enum FLUSH
+    {
+      RECEIVE = 0,
+      SEND = 1,
+      BOTH = 2
+    };
 	SerialCommunication(boost::asio::serial_port& input_port) : port(input_port) { }
  	void send(const std::string& msg);
 	std::string* sendAndReceive(const std::string& msg);
 	std::string* sendAndReceive(const std::string& msg, const std::string& ansEnd);
 	std::string* receive();
 	std::string* receive(const std::string& ansEnd);
-	void flush();
-	void flush(const SerialCommunication::FLUSH type);
-	void flush(const SerialCommunication::FLUSH type, boost::system::error_code& error);
-	
+    void flush();
+    void flush(const SerialCommunication::FLUSH type);
+    void flush(const SerialCommunication::FLUSH type, boost::system::error_code& error);
+
 	
 	
 

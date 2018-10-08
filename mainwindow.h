@@ -3,7 +3,10 @@
 #include <QThread>
 #include <QTimer>
 #include <QMainWindow>
-#include <QtSerialPort/QSerialPort>
+//#include <QtSerialPort/QSerialPort>
+//#include <serialcom.h>
+#include <arduinopressurecontroller.h>
+
 
 namespace Ui {
 class MainWindow;
@@ -14,16 +17,28 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    QString con_str= "Connected";
+
+    QString fail_str = "Failed";
+
     explicit MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
+
     void displayImage();
+
     void SpawnThreadAndLaunch();
 
     void porttest();
-    QSerialPort qsp_pip;
-    QSerialPort qsp_pc;
+
 public slots:
 
+protected:
+    serialcom *sp = nullptr;
+    serialcom *sppc = nullptr;
+    arduinopressurecontroller* acp= nullptr ;
+    QSerialPort qsp_pip;
+    QSerialPort qsp_pc;
 private slots:
      void on_Campushbtn_clicked();
 
@@ -44,6 +59,7 @@ private slots:
 private:
     QTimer *timer;
     Ui::MainWindow *ui;
+
 };
 
 #endif // MAINWINDOW_H
