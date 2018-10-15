@@ -7,9 +7,10 @@
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
-imaging imaging;
+
 bool cam = false;
 cv::VideoCapture cap(0);
+imaging imaging;
 
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -21,22 +22,15 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
     darkPalette.setColor(QPalette::ToolTipText, Qt::white);
     darkPalette.setColor(QPalette::Text, Qt::white);
-    //darkPalette.setColor(QPalette::)
     darkPalette.setColor(QPalette::Button, QColor(0,0,0));
-
     darkPalette.setBrush(QPalette::Button,QColor(40,40,40));
     darkPalette.setColor(QPalette::ButtonText, Qt::white);
-
     darkPalette.setColor(QPalette::BrightText, Qt::red);
     darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-
     darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
     qApp->setPalette(darkPalette);
-
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-
 
 }
 
@@ -44,10 +38,10 @@ QString port = "COM10";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     timer = new QTimer(this);
 }
 

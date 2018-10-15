@@ -17,7 +17,7 @@ public:
     bool openport(QString& com);
     void send(QString& command);
     QByteArray recive();
-    QByteArray sendAndReceive(const QString& msg, const QString& ansEnd);
+    QByteArray sendAndReceive(QString& msg, const QString& ansEnd);
     void sp_flush();
 
 };

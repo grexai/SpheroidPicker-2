@@ -20,7 +20,7 @@ public:
     int error;
     QString EOM= ";\r\n"; //end of message
 
-    void checkAckOrSetError(const std::string& answer);
+    void checkAckOrSetError(QString& answer);
     void requestPressure(const float pressure);
     float getRequestedPressureValue();
     float getPipettePressure();
