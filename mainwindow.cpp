@@ -34,7 +34,7 @@ void setdarkstyle(){
 
 }
 
-QString port = "COM10";
+QString port = "COM5";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -146,42 +146,27 @@ void MainWindow::on_Con_pip_clicked()
         ui->pip_stat->setText(fail_str);
     }
 
- //   acp->breakIn(10,30);
+ //   acp->breakIn(-100,30);
+
 //  acp->acp_sc->openport("COM10");
 //  float p = acp->getPipettePressure();
 }
 
 void MainWindow::on_SetPressure_clicked()
 {
-    acp->breakIn(10,30);
-   // acp= new arduinopressurecontroller(sppc);
-    //arduinopressurecontroller aacp(sppc);
 
-    /*
-    QString cmd = "9,-100,10;";
-    QString ans;
-    sp->send(cmd);
-    */
+ // ui->label_3->setText(QString::number(ui->breakin_value->value()));
+    acp->requestPressure(100);
 
- //   arduinopressurecontroller asp(qsp_pipette);
+}
 
-   // ans = sp->recive();
+void MainWindow::on_atm_button_clicked()
+{
+    float pr=acp->getPipettePressure();
+    ui->label_3->setText(QString::number(pr));
+}
 
-
- //   ui->label_3->setText(ans);
-/*
-    QByteArray s;
-
-    QString command = "9,-100,10;";
-
-    QByteArray s1;
-
-    s1 = qsp_pc.readAll();
-
-    qsp_pc.waitForReadyRead(1000);
-
-    QByteArray x =command.toLocal8Bit();
-
-    qsp_pc.write(x);
-*/
+void MainWindow::on_pc_Breakin_button_clicked()
+{
+    acp->breakIn(ui->breakin_value->value(),ui->breakin_time->value());
 }

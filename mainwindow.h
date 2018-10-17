@@ -56,6 +56,10 @@ private slots:
 
      void on_SetPressure_clicked();
 
+     void on_atm_button_clicked();
+
+     void on_pc_Breakin_button_clicked();
+
 private:
     QTimer *timer;
     Ui::MainWindow *ui;

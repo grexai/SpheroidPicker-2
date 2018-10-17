@@ -19,8 +19,8 @@ bool serialcom::openport(QString& com){
 }
 
 void serialcom::send(QString& command){
-    QByteArray byte_command =command.toLocal8Bit();
     std::lock_guard<std::mutex> lock(comm_mutex);
+    QByteArray byte_command =command.toLocal8Bit();
     sp.write(byte_command);
     sp.waitForBytesWritten(-1);
 };
