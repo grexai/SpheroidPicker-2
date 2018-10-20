@@ -1,16 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "imaging.h"
+#include "imagetools.h"
 #include <thread>
 #include <QStyleFactory>
-#include <pipettercontroller.h>
+#include <PipetterController.h>
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
 
 bool cam = false;
 cv::VideoCapture cap(0);
-imaging imaging;
+imagetools imaging;
 
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -103,19 +103,8 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_Home_pip_clicked()
 {
-
-     QByteArray s;
-     s =  qsp_pip.readAll();
-      qsp_pip.waitForReadyRead(1000);
-           ui->label_3->setText(s);
-     QString command = "G28\r\n";
-
-     QByteArray x =command.toLocal8Bit();
-      qsp_pip.write(x);
+    apipc->goHome(false,false,false);
 }
-
-// QSerialPort qsp_pc;
-// serialcom sp(qsp_pc);
 
 void MainWindow::on_Con_pc_clicked()
 {
@@ -135,9 +124,11 @@ void MainWindow::on_Con_pc_clicked()
 void MainWindow::on_Con_pip_clicked()
 {
    // serialcom sp(qsp_pip);
-    bool ispcopened = false;
+    QString port2= "COM13";
+    apipc = new pipetteController(qsp_pip,port2);
+ //   bool ispcopened = false;
             //sp->openport("COM13");
-    if (ispcopened)
+    if (apipc->isconnected)
     {
         ui->pip_stat->setText(con_str);
         qsp_pip.flush();
@@ -170,3 +161,4 @@ void MainWindow::on_pc_Breakin_button_clicked()
 {
     acp->breakIn(ui->breakin_value->value(),ui->breakin_time->value());
 }
+

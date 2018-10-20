@@ -27,19 +27,20 @@ SOURCES += \
         mainwindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    imaging.cpp \
     stagecontroller.cpp \
-    pipettercontroller.cpp \
     serialcom.cpp \
     arduinopressurecontroller.cpp \
+    imagetools.cpp \
+    PipetteController.cpp
 
 HEADERS += \
         mainwindow.h \
     mainwindow.h \
-    imaging.h \
-    pipettercontroller.h \
     serialcom.h \
     arduinopressurecontroller.h \
+    PipetterController.h \
+    imagetools.h \
+    types.h
 
 FORMS += \
         mainwindow.ui

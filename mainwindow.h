@@ -6,7 +6,7 @@
 //#include <QtSerialPort/QSerialPort>
 //#include <serialcom.h>
 #include <arduinopressurecontroller.h>
-
+#include <pipettercontroller.h>
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +37,7 @@ protected:
     serialcom *sp = nullptr;
     serialcom *sppc = nullptr;
     arduinopressurecontroller* acp= nullptr ;
+    pipetteController* apipc= nullptr;
     QSerialPort qsp_pip;
     QSerialPort qsp_pc;
 private slots:

@@ -6,11 +6,11 @@
 
 
 
-class imaging
+class imagetools
 {
 public:
-    imaging();
-//    ~imaging();
+    imagetools(){}
+    ~imagetools(){}
 
 
  //   void cameraloop();
@@ -19,6 +19,12 @@ public:
     cv::Mat setframe(cv::Mat &input);
     cv::VideoCapture getCamera();
     void setvideodevice(int devn);
+
+    cv::Mat threshimage(cv::Mat input,int thresh);
+
+    int getSphCoors();
+
+
 
 private:
     cv::Mat frame;

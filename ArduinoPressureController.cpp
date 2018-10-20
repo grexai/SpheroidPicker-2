@@ -3,6 +3,7 @@
 #include <iomanip> // setprecision
 #include <sstream> // stringstream
 #include <regex>
+
 const int arduinopressurecontroller::UnknownError = INT_MAX;
 
 void arduinopressurecontroller::requestPressure(const float pressure){
