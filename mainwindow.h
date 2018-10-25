@@ -6,7 +6,7 @@
 //#include <QtSerialPort/QSerialPort>
 //#include <serialcom.h>
 #include <arduinopressurecontroller.h>
-#include <pipettercontroller.h>
+#include <pipettecontroller.h>
 
 namespace Ui {
 class MainWindow;
@@ -60,6 +60,28 @@ private slots:
      void on_atm_button_clicked();
 
      void on_pc_Breakin_button_clicked();
+
+     void on_get_coors_pushButton_clicked();
+
+     void on_s_xp_button_clicked();
+
+     void on_s_xm_button_clicked();
+
+     void on_s_yp_button_clicked();
+
+     void on_s_ym_button_clicked();
+
+     void on_p_xp_button_clicked();
+
+     void on_p_xm_button_clicked();
+
+     void on_p_yp_button_clicked();
+
+     void on_p_ym_button_clicked();
+
+     void on_p_zp_button_clicked();
+
+     void on_p_zm_btton_clicked();
 
 private:
     QTimer *timer;

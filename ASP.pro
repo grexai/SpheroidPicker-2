@@ -38,9 +38,9 @@ HEADERS += \
     mainwindow.h \
     serialcom.h \
     arduinopressurecontroller.h \
-    PipetterController.h \
     imagetools.h \
-    types.h
+    types.h \
+    PipetteController.h
 
 FORMS += \
         mainwindow.ui

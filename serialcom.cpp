@@ -7,13 +7,12 @@ bool serialcom::openport(QString& com){
     this->sp.setParity(QSerialPort::NoParity);
     this->sp.setStopBits(QSerialPort::OneStop);
     this->sp.setFlowControl(QSerialPort::NoFlowControl);
-
-   if ( this->sp.open(QIODevice::ReadWrite))
+    this->sp.open(QIODevice::ReadWrite);
+   if ( sp.isOpen() && sp.isWritable() )
    {
       return true;
    }
    else{
-
       return false;
    }
 }
@@ -22,25 +21,26 @@ void serialcom::send(QString& command){
     std::lock_guard<std::mutex> lock(comm_mutex);
     QByteArray byte_command =command.toLocal8Bit();
     sp.write(byte_command);
-    sp.waitForBytesWritten(-1);
+    sp.waitForBytesWritten(100);
 };
 
 QByteArray  serialcom::recive(){
     std::lock_guard<std::mutex> lock(comm_mutex);
     QByteArray answer = sp.readLine();
-    sp.waitForReadyRead(-1);
+    sp.waitForReadyRead(100);
     return answer;
 }
 
 QByteArray serialcom::sendAndReceive(QString& msg,const QString& ansEnd)
 {
     std::lock_guard<std::mutex> lock(comm_mutex);
-    QString cmd = msg.append(ansEnd);
+    QString cmd = msg.append(";\r\n");
     QByteArray byte_command = msg.toLocal8Bit();
     sp.write(byte_command);
-    sp.waitForBytesWritten(-1);
-    QByteArray answer = sp.readLine();
-    sp.waitForReadyRead(-1);
+    sp.waitForBytesWritten(100);
+    sp.waitForReadyRead(100);
+    QByteArray answer = sp.readAll();
+    sp.waitForReadyRead(200);
     return answer;
 }
 

@@ -252,7 +252,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>450</y>
+      <y>410</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -264,8 +264,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>360</y>
+      <x>370</x>
+      <y>110</y>
       <width>191</width>
       <height>151</height>
      </rect>
@@ -356,7 +356,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>480</y>
+      <y>440</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -369,7 +369,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>420</y>
+      <y>380</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -385,7 +385,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>420</y>
+      <y>380</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -398,7 +398,7 @@
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>420</y>
+      <y>380</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -414,7 +414,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>450</y>
+      <y>410</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -427,7 +427,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>390</y>
+      <y>350</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -440,13 +440,75 @@
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>390</y>
+      <y>350</y>
       <width>47</width>
       <height>13</height>
      </rect>
     </property>
     <property name="text">
      <string>Time</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdNumber">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>380</y>
+      <width>91</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="get_coors_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>90</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>get coors</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>470</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>+ pressure</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>500</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>- pressure</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>350</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Current Pressure</string>
     </property>
    </widget>
   </widget>

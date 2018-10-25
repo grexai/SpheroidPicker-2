@@ -3,7 +3,7 @@
 #include "imagetools.h"
 #include <thread>
 #include <QStyleFactory>
-#include <PipetterController.h>
+#include <PipetteController.h>
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
@@ -124,7 +124,7 @@ void MainWindow::on_Con_pc_clicked()
 void MainWindow::on_Con_pip_clicked()
 {
    // serialcom sp(qsp_pip);
-    QString port2= "COM13";
+    QString port2= "COM13"; //13
     apipc = new pipetteController(qsp_pip,port2);
  //   bool ispcopened = false;
             //sp->openport("COM13");
@@ -162,3 +162,72 @@ void MainWindow::on_pc_Breakin_button_clicked()
     acp->breakIn(ui->breakin_value->value(),ui->breakin_time->value());
 }
 
+
+void MainWindow::on_get_coors_pushButton_clicked()
+{
+    QByteArray  ans;
+
+    Float3coor randx = apipc->getcurrentpos(ans);
+
+    QString s(ans);
+    QStringList resultStrings =  s.split(':');
+    ui->label_3->setText(resultStrings.at(0));
+    ui->label_3->setText(s);
+
+}
+
+void MainWindow::on_s_xp_button_clicked()
+{
+
+}
+
+void MainWindow::on_s_xm_button_clicked()
+{
+
+}
+
+void MainWindow::on_s_yp_button_clicked()
+{
+
+}
+
+void MainWindow::on_s_ym_button_clicked()
+{
+
+}
+
+void MainWindow::on_p_xp_button_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToXAsync(ui->pip_step_spinbox->value());
+}
+
+void MainWindow::on_p_xm_button_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToXAsync(-(ui->pip_step_spinbox->value()));
+}
+
+void MainWindow::on_p_yp_button_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToYAsync(ui->pip_step_spinbox->value());
+}
+
+void MainWindow::on_p_ym_button_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToYAsync(-(ui->pip_step_spinbox->value()));
+}
+
+void MainWindow::on_p_zp_button_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToZAsync(ui->pip_step_spinbox->value());
+}
+
+void MainWindow::on_p_zm_btton_clicked()
+{
+    apipc->setrelativepositioning();
+    apipc->moveToZAsync(-(ui->pip_step_spinbox->value()));
+}
