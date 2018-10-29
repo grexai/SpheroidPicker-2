@@ -45,6 +45,10 @@ private slots:
 
      void update_window();
 
+     void update_currentpressure();
+
+     void show_currentpressure();
+
      void on_actionDark_Mode_triggered();
 
      void on_actionExit_triggered();
@@ -83,8 +87,12 @@ private slots:
 
      void on_p_zm_btton_clicked();
 
+     void on_lcdNumber_overflow();
+
 private:
     QTimer *timer;
+    QTimer *disp_pressure;
+
     Ui::MainWindow *ui;
 
 };

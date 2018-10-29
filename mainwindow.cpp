@@ -34,7 +34,7 @@ void setdarkstyle(){
 
 }
 
-QString port = "COM5";
+QString port = "COM10";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     timer = new QTimer(this);
+    disp_pressure= new QTimer(this);
 }
 
 MainWindow::~MainWindow()
@@ -68,8 +69,20 @@ void MainWindow::update_window()
 
 }
 
+void MainWindow::update_currentpressure(){
+ //   float cp = acp->getPipettePressure();
 
+ //   return dist(*QRandomGenerator::global());
+    float cp = (QRandomGenerator::global()->generate64());
+    QString cps = QString::number(cp);
+    ui->lcdNumber->display(cps);
 
+}
+void MainWindow::show_currentpressure(){
+    update_currentpressure();
+    connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
+    disp_pressure->start(250);
+}
 
 void MainWindow::on_Campushbtn_clicked()
 {
@@ -117,17 +130,16 @@ void MainWindow::on_Con_pc_clicked()
         ui->pc_stat->setText(fail_str);
 
     }
-
+    show_currentpressure();
 
 }
 
 void MainWindow::on_Con_pip_clicked()
 {
+
    // serialcom sp(qsp_pip);
-    QString port2= "COM13"; //13
+    QString port2 = "COM13"; //13
     apipc = new pipetteController(qsp_pip,port2);
- //   bool ispcopened = false;
-            //sp->openport("COM13");
     if (apipc->isconnected)
     {
         ui->pip_stat->setText(con_str);
@@ -137,17 +149,13 @@ void MainWindow::on_Con_pip_clicked()
         ui->pip_stat->setText(fail_str);
     }
 
- //   acp->breakIn(-100,30);
-
-//  acp->acp_sc->openport("COM10");
-//  float p = acp->getPipettePressure();
 }
 
 void MainWindow::on_SetPressure_clicked()
 {
 
  // ui->label_3->setText(QString::number(ui->breakin_value->value()));
-    acp->requestPressure(100);
+    acp->requestPressure(ui->pressure_value->value());
 
 }
 
@@ -230,4 +238,9 @@ void MainWindow::on_p_zm_btton_clicked()
 {
     apipc->setrelativepositioning();
     apipc->moveToZAsync(-(ui->pip_step_spinbox->value()));
+}
+
+void MainWindow::on_lcdNumber_overflow()
+{
+
 }

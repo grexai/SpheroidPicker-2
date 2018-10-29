@@ -31,16 +31,20 @@ QByteArray  serialcom::recive(){
     return answer;
 }
 
-QByteArray serialcom::sendAndReceive(QString& msg,const QString& ansEnd)
+QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
 {
     std::lock_guard<std::mutex> lock(comm_mutex);
-    QString cmd = msg.append(";\r\n");
+    QString cmd = msg.append(ansEnd);
     QByteArray byte_command = msg.toLocal8Bit();
     sp.write(byte_command);
-    sp.waitForBytesWritten(100);
-    sp.waitForReadyRead(100);
-    QByteArray answer = sp.readAll();
+    sp.waitForBytesWritten(200);
     sp.waitForReadyRead(200);
+    QByteArray answer = sp.readAll();
+  //  QByteArray readData = sp.readAll();
+    while ( sp.waitForReadyRead(200))
+        answer.append(sp.readAll());
+
+   // answer.append(sp.readAll());
     return answer;
 }
 

@@ -13,7 +13,7 @@ void pipetteController::setfeedrate(int acceleration){
 }
 
 void pipetteController::goHome(bool x, bool y, bool z){
-    QString msg = "G28\r\n";
+    QString msg = "G28";
     if (x){
         msg.append("X");
     }
@@ -75,9 +75,9 @@ void pipetteController::setrelativepositioning(){
 
 
 Float3coor pipetteController::getcurrentpos(QByteArray& answer){
+    apipc_sc.sp.clear();
     QString msg = "M114";
-    answer=apipc_sc.sendAndReceive(msg,"EOM");
-
+    answer=apipc_sc.sendAndReceive(msg,EOM);
 
     Float3coor pipcoors;
     return pipcoors;
