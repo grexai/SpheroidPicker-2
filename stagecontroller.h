@@ -201,8 +201,59 @@ private:
 };
 
 
+extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId);
+
+class Stage : public Base {
+public:
+    Stage(ahm::Unit *pStageUnit, ahm::Logging *pLogging = 0) : Base(pLogging)
+        , m_XAxis(findUnit(pStageUnit, ahm::MICROSCOPE_X_UNIT))
+        , m_YAxis(findUnit(pStageUnit, ahm::MICROSCOPE_Y_UNIT)) {}
+
+    void printWhatIsSupported() {
+        m_XAxis.printWhatIsSupported();
+        m_YAxis.printWhatIsSupported();
+    }
+
+    Axis& XAxis() { return m_XAxis; }
+    Axis& YAxis() { return m_YAxis; }
+
+    static bool isInProgress(ahm::AsyncResult* pAsyncResult) ;
+
+    bool isMoving() ;
+
+    void moveToAsync(iop::int32 posx, iop::int32 posy, bool flagWaitMovements);
 
 
+class PositionRecorder : public ahm::EventSink {
+public:
+    struct Record {
+        char who;
+        iop::int32 pos;
+        DWORD time;
+    };
+    typedef std::vector<Record> Records;
+
+    virtual void onEvent(ahm::Unit* pSender, ahm::Event* pEvent);
+    virtual void onShutdown(ahm::Unit* sender) ;
+
+    void clear();
+
+    bool getRecords(Records & result, bool flagClear = false);
+
+private:
+    Records m_records;
+    MTLock m_lock;
+};
+
+
+void print(std::ostream & out, const PositionRecorder::Record& record, DWORD t0) ;
+void subscribe(ahm::EventSink* pEventSink) ;
+
+void unsubscribe(PositionRecorder& recorder);
+
+private:
+Axis m_XAxis, m_YAxis;
+};
 
 
 

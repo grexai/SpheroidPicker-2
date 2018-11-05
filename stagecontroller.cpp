@@ -291,127 +291,94 @@ void Axis::printWhatIsSupported() {
 
 
 
-class Stage : public Base {
-public:
-    Stage(ahm::Unit *pStageUnit, ahm::Logging *pLogging = 0) : Base(pLogging)
-        , m_XAxis(findUnit(pStageUnit, ahm::MICROSCOPE_X_UNIT))
-        , m_YAxis(findUnit(pStageUnit, ahm::MICROSCOPE_Y_UNIT)) {}
 
-    void printWhatIsSupported() {
-        m_XAxis.printWhatIsSupported();
-        m_YAxis.printWhatIsSupported();
-    }
-
-    Axis& XAxis() { return m_XAxis; }
-    Axis& YAxis() { return m_YAxis; }
-
-    static bool isInProgress(ahm::AsyncResult* pAsyncResult) {
-        return pAsyncResult != NULL && pAsyncResult->state() == ahm::AsyncResult::INPROGRESS;
-    }
-
-    bool isMoving() {
-        return m_XAxis.isMoving() || m_YAxis.isMoving();
-    }
-
-    void moveToAsync(iop::int32 posx, iop::int32 posy, bool flagWaitMovements)
-    {
-        ahm::AsyncResult *pAsyncResultX = m_XAxis.moveToAsync(posx);
-        ahm::AsyncResult *pAsyncResultY = m_YAxis.moveToAsync(posy);
-        while (flagWaitMovements && (isInProgress(pAsyncResultX) || isInProgress(pAsyncResultY)))
-        {
-            ::Sleep(50);
+        bool Stage::isInProgress(ahm::AsyncResult* pAsyncResult) {
+            return pAsyncResult != NULL && pAsyncResult->state() == ahm::AsyncResult::INPROGRESS;
         }
 
-        // discard Asyncresult objects
-        if (pAsyncResultX != NULL)
-        {
-            pAsyncResultX->dispose();
+        bool Stage::isMoving() {
+            return m_XAxis.isMoving() || m_YAxis.isMoving();
         }
-        if (pAsyncResultY != NULL)
+
+        void Stage::moveToAsync(iop::int32 posx, iop::int32 posy, bool flagWaitMovements)
         {
-            pAsyncResultY->dispose();
+            ahm::AsyncResult *pAsyncResultX = m_XAxis.moveToAsync(posx);
+            ahm::AsyncResult *pAsyncResultY = m_YAxis.moveToAsync(posy);
+            while (flagWaitMovements && (isInProgress(pAsyncResultX) || isInProgress(pAsyncResultY)))
+            {
+                ::Sleep(50);
+            }
+
+            // discard Asyncresult objects
+            if (pAsyncResultX != NULL)
+            {
+                pAsyncResultX->dispose();
+            }
+            if (pAsyncResultY != NULL)
+            {
+                pAsyncResultY->dispose();
+            }
         }
-    }
 
+        void Stage::PositionRecorder::onEvent(ahm::Unit* pSender, ahm::Event* pEvent) {
 
+                if (pEvent && pEvent->eventType() == ValueChangedEvent::EVENT_TYPE) {
+                    ValueChangedEvent *pValueChangedEvent = (ValueChangedEvent *)pEvent;
 
-    class PositionRecorder : public ahm::EventSink {
-    public:
-        struct Record {
-            char who;
-            iop::int32 pos;
-            DWORD time;
-        };
-        typedef std::vector<Record> Records;
+                    if (pValueChangedEvent->interfaceId() == ahm::IID_BASIC_CONTROL_VALUE) { // position event
+                        char chWho = '?';
+                        if (Axis::isX(pSender)) {
+                            chWho = 'X';
+                        }
+                        else if (Axis::isY(pSender)) {
+                            chWho = 'Y';
+                        }
+                        Record record;
+                        record.who = chWho;
+                        record.pos = pValueChangedEvent->value();// native position value
+                        record.time = ::GetTickCount();
 
-        virtual void onEvent(ahm::Unit* pSender, ahm::Event* pEvent) {
-
-            if (pEvent && pEvent->eventType() == ValueChangedEvent::EVENT_TYPE) {
-                ValueChangedEvent *pValueChangedEvent = (ValueChangedEvent *)pEvent;
-
-                if (pValueChangedEvent->interfaceId() == ahm::IID_BASIC_CONTROL_VALUE) { // position event
-                    char chWho = '?';
-                    if (Axis::isX(pSender)) {
-                        chWho = 'X';
-                    }
-                    else if (Axis::isY(pSender)) {
-                        chWho = 'Y';
-                    }
-                    Record record;
-                    record.who = chWho;
-                    record.pos = pValueChangedEvent->value();// native position value
-                    record.time = ::GetTickCount();
-
-                    {
-                        MT_SYNCHRONIZED_BLOCK(m_lock);
-                        m_records.push_back(record);
+                        {
+                            MT_SYNCHRONIZED_BLOCK(m_lock);
+                            m_records.push_back(record);
+                        }
                     }
                 }
             }
+            void Stage::PositionRecorder::onShutdown(ahm::Unit* sender) {}
+
+            void Stage::PositionRecorder::clear() {
+                MT_SYNCHRONIZED_BLOCK(m_lock);
+                m_records.clear();
+            }
+
+            bool Stage::PositionRecorder::getRecords(Records & result, bool flagClear) {
+                MT_SYNCHRONIZED_BLOCK(m_lock);
+                result = m_records;
+                if (flagClear) m_records.clear();
+                return !result.empty();
+            }
+
+        void Stage::print(std::ostream & out, const PositionRecorder::Record& record, DWORD t0) {
+            out << record.time - t0 << " millis " << record.who << "  pos: " << record.pos;
+            Axis & axis = m_XAxis;
+            if (record.who == 'y') axis = m_YAxis;
+
+            out << " (" << axis.toMicrons(record.pos) << ")";
         }
-        virtual void onShutdown(ahm::Unit* sender) {}
-
-        void clear() {
-            MT_SYNCHRONIZED_BLOCK(m_lock);
-            m_records.clear();
+        void Stage::subscribe(ahm::EventSink* pEventSink) {
+            m_XAxis.subscribeEvents(pEventSink);
+            m_YAxis.subscribeEvents(pEventSink);
         }
 
-        bool getRecords(Records & result, bool flagClear = false) {
-            MT_SYNCHRONIZED_BLOCK(m_lock);
-            result = m_records;
-            if (flagClear) m_records.clear();
-            return !result.empty();
+        void Stage::unsubscribe(PositionRecorder& recorder) {
+            m_XAxis.unsubscribeEvents(&recorder);
+            m_YAxis.unsubscribeEvents(&recorder);
         }
-
-    private:
-        Records m_records;
-        MTLock m_lock;
-    };
-
-    void print(std::ostream & out, const PositionRecorder::Record& record, DWORD t0) {
-        out << record.time - t0 << " millis " << record.who << "  pos: " << record.pos;
-        Axis & axis = m_XAxis;
-        if (record.who == 'y') axis = m_YAxis;
-
-        out << " (" << axis.toMicrons(record.pos) << ")";
-    }
-    void subscribe(ahm::EventSink* pEventSink) {
-        m_XAxis.subscribeEvents(pEventSink);
-        m_YAxis.subscribeEvents(pEventSink);
-    }
-
-    void unsubscribe(PositionRecorder& recorder) {
-        m_XAxis.unsubscribeEvents(&recorder);
-        m_YAxis.unsubscribeEvents(&recorder);
-    }
-
-private:
-    Axis m_XAxis, m_YAxis;
-};
 
 
 // stage sample procedure
-void stage_sample(ahm::Unit *pRootUnit) {
+extern void stage_sample(ahm::Unit *pRootUnit) {
 
     // search necessary units:
     ahm::Unit *pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
