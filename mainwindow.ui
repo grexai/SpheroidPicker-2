@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1314</width>
-    <height>580</height>
+    <width>1309</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>220</y>
+      <y>200</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -34,7 +34,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>220</y>
+      <y>200</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -53,7 +53,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>170</y>
+      <y>150</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -66,7 +66,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>270</y>
+      <y>250</y>
       <width>41</width>
       <height>41</height>
      </rect>
@@ -156,7 +156,7 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>510</x>
       <y>20</y>
       <width>701</width>
       <height>501</height>
@@ -225,14 +225,14 @@
    <widget class="QPushButton" name="Campushbtn">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>1220</x>
       <y>20</y>
       <width>80</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Camera</string>
+     <string> Camera on</string>
     </property>
    </widget>
    <widget class="QLabel" name="pipstep_label">
@@ -264,10 +264,10 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>110</y>
-      <width>191</width>
-      <height>151</height>
+      <x>380</x>
+      <y>130</y>
+      <width>111</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="text">
@@ -455,14 +455,23 @@
       <x>290</x>
       <y>380</y>
       <width>91</width>
-      <height>51</height>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+    <property name="digitCount">
+     <number>9</number>
     </property>
    </widget>
    <widget class="QPushButton" name="get_coors_pushButton">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>330</x>
       <y>90</y>
       <width>80</width>
       <height>21</height>
@@ -517,7 +526,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1314</width>
+     <width>1309</width>
      <height>20</height>
     </rect>
    </property>

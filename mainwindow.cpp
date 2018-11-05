@@ -3,7 +3,7 @@
 #include "imagetools.h"
 #include <thread>
 #include <QStyleFactory>
-#include <PipetteController.h>
+
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 

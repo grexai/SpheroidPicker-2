@@ -5,7 +5,7 @@
 
 // tools
 // findUnit: tool function to find a unit with a given type id in the unit tree
-Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
+extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
     // test unit's type for given typeId
     if (pUnit && pUnit->type()) {
         if (pUnit->type()->isA(typeId)) {

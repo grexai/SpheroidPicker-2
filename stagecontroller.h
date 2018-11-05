@@ -10,12 +10,12 @@
 #include <ahwmicpropid.h>
 #include <ahwprop2.h>
 #include <reuse/proptools.h>
-#include <windows.h>
+#include <Windows.h>
 
 
 using namespace ahm;
 
-
+extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId);
 
 template <class clazz> clazz* find_itf(ahm::Unit *pUnit, iop::int32 iid) {
     if (pUnit && pUnit->interfaces()) {

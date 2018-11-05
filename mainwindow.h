@@ -6,8 +6,8 @@
 //#include <QtSerialPort/QSerialPort>
 //#include <serialcom.h>
 #include <arduinopressurecontroller.h>
-#include <pipettecontroller.h>
-
+#include <PipetteController.h>
+#include <stagecontroller.h>
 namespace Ui {
 class MainWindow;
 }
