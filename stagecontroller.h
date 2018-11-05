@@ -1,6 +1,6 @@
 #ifndef STAGECONTROLLER_H
 #define STAGECONTROLLER_H
-
+#include <Windows.h>
 #include <iostream>
 #include <string>
 #include <strstream>
@@ -10,12 +10,8 @@
 #include <ahwmicpropid.h>
 #include <ahwprop2.h>
 #include <reuse/proptools.h>
-#include <Windows.h>
 
-
-using namespace ahm;
-
-extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId);
+ahm::Unit *findUnit(ahm::Unit *pUnit, ahm::TypeId typeId);
 
 template <class clazz> clazz* find_itf(ahm::Unit *pUnit, iop::int32 iid) {
     if (pUnit && pUnit->interfaces()) {
@@ -25,7 +21,6 @@ template <class clazz> clazz* find_itf(ahm::Unit *pUnit, iop::int32 iid) {
     return 0;
 }
 
-
 template <class clazz> clazz* find_itf_version(ahm::Unit *pUnit, iop::int32 iid, iop::int32 minimumVersion) {
     if (pUnit && pUnit->interfaces()) {
         ahm::Interface* pInterface = pUnit->interfaces()->findInterface(iid);
@@ -34,14 +29,11 @@ template <class clazz> clazz* find_itf_version(ahm::Unit *pUnit, iop::int32 iid,
     return 0;
 }
 
-iop::string safe(iop::string sz) { return sz ? sz : ""; }
-
 
 
 class MTLock {
 public:
-    MTLock() {
-        ::InitializeCriticalSection(&m_cs);
+    MTLock() { ::InitializeCriticalSection(&m_cs);
     }
     void lock() {
         ::EnterCriticalSection(&m_cs);
@@ -67,28 +59,17 @@ private:
 };
 
 #define MT_SYNCHRONIZED_BLOCK(lock)  MTSynchBlock __synch_block_temp__(lock);
+
 class MTPrinter {
 public:
     MTPrinter() {
-
     }
+    void print(std::strstream & sstream, bool nl = false);
 
-    void print(std::strstream & sstream, bool nl = false) {
-        std::string str;
-        sstream << '\0';
-        str = (iop::string) sstream.str();
-        print(str, nl);
-    }
-
-    void print(const std::string& str, bool nl = false) {
-        MT_SYNCHRONIZED_BLOCK(m_lock);
-        std::cout << str.c_str();
-        if (nl) std::cout << std::endl;
-    }
+    void print(const std::string& str, bool nl = false);
 private:
     MTLock m_lock;
 };
-
 
 class Base {
 public:
@@ -139,17 +120,13 @@ public:
     // DirectedControlValueAsync
     void moveAsync(iop::int32 direction) ; // <0 => to min >=0 => to max
 
-
     // DirectedControlValueAsyncVelocity
     void moveAsyncVel(iop::int32 speed) ;// <0 => to min >=0 => to max
-
 
     // BasicControlValueVelocity - current speed
     bool setCurrentSpeed(iop::int32 speed) ;// set current native speed
 
-
     iop::int32 getCurrentSpeed();// retrieve current native speed
-
 
     iop::int32 getMinSpeed() ; // min native speed
 
@@ -184,8 +161,8 @@ public:
 
     static bool isX(ahm::Unit *pUnit);
 
+    static bool isY(ahm::Unit *pUnit);
 
-    static bool isY(ahm::Unit *pUnit) ;
 
 private:
     ahm::Unit *m_pAxisUnit;
@@ -199,9 +176,6 @@ private:
     ahm::BasicControlState *m_pBasicControlState;
     ahm::EventSource *m_pEventSource;
 };
-
-
-extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId);
 
 class Stage : public Base {
 public:
@@ -252,12 +226,9 @@ void subscribe(ahm::EventSink* pEventSink) ;
 void unsubscribe(PositionRecorder& recorder);
 
 private:
-Axis m_XAxis, m_YAxis;
+    Axis m_XAxis;
+    Axis m_YAxis;
 };
-
-
-
-
 
 
 

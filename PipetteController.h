@@ -2,6 +2,7 @@
 #define PIPETTERCONTROLLER_H
 #include "serialcom.h"
 #include "types.h"
+//#include <stagecontroller.h>
 class pipetteController
 {
 public:

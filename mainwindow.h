@@ -3,11 +3,12 @@
 #include <QThread>
 #include <QTimer>
 #include <QMainWindow>
-//#include <QtSerialPort/QSerialPort>
-//#include <serialcom.h>
+
+#include "imagetools.h"
 #include <arduinopressurecontroller.h>
 #include <PipetteController.h>
 #include <stagecontroller.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -34,8 +35,6 @@ public:
 public slots:
 
 protected:
-    serialcom *sp = nullptr;
-    serialcom *sppc = nullptr;
     arduinopressurecontroller* acp= nullptr ;
     pipetteController* apipc= nullptr;
     QSerialPort qsp_pip;
@@ -58,6 +57,8 @@ private slots:
      void on_Con_pc_clicked();
 
      void on_Con_pip_clicked();
+
+     void on_Con_xystage_button_clicked();
 
      void on_SetPressure_clicked();
 
@@ -89,7 +90,7 @@ private slots:
 
      void on_lcdNumber_overflow();
 
-     void on_Con_xystage_button_clicked();
+
 
 private:
     QTimer *timer;

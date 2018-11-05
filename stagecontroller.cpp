@@ -5,7 +5,7 @@
 
 // tools
 // findUnit: tool function to find a unit with a given type id in the unit tree
-extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
+ahm::Unit *findUnit(ahm::Unit *pUnit, ahm::TypeId typeId) {
     // test unit's type for given typeId
     if (pUnit && pUnit->type()) {
         if (pUnit->type()->isA(typeId)) {
@@ -15,7 +15,7 @@ extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
             if (pUnit->units()) {
                 // recursively find unit in child units
                 for (iop::int32 i = 0; i<pUnit->units()->numUnits(); i++) {
-                    Unit *pDeepUnit = findUnit(pUnit->units()->getUnit(i), typeId);
+                    ahm::Unit *pDeepUnit = findUnit(pUnit->units()->getUnit(i), typeId);
                     if (pDeepUnit) {
                         return pDeepUnit; // stop recursion
                     }
@@ -26,13 +26,20 @@ extern Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
     return 0; // unit with type id was not found
 }
 
+iop::string safe(iop::string sz) { return sz ? sz : ""; }
 
 
-
-
-
-
-
+void MTPrinter::print(std::strstream & sstream, bool nl) {
+    std::string str;
+    sstream << '\0';
+    str = (iop::string) sstream.str();
+    print(str, nl);
+}
+void MTPrinter::print(const std::string& str, bool nl) {
+    MT_SYNCHRONIZED_BLOCK(m_lock);
+    std::cout << str.c_str();
+    if (nl) std::cout << std::endl;
+}
 
 
 
@@ -42,7 +49,7 @@ void Base::addLogText(iop::string szText) {
     }
 }
 
-void printCheck(iop::string text, void *ptr) {
+extern void printCheck(iop::string text, void *ptr) {
     std::cout << "\t" << text << "\t" << (ptr != NULL ? "[X]" : "[ ]") << std::endl;
 }
 
@@ -322,8 +329,8 @@ void Axis::printWhatIsSupported() {
 
         void Stage::PositionRecorder::onEvent(ahm::Unit* pSender, ahm::Event* pEvent) {
 
-                if (pEvent && pEvent->eventType() == ValueChangedEvent::EVENT_TYPE) {
-                    ValueChangedEvent *pValueChangedEvent = (ValueChangedEvent *)pEvent;
+                if (pEvent && pEvent->eventType() == ahm::ValueChangedEvent::EVENT_TYPE) {
+                    ahm::ValueChangedEvent *pValueChangedEvent = (ahm::ValueChangedEvent *)pEvent;
 
                     if (pValueChangedEvent->interfaceId() == ahm::IID_BASIC_CONTROL_VALUE) { // position event
                         char chWho = '?';
@@ -345,6 +352,7 @@ void Axis::printWhatIsSupported() {
                     }
                 }
             }
+
             void Stage::PositionRecorder::onShutdown(ahm::Unit* sender) {}
 
             void Stage::PositionRecorder::clear() {
@@ -376,7 +384,7 @@ void Axis::printWhatIsSupported() {
             m_YAxis.unsubscribeEvents(&recorder);
         }
 
-
+/*
 // stage sample procedure
 extern void stage_sample(ahm::Unit *pRootUnit) {
 
@@ -481,3 +489,4 @@ extern void stage_sample(ahm::Unit *pRootUnit) {
     std::cout << "current speed is " << stage.XAxis().toMicronsPerSecond(stage.XAxis().getCurrentSpeed()) << " microns/sec" << std::endl;
 }
 
+*/

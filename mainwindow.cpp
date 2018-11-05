@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "imagetools.h"
-#include <thread>
 #include <QStyleFactory>
 
 //#include "serialcom.h"
@@ -51,11 +49,10 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_currentpressure(){
- //   float cp = acp->getPipettePressure();
+//  float cp = acp->getPipettePressure();
     float cp = (QRandomGenerator::global()->generate());
     QString cps = QString::number(cp);
     ui->lcdNumber->display(cps);
-
 }
 void MainWindow::show_currentpressure(){
     update_currentpressure();
@@ -128,7 +125,7 @@ void MainWindow::on_Con_pip_clicked()
 {
 
    // serialcom sp(qsp_pip);
-    QString port2 = "COM13"; //13
+    QString port2 = "COM15"; //13
     apipc = new pipetteController(qsp_pip,port2);
     if (apipc->isconnected)
     {
@@ -233,6 +230,6 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-//    ahm::Unit *pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+    ahm::Unit *pStageUnit;
 
 }
