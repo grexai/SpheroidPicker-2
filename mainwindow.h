@@ -89,6 +89,8 @@ private slots:
 
      void on_lcdNumber_overflow();
 
+     void on_Con_xystage_button_clicked();
+
 private:
     QTimer *timer;
     QTimer *disp_pressure;

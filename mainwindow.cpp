@@ -34,7 +34,6 @@ void setdarkstyle(){
 
 }
 
-QString port = "COM10";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,14 +49,22 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-void MainWindow::displayImage(){
+
+void MainWindow::update_currentpressure(){
+ //   float cp = acp->getPipettePressure();
+    float cp = (QRandomGenerator::global()->generate());
+    QString cps = QString::number(cp);
+    ui->lcdNumber->display(cps);
 
 }
-
+void MainWindow::show_currentpressure(){
+    update_currentpressure();
+    connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
+    disp_pressure->start(250);
+}
 
 void MainWindow::update_window()
 {
-    //sp->openport("asd");
     cv::Mat cframe;
     cap.read( cframe);
     cvtColor(cframe,cframe,CV_BGR2RGB,0);
@@ -69,20 +76,6 @@ void MainWindow::update_window()
 
 }
 
-void MainWindow::update_currentpressure(){
- //   float cp = acp->getPipettePressure();
-
- //   return dist(*QRandomGenerator::global());
-    float cp = (QRandomGenerator::global()->generate64());
-    QString cps = QString::number(cp);
-    ui->lcdNumber->display(cps);
-
-}
-void MainWindow::show_currentpressure(){
-    update_currentpressure();
-    connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
-    disp_pressure->start(250);
-}
 
 void MainWindow::on_Campushbtn_clicked()
 {
@@ -103,10 +96,6 @@ void MainWindow::on_actionDark_Mode_triggered()
     setdarkstyle();
 
 }
-void porttest(){
-
-
-}
 
 
 void MainWindow::on_actionExit_triggered()
@@ -121,16 +110,17 @@ void MainWindow::on_Home_pip_clicked()
 
 void MainWindow::on_Con_pc_clicked()
 {
+    QString port = "COM10";
     acp = new arduinopressurecontroller(qsp_pc,port);
     if (acp->isconnected)
     {
         ui->pc_stat->setText(con_str);
+        show_currentpressure();
     }
     else{
         ui->pc_stat->setText(fail_str);
-
     }
-    show_currentpressure();
+
 
 }
 
@@ -143,7 +133,7 @@ void MainWindow::on_Con_pip_clicked()
     if (apipc->isconnected)
     {
         ui->pip_stat->setText(con_str);
-        qsp_pip.flush();
+      //  qsp_pip.flush();
     }
     else{
         ui->pip_stat->setText(fail_str);
@@ -153,10 +143,7 @@ void MainWindow::on_Con_pip_clicked()
 
 void MainWindow::on_SetPressure_clicked()
 {
-
- // ui->label_3->setText(QString::number(ui->breakin_value->value()));
     acp->requestPressure(ui->pressure_value->value());
-
 }
 
 void MainWindow::on_atm_button_clicked()
@@ -169,7 +156,6 @@ void MainWindow::on_pc_Breakin_button_clicked()
 {
     acp->breakIn(ui->breakin_value->value(),ui->breakin_time->value());
 }
-
 
 void MainWindow::on_get_coors_pushButton_clicked()
 {
@@ -242,5 +228,11 @@ void MainWindow::on_p_zm_btton_clicked()
 
 void MainWindow::on_lcdNumber_overflow()
 {
+
+}
+
+void MainWindow::on_Con_xystage_button_clicked()
+{
+//    ahm::Unit *pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
 
 }
