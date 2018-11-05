@@ -39,6 +39,9 @@ protected:
     pipetteController* apipc= nullptr;
     QSerialPort qsp_pip;
     QSerialPort qsp_pc;
+    ahm::Unit *pStageUnit= nullptr;
+    ahm::Unit *pRootUnit = nullptr;
+    Stage *stage= nullptr;
 private slots:
      void on_Campushbtn_clicked();
 

@@ -230,6 +230,7 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-    ahm::Unit *pStageUnit;
-
+    pRootUnit = theHardwareModel()->getUnit("");
+    pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+    stage= new Stage(pRootUnit);
 }
