@@ -40,7 +40,8 @@ HEADERS += \
     arduinopressurecontroller.h \
     imagetools.h \
     types.h \
-    PipetteController.h
+    PipetteController.h \
+    stagecontroller.h
 
 FORMS += \
         mainwindow.ui

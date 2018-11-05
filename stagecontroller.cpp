@@ -1,15 +1,5 @@
-#include <iostream>
-#include <string>
-#include <strstream>
-#include <ahm.h>  // include AHM header
-#include <ahwbasic.h>
-#include <ahwmic.h>
-#include <ahwmicpropid.h>
-#include <ahwprop2.h>
-#include <reuse/proptools.h>
-#include <windows.h>
+#include <stagecontroller.h>
 
-using namespace ahm;
 
 // ITK HYDRA
 
@@ -54,35 +44,6 @@ template <class clazz> clazz* find_itf_version(ahm::Unit *pUnit, iop::int32 iid,
 
 iop::string safe(iop::string sz) { return sz ? sz : ""; }
 
-class MTLock {
-public:
-    MTLock() {
-        ::InitializeCriticalSection(&m_cs);
-    }
-    void lock() {
-        ::EnterCriticalSection(&m_cs);
-    }
-    void unlock() {
-        ::LeaveCriticalSection(&m_cs);
-    }
-
-private:
-    CRITICAL_SECTION m_cs;
-};
-
-class MTSynchBlock {
-public:
-    MTSynchBlock(MTLock &lock) : m_lock(lock) {
-        m_lock.lock();
-    }
-    ~MTSynchBlock() {
-        m_lock.unlock();
-    }
-private:
-    MTLock& m_lock;
-};
-
-#define MT_SYNCHRONIZED_BLOCK(lock)  MTSynchBlock __synch_block_temp__(lock);
 
 
 
@@ -110,18 +71,12 @@ private:
 
 
 
-class Base {
-public:
-    Base(ahm::Logging *pLogging) : m_pLogging(pLogging) {}
-    void addLogText(iop::string szText) {
-        if (m_pLogging) {
-            m_pLogging->addText(szText);
-        }
-    }
-private:
-    ahm::Logging *m_pLogging;
-};
 
+void Base::addLogText(iop::string szText) {
+    if (m_pLogging) {
+        m_pLogging->addText(szText);
+    }
+}
 
 void printCheck(iop::string text, void *ptr) {
     std::cout << "\t" << text << "\t" << (ptr != NULL ? "[X]" : "[ ]") << std::endl;
@@ -527,6 +482,7 @@ void stage_sample(ahm::Unit *pRootUnit) {
         std::cout << "stage_sample: no stage found!" << std::endl;
         return;
     }
+
     Stage stage(pStageUnit);
     stage.printWhatIsSupported();
 
@@ -540,7 +496,6 @@ void stage_sample(ahm::Unit *pRootUnit) {
     iop::int32 y0 = stage.YAxis().getMinPosition();
     iop::int32 y1 = stage.YAxis().getMaxPosition();
     std::cout << "moving to minimum" << std::endl;
-
     stage.moveToAsync(x0, y0, true); // move to min corner and wait
 
     std::cout << "current position: " << stage.XAxis().toMicrons(stage.XAxis().getCurrentPosition()) << ";" << stage.YAxis().toMicrons(stage.YAxis().getCurrentPosition()) << std::endl;
