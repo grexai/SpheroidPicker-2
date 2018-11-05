@@ -26,48 +26,12 @@ Unit *findUnit(Unit *pUnit, ahm::TypeId typeId) {
     return 0; // unit with type id was not found
 }
 
-template <class clazz> clazz* find_itf(ahm::Unit *pUnit, iop::int32 iid) {
-    if (pUnit && pUnit->interfaces()) {
-        ahm::Interface* pInterface = pUnit->interfaces()->findInterface(iid);
-        return pInterface ? (clazz*)pInterface->object() : 0;
-    }
-    return 0;
-}
-
-template <class clazz> clazz* find_itf_version(ahm::Unit *pUnit, iop::int32 iid, iop::int32 minimumVersion) {
-    if (pUnit && pUnit->interfaces()) {
-        ahm::Interface* pInterface = pUnit->interfaces()->findInterface(iid);
-        return pInterface && pInterface->interfaceVersion() >= minimumVersion ? (clazz*)pInterface->object() : 0;
-    }
-    return 0;
-}
-
-iop::string safe(iop::string sz) { return sz ? sz : ""; }
 
 
 
 
-class MTPrinter {
-public:
-    MTPrinter() {
 
-    }
 
-    void print(std::strstream & sstream, bool nl = false) {
-        std::string str;
-        sstream << '\0';
-        str = (iop::string) sstream.str();
-        print(str, nl);
-    }
-
-    void print(const std::string& str, bool nl = false) {
-        MT_SYNCHRONIZED_BLOCK(m_lock);
-        std::cout << str.c_str();
-        if (nl) std::cout << std::endl;
-    }
-private:
-    MTLock m_lock;
-};
 
 
 
@@ -87,22 +51,8 @@ void printCheck(iop::string text, void *ptr) {
 
 
 // Stage axis wrapper class
-class Axis : Base {
-public:
-    Axis(ahm::Unit *pAxisUnit, ahm::Logging *pLogging = 0) : Base(pLogging), m_pAxisUnit(pAxisUnit) {
-        m_pBasicControlValue = find_itf<ahm::BasicControlValue>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE);
-        m_pBasicControlValueAsync = find_itf<ahm::BasicControlValueAsync>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_ASYNC);
-        m_pHaltControlValue = find_itf<ahm::HaltControlValue>(m_pAxisUnit, ahm::IID_HALT_CONTROL_VALUE);
-        m_pDirectedControlValueAsync = find_itf<ahm::DirectedControlValueAsync>(m_pAxisUnit, ahm::IID_DIRECTED_CONTROL_VALUE_ASYNC);
-        m_pBasicControlValueVelocity = find_itf<ahm::BasicControlValueVelocity>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_VELOCITY);
-        m_pDirectedControlValueAsyncVelocity = find_itf<ahm::DirectedControlValueAsyncVelocity>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_ASYNC);
-        m_pBasicControlState = find_itf<ahm::BasicControlState>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_STATE);
-        m_pEventSource = find_itf<ahm::EventSource>(m_pAxisUnit, ahm::IID_EVENT_SOURCE);
-        m_pMicronsConverter = m_pBasicControlValue != 0 && m_pBasicControlValue->metricsConverters() != 0 ? m_pBasicControlValue->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS) : 0;
-        m_pMicronsPerSecondConverter = m_pBasicControlValueVelocity != 0 && m_pBasicControlValueVelocity->metricsConverters() != 0 ? m_pBasicControlValueVelocity->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS_PER_SECOND) : 0;
-    }
 
-    void printWhatIsSupported() {
+void Axis::printWhatIsSupported() {
         std::cout << (isX(m_pAxisUnit) ? 'X' : (isY(m_pAxisUnit) ? 'Y' : '?')) << " Axis" << std::endl;
         printCheck("BasicControlValue", m_pBasicControlValue);
         printCheck("BasicControlValueAsync", m_pBasicControlValueAsync);
@@ -119,7 +69,7 @@ public:
     // BasicControlValue - sync control
 
     // move to position in microsteps
-    bool moveTo(iop::int32 pos) {
+    bool Axis::moveTo(iop::int32 pos) {
         if (m_pBasicControlValue) {
             try {
                 m_pBasicControlValue->setControlValue(pos);
@@ -132,7 +82,7 @@ public:
         return false;
     }
 
-    iop::int32 getCurrentPosition() { // current position in micro steps
+    iop::int32 Axis::getCurrentPosition() { // current position in micro steps
         if (m_pBasicControlValue) {
             try {
                 return m_pBasicControlValue->getControlValue();
@@ -144,7 +94,7 @@ public:
         return 0;
     }
 
-    iop::int32 getMinPosition() { // min position in micro steps
+    iop::int32 Axis::getMinPosition() { // min position in micro steps
         if (m_pBasicControlValue) {
             try {
                 return m_pBasicControlValue->minControlValue();
@@ -155,7 +105,7 @@ public:
         }
         return 0;
     }
-    iop::int32 getMaxPosition() { // min position in micro steps
+    iop::int32 Axis::getMaxPosition() { // min position in micro steps
         if (m_pBasicControlValue) {
             try {
                 return m_pBasicControlValue->maxControlValue();
@@ -168,7 +118,7 @@ public:
     }
 
     // BasicControlState
-    bool isMoving() {
+    bool Axis::isMoving() {
         if (m_pBasicControlState) {
             try {
                 return m_pBasicControlState->isChanging();
@@ -181,8 +131,8 @@ public:
     }
 
     // BasicControlValueAsync
-    ahm::AsyncResult *moveToAsync(iop::int32 pos) {
-        if (m_pBasicControlValueAsync) {
+    ahm::AsyncResult* Axis::moveToAsync(iop::int32 pos) {
+       if (m_pBasicControlValueAsync) {
             try {
                 return m_pBasicControlValueAsync->setControlValueAsync(pos);
             }
@@ -194,7 +144,7 @@ public:
     }
 
     // DirectedControlValueAsync
-    void moveAsync(iop::int32 direction) { // <0 => to min >=0 => to max
+    void Axis::moveAsync(iop::int32 direction) { // <0 => to min >=0 => to max
         if (m_pDirectedControlValueAsync) {
             try {
                 if (direction<0) {
@@ -211,7 +161,7 @@ public:
     }
 
     // DirectedControlValueAsyncVelocity
-    void moveAsyncVel(iop::int32 speed) { // <0 => to min >=0 => to max
+    void Axis::moveAsyncVel(iop::int32 speed) { // <0 => to min >=0 => to max
         if (m_pDirectedControlValueAsyncVelocity) {
             try {
                 if (speed<0) {
@@ -228,7 +178,7 @@ public:
     }
 
     // BasicControlValueVelocity - current speed
-    bool setCurrentSpeed(iop::int32 speed) {// set current native speed
+    bool Axis::setCurrentSpeed(iop::int32 speed) {// set current native speed
         if (m_pBasicControlValueVelocity) {
             try {
                 m_pBasicControlValueVelocity->setControlValue(speed);
@@ -241,7 +191,7 @@ public:
         return false;
     }
 
-    iop::int32 getCurrentSpeed() { // retrieve current native speed
+    iop::int32 Axis::getCurrentSpeed() { // retrieve current native speed
         if (m_pBasicControlValueVelocity) {
             try {
                 return m_pBasicControlValueVelocity->getControlValue();
@@ -253,7 +203,7 @@ public:
         return 0;
     }
 
-    iop::int32 getMinSpeed() { // min native speed
+    iop::int32 Axis::getMinSpeed() { // min native speed
         if (m_pBasicControlValueVelocity) {
             try {
                 return m_pBasicControlValueVelocity->minControlValue();
@@ -264,7 +214,7 @@ public:
         }
         return 0;
     }
-    iop::int32 getMaxSpeed() { // min position in micro steps
+    iop::int32 Axis::getMaxSpeed() { // min position in micro steps
         if (m_pBasicControlValueVelocity) {
             try {
                 return m_pBasicControlValueVelocity->maxControlValue();
@@ -277,37 +227,37 @@ public:
     }
 
     // what is supported
-    bool isAsyncSupported() const {
+    bool Axis::isAsyncSupported() const {
         return m_pBasicControlValueAsync != 0;
     }
 
-    bool isDirectedAsyncVelSupported() const {
+    bool Axis::isDirectedAsyncVelSupported() const {
         return m_pDirectedControlValueAsyncVelocity != 0;
     }
 
-    bool eventsSupported() const {
+    bool Axis::eventsSupported() const {
         return m_pEventSource != 0;
     }
     // converters
-    iop::float64 toMicrons(iop::int32 pos) { // convert native steps to microns
+    iop::float64 Axis::toMicrons(iop::int32 pos) { // convert native steps to microns
         return m_pMicronsConverter != 0 ? m_pMicronsConverter->getMetricsValue(pos) : 0.0;
     }
 
-    iop::int32 toNativePosition(iop::float64 dMicrons) {// convert microns to native steps
+    iop::int32 Axis::toNativePosition(iop::float64 dMicrons) {// convert microns to native steps
         return m_pMicronsConverter ? m_pMicronsConverter->getControlValue(dMicrons) : 0;
     }
 
-    iop::float64 toMicronsPerSecond(iop::int32 speed) { // convert native speed to microns/s
+    iop::float64 Axis::toMicronsPerSecond(iop::int32 speed) { // convert native speed to microns/s
         return m_pMicronsPerSecondConverter != 0 ? m_pMicronsPerSecondConverter->getMetricsValue(speed) : 0.0;
     }
 
-    iop::int32 toNativeSpeed(iop::float64 dMicronsPerSecond) {// convert microns/s to native speed
+    iop::int32 Axis::toNativeSpeed(iop::float64 dMicronsPerSecond) {// convert microns/s to native speed
         return m_pMicronsConverter ? m_pMicronsConverter->getControlValue(dMicronsPerSecond) : 0;
     }
 
 
     // events
-    void subscribeEvents(ahm::EventSink *pEventSink) {
+    void Axis::subscribeEvents(ahm::EventSink *pEventSink) {
         if (m_pEventSource) {
             try {
                 m_pEventSource->subscribe(pEventSink);
@@ -318,7 +268,7 @@ public:
         }
     }
 
-    void unsubscribeEvents(ahm::EventSink *pEventSink) {
+    void Axis::unsubscribeEvents(ahm::EventSink *pEventSink) {
         if (m_pEventSource) {
             try {
                 m_pEventSource->unsubscribe(pEventSink);
@@ -329,25 +279,14 @@ public:
         }
     }
 
-    static bool isX(ahm::Unit *pUnit) {
+    bool Axis::isX(ahm::Unit *pUnit) {
         return pUnit != 0 && pUnit->type()->isA(ahm::MICROSCOPE_X_UNIT);
     }
 
-    static bool isY(ahm::Unit *pUnit) {
+    bool Axis::isY(ahm::Unit *pUnit) {
         return pUnit != 0 && pUnit->type()->isA(ahm::MICROSCOPE_Y_UNIT);
     }
-private:
-    ahm::Unit *m_pAxisUnit;
-    ahm::BasicControlValue *m_pBasicControlValue;
-    ahm::BasicControlValueAsync *m_pBasicControlValueAsync;
-    ahm::HaltControlValue *m_pHaltControlValue;
-    ahm::MetricsConverter *m_pMicronsConverter, *m_pMicronsPerSecondConverter;
-    ahm::DirectedControlValueAsync *m_pDirectedControlValueAsync;
-    ahm::DirectedControlValueAsyncVelocity *m_pDirectedControlValueAsyncVelocity;
-    ahm::BasicControlValueVelocity *m_pBasicControlValueVelocity;
-    ahm::BasicControlState *m_pBasicControlState;
-    ahm::EventSource *m_pEventSource;
-};
+
 
 
 
