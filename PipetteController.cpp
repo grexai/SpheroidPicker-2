@@ -50,16 +50,17 @@ void pipetteController::moveAsync(float x, float y, float z,bool movetype){
 
 void pipetteController::moveToXAsync(float x_value){
     QString msg= "G0";
-    apipc_sc.send(msg.append("X").append(QString::number(x_value)).append(EOM));
+    apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
 }
+
 void pipetteController::moveToYAsync(float y_value){
     QString msg= "G0";
-    apipc_sc.send(msg.append("Y").append(QString::number(y_value)).append(EOM));
+    apipc_sc.send(msg.append("Y").append(QString::number(y_value,'f',2)).append(EOM));
 }
 
 void pipetteController::moveToZAsync(float z_value){
     QString msg= "G0";
-    apipc_sc.send(msg.append("Z").append(QString::number(z_value)).append(EOM));
+    apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
 
 void pipetteController::setabsoluepositioning(){
@@ -75,13 +76,13 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
     apipc_sc.sp.clear();
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
-    //split strings by :
     QString s(answer);
+    //split strings by :
     QStringList resultStrings =  s.split(':');
-
-    // get every floating point
-
+    Float3coor pipcoors;
+    // get floating point number  regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
+    //TAKNYOLÁS
     xRegExp.indexIn( resultStrings.at(1));
     QStringList xList = xRegExp.capturedTexts();
     if (xList.empty())
@@ -89,32 +90,25 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
         // return 0.0f;
              //err
      }
-    Float3coor pipcoors;
     pipcoors.x = xList.begin()->toFloat();
-
     xRegExp.indexIn( resultStrings.at(2));
+    xList = xRegExp.capturedTexts();
+    try {
+        pipcoors.y = xList.begin()->toFloat();
+    }
+    catch (...)
+    {
+       //error extracting coordinates
+    }
+    xRegExp.indexIn( resultStrings.at(3));
     xList = xRegExp.capturedTexts();
     if (xList.empty())
     {
-        // return 0.0f;
-             //err
-     }
-
-     pipcoors.y = xList.begin()->toFloat();
-
-     xRegExp.indexIn( resultStrings.at(3));
-     xList = xRegExp.capturedTexts();
-     if (xList.empty())
-     {
-         // return 0.0f;
-              //err
-      }
-
-      pipcoors.z = xList.begin()->toFloat();
-
-
-
-
+        // return 0.0f;              //err
+    }
+     pipcoors.z = xList.begin()->toFloat();
+    // END OF TAKNYOLÁS
+    // TODO for;  std::vector<QString> vec;
     return pipcoors;
 }
 

@@ -9,4 +9,11 @@ public:
         float z=0.0f;
 } Float3coor;
 
+typedef struct Int2Coors{
+public:
+    int x=0;
+    int y=0;
+}Int2Coors;
+
+
 #endif // TYPES_H
