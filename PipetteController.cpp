@@ -43,7 +43,8 @@ void pipetteController::moveAsync(float x, float y, float z,bool movetype){
     }
     if (z>0){
         msg.append("Z").append(QString::number(z));
-    }*/
+    }
+*/
     apipc_sc.send(msg);
 }
 
@@ -70,17 +71,50 @@ void pipetteController::setrelativepositioning(){
     apipc_sc.send(msg.append(EOM));
 }
 
-
-
-
-
 Float3coor pipetteController::getcurrentpos(QByteArray& answer){
     apipc_sc.sp.clear();
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
+    //split strings by :
+    QString s(answer);
+    QStringList resultStrings =  s.split(':');
 
+    // get every floating point
+
+    QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
+    xRegExp.indexIn( resultStrings.at(1));
+    QStringList xList = xRegExp.capturedTexts();
+    if (xList.empty())
+    {
+        // return 0.0f;
+             //err
+     }
     Float3coor pipcoors;
-    return pipcoors;
+    pipcoors.x = xList.begin()->toFloat();
 
+    xRegExp.indexIn( resultStrings.at(2));
+    xList = xRegExp.capturedTexts();
+    if (xList.empty())
+    {
+        // return 0.0f;
+             //err
+     }
+
+     pipcoors.y = xList.begin()->toFloat();
+
+     xRegExp.indexIn( resultStrings.at(3));
+     xList = xRegExp.capturedTexts();
+     if (xList.empty())
+     {
+         // return 0.0f;
+              //err
+      }
+
+      pipcoors.z = xList.begin()->toFloat();
+
+
+
+
+    return pipcoors;
 }
 

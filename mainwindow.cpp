@@ -29,7 +29,7 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-
+    //qApp->setStyleSheet("1");
 }
 
 
@@ -125,7 +125,7 @@ void MainWindow::on_Con_pip_clicked()
 {
 
    // serialcom sp(qsp_pip);
-    QString port2 = "COM15"; //13
+    QString port2 = "COM13"; //13
     apipc = new pipetteController(qsp_pip,port2);
     if (apipc->isconnected)
     {
@@ -160,11 +160,9 @@ void MainWindow::on_get_coors_pushButton_clicked()
 
     Float3coor randx = apipc->getcurrentpos(ans);
 
-    QString s(ans);
-    QStringList resultStrings =  s.split(':');
-    ui->label_3->setText(resultStrings.at(0));
-    ui->label_3->setText(s);
-
+    ui->xc_label->setText("X: " + QString::number(randx.x,'f',2));
+    ui->yc_label->setText("Y: " + QString::number(randx.y,'f',2));
+    ui->zc_label->setText("Z: " + QString::number(randx.z,'f',2));
 }
 
 void MainWindow::on_s_xp_button_clicked()
@@ -230,7 +228,7 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-    pRootUnit = theHardwareModel()->getUnit("");
-    pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
-    stage= new Stage(pRootUnit);
+    //pRootUnit = theHardwareModel()->getUnit("");
+    //pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+    //stage= new Stage(pRootUnit);
 }
