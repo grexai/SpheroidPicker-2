@@ -67,6 +67,7 @@ void pipetteController::setabsoluepositioning(){
     QString msg = "G90";
     apipc_sc.send(msg.append(EOM));
 }
+
 void pipetteController::setrelativepositioning(){
     QString msg = "G91";
     apipc_sc.send(msg.append(EOM));
@@ -82,33 +83,21 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
     Float3coor pipcoors;
     // get floating point number  regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-    //TAKNYOLÁS
-    xRegExp.indexIn( resultStrings.at(1));
-    QStringList xList = xRegExp.capturedTexts();
-    if (xList.empty())
-    {
-        // return 0.0f;
-             //err
-     }
-    pipcoors.x = xList.begin()->toFloat();
-    xRegExp.indexIn( resultStrings.at(2));
-    xList = xRegExp.capturedTexts();
-    try {
-        pipcoors.y = xList.begin()->toFloat();
+    std::vector<float> coors;
+    for (int i=1;i<4;i++){
+         xRegExp.indexIn( resultStrings.at(i));
+         QStringList xList= xRegExp.capturedTexts();
+         try {
+             coors.push_back( xList.begin()->toFloat());
+         }
+         catch (...)
+         {
+            //error extracting coordinates
+         }
     }
-    catch (...)
-    {
-       //error extracting coordinates
-    }
-    xRegExp.indexIn( resultStrings.at(3));
-    xList = xRegExp.capturedTexts();
-    if (xList.empty())
-    {
-        // return 0.0f;              //err
-    }
-     pipcoors.z = xList.begin()->toFloat();
-    // END OF TAKNYOLÁS
-    // TODO for;  std::vector<QString> vec;
+    pipcoors.x= coors.at(0);
+    pipcoors.y= coors.at(1);
+    pipcoors.z= coors.at(2);
     return pipcoors;
 }
 
