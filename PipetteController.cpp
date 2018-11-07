@@ -26,6 +26,7 @@ void pipetteController::goHome(bool x, bool y, bool z){
     msg.append(EOM);
     apipc_sc.send(msg);
 }
+
 void pipetteController::moveAsync(float x, float y, float z,bool movetype){
     QString msg(QString::null);
     if (movetype){
@@ -74,30 +75,33 @@ void pipetteController::setrelativepositioning(){
 }
 
 Float3coor pipetteController::getcurrentpos(QByteArray& answer){
-    apipc_sc.sp.clear();
+//  apipc_sc.sp.clear();
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
-    QString s(answer);
     //split strings by :
+    QString s(answer);
     QStringList resultStrings =  s.split(':');
     Float3coor pipcoors;
-    // get floating point number  regularexpressions
+    // get floating point number regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
     std::vector<float> coors;
     for (int i=1;i<4;i++){
          xRegExp.indexIn( resultStrings.at(i));
-         QStringList xList= xRegExp.capturedTexts();
+         QStringList xList = xRegExp.capturedTexts();
          try {
              coors.push_back( xList.begin()->toFloat());
          }
          catch (...)
          {
-            //error extracting coordinates
+             std::cout << "extractiing cooordinates error error " << std::endl;
+            //error extracting coord
          }
     }
-    pipcoors.x= coors.at(0);
-    pipcoors.y= coors.at(1);
-    pipcoors.z= coors.at(2);
+
+    pipcoors.x = coors.at(0);
+    pipcoors.y = coors.at(1);
+    pipcoors.z = coors.at(2);
+
     return pipcoors;
 }
 

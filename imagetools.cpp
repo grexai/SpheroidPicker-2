@@ -13,8 +13,8 @@ cv::Mat imagetools::setframe(cv::Mat &input){
    return this->frame= input;
 }
 
-
-/*0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
+/*
+0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
 1. CV_CAP_PROP_POS_FRAMES 0-based index of the frame to be decoded/captured next.
 2. CV_CAP_PROP_POS_AVI_RATIO Relative position of the video file
 3. CV_CAP_PROP_FRAME_WIDTH Width of the frames in the video stream.
@@ -35,6 +35,20 @@ cv::Mat imagetools::setframe(cv::Mat &input){
 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
 */
 
+void imagetools::setimagewidth(cv::VideoCapture& device,int imwidth){
+
+
+}
+
+void imagetools::setimageheight(cv::VideoCapture& device, int imheight){}
+
+void imagetools::setframerate(cv::VideoCapture& device,int reqframerate){
+     device.set(5,reqframerate);
+}
+
+void imagetools::setexposuretime(cv::VideoCapture& device, float exptime){}
+
+void imagetools::setgain(cv::VideoCapture& device,float gain){}
 
 cv::VideoCapture imagetools::getCamera(){
     return 1;

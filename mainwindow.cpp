@@ -76,7 +76,7 @@ void MainWindow::update_window()
 
 void MainWindow::on_Campushbtn_clicked()
 {
-  //  cap.set(5,30);
+  //
   //  cap.set(15, 0.8);
     if (!cap.open(0)){
         cap.release();
