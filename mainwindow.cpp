@@ -63,11 +63,10 @@ void MainWindow::update_window()
 {
 
     cv::Mat cframe;
-    QTextStream(stdout) << "yo program  has succesfully crashed." << endl;
+
     imtools->setvideodevice(0);
-    QTextStream(stdout) << "string to print" << endl;
     imtools->getCameraframe();
-    QTextStream(stdout) << "yo program  has succesfully uncrashed." << endl;
+
     auto scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888)));
@@ -76,29 +75,15 @@ void MainWindow::update_window()
 
 void MainWindow::on_Campushbtn_clicked()
 {
-  //
-  //  cap.set(15, 0.8);
-     QTextStream(stdout) << "string to prin12t" << endl;
-    imtools->setvideodevice(0);
- QTextStream(stdout) << "string to prin213123123" << endl;
-  //  if (!cap.open(0)){
-    //    cap.release();
-     //   disconnect(timer, SIGNAL(timeout()), this,NULL);
-       //  qt_image = QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888);
-  //  }else{
-        connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
-        timer->start(20);
-   // }
-/*
-    if (!cap.open(0)){
-        cap.release();
+    if ((imtools->iscameraopen)){
+        imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,NULL);
-       //  qt_image = QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888);
     }else{
+        imtools->setvideodevice(0);
+        QImage qt_image = QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888);
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
-    */
 }
 
 void MainWindow::on_actionDark_Mode_triggered()
@@ -246,6 +231,5 @@ void MainWindow::on_Con_xystage_button_clicked()
 
 void MainWindow::on_actionOpen_console_triggered()
 {
-
-
+    QTextStream(stdout) << "yo program  has succesfully crashed." << endl;
 }

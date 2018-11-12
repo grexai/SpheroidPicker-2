@@ -14,10 +14,15 @@ cv::Mat imagetools::setframe(cv::Mat &input){
 
 void imagetools::setvideodevice(int devid){
     camera = new cv::VideoCapture(devid);
-
-
-
+    iscameraopen = camera->isOpened();
 }
+
+void imagetools::rmvideodevice(){
+    camera->release();
+    iscameraopen= camera->isOpened();
+    camera = nullptr;
+}
+
 
 void imagetools::getCameraframe(){
     cv::Mat temp;
@@ -25,7 +30,6 @@ void imagetools::getCameraframe(){
     cvtColor(temp,temp,CV_BGR2RGB,0);
     setframe(temp);
 }
-
 
 /*
 0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.

@@ -37,13 +37,19 @@ public:
 
     void setvideodevice(int devid);
 
+    void rmvideodevice();
+
     cv::Mat threshimage(cv::Mat input,int thresh);
 
     int getSphCoors();
 
+    bool iscameraopen=false;
 
-private:
+protected:
+
     cv::VideoCapture* camera=nullptr;
+private:
+
     cv::Mat frame;
 
 };
