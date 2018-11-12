@@ -7,7 +7,7 @@
 
 
 bool cam = false;
-cv::VideoCapture cap(0);
+//cv::VideoCapture cap(0);
 imagetools imaging;
 
 void setdarkstyle(){
@@ -29,7 +29,6 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-    //qApp->setStyleSheet("1");
 }
 
 
@@ -38,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
 }
@@ -62,15 +61,16 @@ void MainWindow::show_currentpressure(){
 
 void MainWindow::update_window()
 {
-    cv::Mat cframe;
-    cap.read( cframe);
-    cvtColor(cframe,cframe,CV_BGR2RGB,0);
-    imaging.setframe(cframe);
 
+    cv::Mat cframe;
+    QTextStream(stdout) << "yo program  has succesfully crashed." << endl;
+    imtools->setvideodevice(0);
+    QTextStream(stdout) << "string to print" << endl;
+    imtools->getCameraframe();
+    QTextStream(stdout) << "yo program  has succesfully uncrashed." << endl;
     auto scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
-    scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888)));
-
+    scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888)));
 }
 
 
@@ -78,22 +78,32 @@ void MainWindow::on_Campushbtn_clicked()
 {
   //
   //  cap.set(15, 0.8);
-    if (!cap.open(0)){
-        cap.release();
-        disconnect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
+     QTextStream(stdout) << "string to prin12t" << endl;
+    imtools->setvideodevice(0);
+ QTextStream(stdout) << "string to prin213123123" << endl;
+  //  if (!cap.open(0)){
+    //    cap.release();
+     //   disconnect(timer, SIGNAL(timeout()), this,NULL);
        //  qt_image = QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888);
-    }else{
-
+  //  }else{
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
-}
-
+   // }
+/*
+    if (!cap.open(0)){
+        cap.release();
+        disconnect(timer, SIGNAL(timeout()), this,NULL);
+       //  qt_image = QImage((const unsigned char*) (imaging.getframe().data),imaging.getframe().cols, imaging.getframe().rows, QImage::Format_RGB888);
+    }else{
+        connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
+        timer->start(20);
+    }
+    */
 }
 
 void MainWindow::on_actionDark_Mode_triggered()
 {
     setdarkstyle();
-
 }
 
 
@@ -119,13 +129,10 @@ void MainWindow::on_Con_pc_clicked()
     else{
         ui->pc_stat->setText(fail_str);
     }
-
-
 }
 
 void MainWindow::on_Con_pip_clicked()
 {
-
    // serialcom sp(qsp_pip);
     QString port2 = "COM13"; //13
     apipc = new pipetteController(qsp_pip,port2);
@@ -233,4 +240,12 @@ void MainWindow::on_Con_xystage_button_clicked()
     //pRootUnit = theHardwareModel()->getUnit("");
     //pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
     //stage= new Stage(pRootUnit);
+}
+
+
+
+void MainWindow::on_actionOpen_console_triggered()
+{
+
+
 }

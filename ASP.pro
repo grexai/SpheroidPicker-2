@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 QT += serialport
+CONFIG += console
 SOURCES += \
         main.cpp \
         mainwindow.cpp \

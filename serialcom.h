@@ -11,13 +11,19 @@ class serialcom
 
 public:
     serialcom(QSerialPort& i_sp): sp(i_sp){}
+
      ~serialcom(){}
+
     QSerialPort& sp;
 
     bool openport(QString& com);
+
     void send(QString& command);
+
     QByteArray recive();
+
     QByteArray sendAndReceive(QString& msg, QString& ansEnd);
+
     void sp_flush();
 
 };

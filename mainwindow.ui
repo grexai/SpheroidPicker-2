@@ -1051,8 +1051,15 @@ outputs debug
     <addaction name="separator"/>
     <addaction name="actionDark_Mode"/>
    </widget>
+   <widget class="QMenu" name="menuDebug_tools">
+    <property name="title">
+     <string>Debug tools</string>
+    </property>
+    <addaction name="actionOpen_console"/>
+   </widget>
    <addaction name="menuFIle"/>
    <addaction name="menuTheme"/>
+   <addaction name="menuDebug_tools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -1071,6 +1078,11 @@ outputs debug
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionOpen_console">
+   <property name="text">
+    <string>Open console</string>
    </property>
   </action>
  </widget>

@@ -1,6 +1,6 @@
 #include "imagetools.h"
 #include <thread>
-
+#include <QtCore>
 
 
 cv::Mat imagetools::getframe()
@@ -8,10 +8,24 @@ cv::Mat imagetools::getframe()
     return this->frame;
 }
 
-
 cv::Mat imagetools::setframe(cv::Mat &input){
-   return this->frame= input;
+   return this->frame = input;
 }
+
+void imagetools::setvideodevice(int devid){
+    camera = new cv::VideoCapture(devid);
+
+
+
+}
+
+void imagetools::getCameraframe(){
+    cv::Mat temp;
+    camera->read(temp);
+    cvtColor(temp,temp,CV_BGR2RGB,0);
+    setframe(temp);
+}
+
 
 /*
 0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
@@ -36,26 +50,27 @@ cv::Mat imagetools::setframe(cv::Mat &input){
 */
 
 void imagetools::setimagewidth(cv::VideoCapture& device,int imwidth){
-
-
+    device.set(3,imwidth);
 }
 
-void imagetools::setimageheight(cv::VideoCapture& device, int imheight){}
+void imagetools::setimageheight(cv::VideoCapture& device, int imheight){
+    device.set(4,imheight);
+}
 
 void imagetools::setframerate(cv::VideoCapture& device,int reqframerate){
-     device.set(5,reqframerate);
+    device.set(5,reqframerate);
 }
 
-void imagetools::setexposuretime(cv::VideoCapture& device, float exptime){}
+void imagetools::setgain(cv::VideoCapture& device,float gain){
+    device.set(14,gain);
+}
 
-void imagetools::setgain(cv::VideoCapture& device,float gain){}
+void imagetools::setexposuretime(cv::VideoCapture& device, float exptime){
+    device.set(15,exptime);
+}
 
 cv::VideoCapture imagetools::getCamera(){
     return 1;
-}
-
-void imagetools::setvideodevice(int devn){
-
 }
 
 //void imagetools::

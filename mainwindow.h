@@ -42,6 +42,8 @@ protected:
     ahm::Unit* pStageUnit= nullptr;
     ahm::Unit* pRootUnit = nullptr;
     Stage *stage= nullptr;
+    imagetools* imtools= nullptr;
+
 private slots:
      void on_Campushbtn_clicked();
 
@@ -94,6 +96,8 @@ private slots:
      void on_lcdNumber_overflow();
 
 
+
+     void on_actionOpen_console_triggered();
 
 private:
     QTimer *timer;
