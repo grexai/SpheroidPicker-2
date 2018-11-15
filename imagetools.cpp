@@ -77,4 +77,53 @@ cv::VideoCapture imagetools::getCamera(){
     return 1;
 }
 
+int2coors imagetools::getSphCoors(cv::Mat &img){
+    using namespace   std;
+    int2coors sphcoors;
+        cv::Mat gray;
+        cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
+        cv::Mat out,out2;
+
+    //	threshold(gray, out, 105, 255, THRESH_BINARY);
+        threshold(gray, out, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    //	adaptiveThreshold(gray, out2, 255, CV, THRESH_BINARY,27,2);
+
+        bitwise_not(out, out);
+
+        cv::Mat label ;
+
+//     int la = connectedComponents(out, label,8, CV_16U);
+
+        cv::Mat labels, stats, centroids;
+
+        int nLabels = connectedComponentsWithStats(out, label,stats, centroids, 8, CV_16U);
+
+        cv::Mat seeMyLabels;
+
+        cv::normalize(label, seeMyLabels,0, 255, cv::NORM_MINMAX, CV_8U);
+
+        cv::applyColorMap(seeMyLabels, seeMyLabels, cv::COLORMAP_JET);
+
+        cout << "Number of connected components = " << nLabels << endl << endl;
+        // Statistics
+        cout << "Show statistics and centroids:" << endl;
+        cout << "stats:" << endl << "(left,top,width,height,area)" << endl << stats << endl << endl;
+        cout << "centroids:" << endl << "(x, y)" << endl << centroids << endl << endl;
+
+        // Print individual stats for component 1 (component 0 is background)
+        cout << "Component 1 stats:" << endl;
+
+        std::cout << "CC_STAT_LEFT   = " << stats.at<int>(3, cv::CC_STAT_LEFT) << endl;
+        cout << "CC_STAT_TOP    = " << stats.at<int>(3, cv::CC_STAT_TOP) << endl;
+        cout << "CC_STAT_WIDTH  = " << stats.at<int>(3,cv:: CC_STAT_WIDTH) << endl;
+        cout << "CC_STAT_HEIGHT = " << stats.at<int>(3,cv:: CC_STAT_HEIGHT) << endl;
+        cout << "CC_STAT_AREA   = " << stats.at<int>(79,cv:: CC_STAT_AREA) << endl;
+
+    return sphcoors;
+
+}
+
+
+
+
 //void imagetools::

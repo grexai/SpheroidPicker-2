@@ -81,7 +81,7 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
     //split strings by :
     QString s(answer);
     QStringList resultStrings =  s.split(':');
-    Float3coor pipcoors;
+    float3coors pipcoors;
     // get floating point number regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
     std::vector<float> coors;

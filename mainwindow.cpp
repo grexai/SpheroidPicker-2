@@ -6,10 +6,6 @@
 //#include "ArduinoPressureController.h"
 
 
-bool cam = false;
-//cv::VideoCapture cap(0);
-imagetools imaging;
-
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
     QPalette darkPalette;
@@ -53,6 +49,7 @@ void MainWindow::update_currentpressure(){
     QString cps = QString::number(cp);
     ui->lcdNumber->display(cps);
 }
+
 void MainWindow::show_currentpressure(){
     update_currentpressure();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
@@ -61,12 +58,9 @@ void MainWindow::show_currentpressure(){
 
 void MainWindow::update_window()
 {
-
     cv::Mat cframe;
-
     imtools->setvideodevice(0);
     imtools->getCameraframe();
-
     auto scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888)));
@@ -77,10 +71,9 @@ void MainWindow::on_Campushbtn_clicked()
 {
     if ((imtools->iscameraopen)){
         imtools->rmvideodevice();
-        disconnect(timer, SIGNAL(timeout()), this,NULL);
+        disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
         imtools->setvideodevice(0);
-        QImage qt_image = QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888);
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
@@ -223,6 +216,7 @@ void MainWindow::on_lcdNumber_overflow()
 void MainWindow::on_Con_xystage_button_clicked()
 {
     //pRootUnit = theHardwareModel()->getUnit("");
+
     //pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
     //stage= new Stage(pRootUnit);
 }
@@ -232,4 +226,5 @@ void MainWindow::on_Con_xystage_button_clicked()
 void MainWindow::on_actionOpen_console_triggered()
 {
     QTextStream(stdout) << "yo program  has succesfully crashed." << endl;
+   // std::cout<< "asdsaedsadsadsa"<< std::endl;
 }

@@ -2,8 +2,10 @@
 #define IMAGING_H
 #include <opencv2/opencv.hpp>
 #include <opencv/highgui.h>
-
-
+#include <opencv2\core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <types.h>
 
 
 class imagetools
@@ -41,7 +43,7 @@ public:
 
     cv::Mat threshimage(cv::Mat input,int thresh);
 
-    int getSphCoors();
+    int2coors getSphCoors(cv::Mat &img);
 
     bool iscameraopen=false;
 

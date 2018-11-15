@@ -46,7 +46,7 @@ public:
 
     bool getEndstopstatus(); //M119
 
-    Float3coor getcurrentpos(QByteArray& answer); //M114
+    float3coors getcurrentpos(QByteArray& answer); //M114
 
 protected:
 
