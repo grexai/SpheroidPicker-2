@@ -34,17 +34,19 @@ public:
 
 public slots:
 
+
 protected:
     arduinopressurecontroller* acp= nullptr ;
     pipetteController* apipc= nullptr;
     QSerialPort qsp_pip;
     QSerialPort qsp_pc;
     ahm::Unit* pStageUnit= nullptr;
-    ahm::Unit* pRootUnit = nullptr;
+    ahm::Unit* pRootUnit= nullptr;
     Stage *stage= nullptr;
     imagetools* imtools= nullptr;
 
 private slots:
+
      void on_Campushbtn_clicked();
 
      void update_window();
@@ -98,6 +100,8 @@ private slots:
 
 
      void on_actionOpen_console_triggered();
+
+     void on_s_center_button_clicked();
 
 private:
     QTimer *timer;

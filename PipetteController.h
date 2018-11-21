@@ -26,11 +26,11 @@ public:
     // move Linear or interpolated default movement type is linear else Interpolated movement
     void moveAsync(float x, float y, float z,bool movetype = true); // G0
 
-    void moveToXAsync(float x_value);
+    void moveToXSync(float x_value);
 
-    void moveToYAsync(float y_value);
+    void moveToYSync(float y_value);
 
-    void moveToZAsync(float z_value);
+    void moveToZSync(float z_value);
 
 
     //G28
@@ -48,6 +48,7 @@ public:
 
     float3coors getcurrentpos(QByteArray& answer); //M114
 
+    void moveThereSync(float3coors there);
 protected:
 
     serialcom apipc_sc;

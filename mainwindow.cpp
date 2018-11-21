@@ -154,58 +154,68 @@ void MainWindow::on_get_coors_pushButton_clicked()
 
 void MainWindow::on_s_xp_button_clicked()
 {
-
+    iop::int32 x0= stage->XAxis().getCurrentPosition();
+    iop::int32 x = ui->s_step_spinbox->value();
+    stage->XAxis().moveToAsync(x0+x);
 }
 
 void MainWindow::on_s_xm_button_clicked()
 {
 
+    iop::int32 x0= stage->XAxis().getCurrentPosition();
+    iop::int32 x = ui->s_step_spinbox->value();
+    stage->XAxis().moveToAsync(x0-x);
 }
 
 void MainWindow::on_s_yp_button_clicked()
 {
-
+    iop::int32 y0= stage->YAxis().getCurrentPosition();
+    iop::int32 y = ui->s_step_spinbox->value();
+    stage->YAxis().moveToAsync(y0+y);
 }
 
 void MainWindow::on_s_ym_button_clicked()
 {
-
+    iop::int32 y0= stage->YAxis().getCurrentPosition();
+    iop::int32 y = ui->s_step_spinbox->value();
+    stage->YAxis().moveToAsync(y0-y);
 }
 
 void MainWindow::on_p_xp_button_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToXAsync(ui->pip_step_spinbox->value());
+    apipc->moveToXSync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToXAsync(-(ui->pip_step_spinbox->value()));
+    apipc->moveToXSync(-(ui->pip_step_spinbox->value()));
 }
 
 void MainWindow::on_p_yp_button_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToYAsync(ui->pip_step_spinbox->value());
+    apipc->moveToYSync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_ym_button_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToYAsync(-(ui->pip_step_spinbox->value()));
+    apipc->moveToYSync(-(ui->pip_step_spinbox->value()));
 }
 
 void MainWindow::on_p_zp_button_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToZAsync(ui->pip_step_spinbox->value());
+    apipc->moveToZSync(ui->pip_step_spinbox->value());
 }
+
 
 void MainWindow::on_p_zm_btton_clicked()
 {
     apipc->setrelativepositioning();
-    apipc->moveToZAsync(-(ui->pip_step_spinbox->value()));
+    apipc->moveToZSync(-(ui->pip_step_spinbox->value()));
 }
 
 void MainWindow::on_lcdNumber_overflow()
@@ -215,16 +225,109 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-    //pRootUnit = theHardwareModel()->getUnit("");
+try{
+    if(theHardwareModel()){
 
-    //pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
-    //stage= new Stage(pRootUnit);
+    QTextStream(stdout) << "asdsad" << endl;
+
+    iop::string name = "";
+
+    pRootUnit = theHardwareModel()->getUnit("");
+
+    QTextStream(stdout) << pRootUnit << endl;
+
+    if(pRootUnit){
+        pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+        stage = new Stage(pStageUnit) ;
+
+        if(!pStageUnit){
+            QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
+            return;
+        }
+
+        stage->printWhatIsSupported();
+        iop::int32 x0 = stage->XAxis().getMinPosition();
+        iop::int32 x1 = stage->XAxis().getMaxPosition();
+
+        iop::int32 y0 = stage->YAxis().getMinPosition();
+        iop::int32 y1 = stage->YAxis().getMaxPosition();
+
+        stage->moveToAsync(x0,y0, true); // move to min corner and wait
+
+        iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
+        iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
+
+        Stage::PositionRecorder recorder;
+
+        stage->subscribe(&recorder);
+
+        DWORD t0 = ::GetTickCount();
+
+        stage->moveToAsync(x,y, false);
+
+        ::Sleep(1000);
+
+        Stage::PositionRecorder::Records records;
+        recorder.getRecords(records, true);
+
+        bool flagMoving = stage->isMoving();
+
+        iop::int32 maxSpeedX = stage->XAxis().getMaxSpeed();
+        iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
+
+
+        iop::int32 oldSpeedX = curSpeedX; // save original speed
+
+        curSpeedX = curSpeedX / 2;
+
+
+        stage->XAxis().setCurrentSpeed(curSpeedX);
+
+        // lets move back to min
+
+        t0 =     ::GetTickCount();
+
+        ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
+
+        if(pAsyncResult){     // discard AsyncResult
+            pAsyncResult->dispose();
+            pAsyncResult=0;
+        }
+            ::Sleep(1000);
+
+            recorder.getRecords(records, true);
+
+            flagMoving = stage->isMoving();
+
+            stage->XAxis().setCurrentSpeed(oldSpeedX); // restore original speed
+        }
+    }
+    }
+    catch (ahm::Exception & ex) {
+          // a hardware model exception occured:
+          QTextStream(stdout) << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << endl;
+   }
+
 }
-
-
 
 void MainWindow::on_actionOpen_console_triggered()
 {
-    QTextStream(stdout) << "yo program  has succesfully crashed." << endl;
+    QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
    // std::cout<< "asdsaedsadsadsa"<< std::endl;
+}
+
+
+void MainWindow::on_s_center_button_clicked()
+{
+
+    iop::int32 x0 = stage->XAxis().getMinPosition();
+    iop::int32 x1 = stage->XAxis().getMaxPosition();
+
+    iop::int32 y0 = stage->YAxis().getMinPosition();
+    iop::int32 y1 = stage->YAxis().getMaxPosition();
+
+    iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
+    iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
+
+    stage->moveToAsync(x,y, false);
 }

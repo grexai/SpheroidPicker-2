@@ -49,17 +49,17 @@ void pipetteController::moveAsync(float x, float y, float z,bool movetype){
     apipc_sc.send(msg);
 }
 
-void pipetteController::moveToXAsync(float x_value){
+void pipetteController::moveToXSync(float x_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
 }
 
-void pipetteController::moveToYAsync(float y_value){
+void pipetteController::moveToYSync(float y_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("Y").append(QString::number(y_value,'f',2)).append(EOM));
 }
 
-void pipetteController::moveToZAsync(float z_value){
+void pipetteController::moveToZSync(float z_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
@@ -97,11 +97,21 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
             //error extracting coord
          }
     }
-
     pipcoors.x = coors.at(0);
     pipcoors.y = coors.at(1);
     pipcoors.z = coors.at(2);
 
     return pipcoors;
 }
+
+void pipetteController::moveThereSync(float3coors there){
+    setabsoluepositioning();
+    moveToZSync(there.z+40);
+    moveToXSync(there.x);
+    moveToYSync(there.y);
+    moveToZSync(there.z+20);
+
+}
+
+
 

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1309</width>
-    <height>594</height>
+    <width>1659</width>
+    <height>772</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -158,8 +158,8 @@
      <rect>
       <x>440</x>
       <y>40</y>
-      <width>711</width>
-      <height>491</height>
+      <width>1101</width>
+      <height>671</height>
      </rect>
     </property>
    </widget>
@@ -237,7 +237,7 @@
    <widget class="QPushButton" name="Campushbtn">
     <property name="geometry">
      <rect>
-      <x>1160</x>
+      <x>1560</x>
       <y>40</y>
       <width>80</width>
       <height>21</height>
@@ -263,8 +263,8 @@
    <widget class="QPushButton" name="SetPressure">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>410</y>
+      <x>30</x>
+      <y>530</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -276,8 +276,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>350</y>
+      <x>290</x>
+      <y>470</y>
       <width>131</width>
       <height>111</height>
      </rect>
@@ -369,8 +369,8 @@ outputs debug
    <widget class="QPushButton" name="atm_button">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>440</y>
+      <x>30</x>
+      <y>560</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -382,8 +382,8 @@ outputs debug
    <widget class="QDoubleSpinBox" name="breakin_value">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>380</y>
+      <x>130</x>
+      <y>500</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -398,8 +398,8 @@ outputs debug
    <widget class="QPushButton" name="pc_Breakin_button">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>380</y>
+      <x>30</x>
+      <y>500</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -411,8 +411,8 @@ outputs debug
    <widget class="QDoubleSpinBox" name="breakin_time">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>380</y>
+      <x>210</x>
+      <y>500</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -427,8 +427,8 @@ outputs debug
    <widget class="QDoubleSpinBox" name="pressure_value">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>410</y>
+      <x>130</x>
+      <y>530</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -440,8 +440,8 @@ outputs debug
    <widget class="QLabel" name="Pressrelbl">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>350</y>
+      <x>130</x>
+      <y>470</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -453,8 +453,8 @@ outputs debug
    <widget class="QLabel" name="breakin_time_text">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>350</y>
+      <x>210</x>
+      <y>470</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -466,8 +466,8 @@ outputs debug
    <widget class="QLCDNumber" name="lcdNumber">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>490</y>
+      <x>180</x>
+      <y>610</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -913,8 +913,8 @@ outputs debug
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>470</y>
+      <x>30</x>
+      <y>590</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -926,8 +926,8 @@ outputs debug
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>500</y>
+      <x>30</x>
+      <y>620</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -939,8 +939,8 @@ outputs debug
    <widget class="QLabel" name="c_p_text">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>450</y>
+      <x>150</x>
+      <y>570</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -952,7 +952,7 @@ outputs debug
    <widget class="QLabel" name="LiveImage_text">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>990</x>
       <y>10</y>
       <width>91</width>
       <height>16</height>
@@ -965,7 +965,7 @@ outputs debug
    <widget class="QLabel" name="camerasettings_text">
     <property name="geometry">
      <rect>
-      <x>1160</x>
+      <x>1560</x>
       <y>10</y>
       <width>81</width>
       <height>16</height>
@@ -978,8 +978,8 @@ outputs debug
    <widget class="QLabel" name="pc_coms_text">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>350</y>
+      <x>30</x>
+      <y>470</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -1027,13 +1027,27 @@ outputs debug
      <string>Z: </string>
     </property>
    </widget>
+   <widget class="QPushButton" name="s_center_button">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>200</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Center
+Stage</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1309</width>
+     <width>1659</width>
      <height>20</height>
     </rect>
    </property>
@@ -1053,7 +1067,7 @@ outputs debug
    </widget>
    <widget class="QMenu" name="menuDebug_tools">
     <property name="title">
-     <string>Debug tools</string>
+     <string>Tools</string>
     </property>
     <addaction name="actionOpen_console"/>
    </widget>
@@ -1082,7 +1096,7 @@ outputs debug
   </action>
   <action name="actionOpen_console">
    <property name="text">
-    <string>Open console</string>
+    <string>Open python console</string>
    </property>
   </action>
  </widget>
