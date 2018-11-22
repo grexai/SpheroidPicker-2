@@ -64,6 +64,10 @@ void MainWindow::update_window()
     auto scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888)));
+    ui->graphicsView->fitInView( scene->sceneRect(), Qt::KeepAspectRatio);
+
+    //ui->graphicsView->scale(imtools->getframe().cols / ui->graphicsView->sceneRect().width(), imtools->getframe().rows /  ui->graphicsView->sceneRect().height());
+
 }
 
 
@@ -74,6 +78,7 @@ void MainWindow::on_Campushbtn_clicked()
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
         imtools->setvideodevice(0);
+
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
@@ -225,89 +230,86 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-try{
-    if(theHardwareModel()){
+    try{
+        if(theHardwareModel()){
 
-    QTextStream(stdout) << "asdsad" << endl;
+            QTextStream(stdout) << "asdsad" << endl;
 
-    iop::string name = "";
+            iop::string name = "";
 
-    pRootUnit = theHardwareModel()->getUnit("");
+            pRootUnit = theHardwareModel()->getUnit("");
 
-    QTextStream(stdout) << pRootUnit << endl;
+            QTextStream(stdout) << pRootUnit << endl;
 
-    if(pRootUnit){
-        pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
-        stage = new Stage(pStageUnit) ;
+            if(pRootUnit){
+                pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
+                stage = new Stage(pStageUnit) ;
 
-        if(!pStageUnit){
-            QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
-            return;
-        }
+            if(!pStageUnit){
+                QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
+                return;
+            }
 
-        stage->printWhatIsSupported();
-        iop::int32 x0 = stage->XAxis().getMinPosition();
-        iop::int32 x1 = stage->XAxis().getMaxPosition();
+            stage->printWhatIsSupported();
+            iop::int32 x0 = stage->XAxis().getMinPosition();
+            iop::int32 x1 = stage->XAxis().getMaxPosition();
 
-        iop::int32 y0 = stage->YAxis().getMinPosition();
-        iop::int32 y1 = stage->YAxis().getMaxPosition();
+            iop::int32 y0 = stage->YAxis().getMinPosition();
+            iop::int32 y1 = stage->YAxis().getMaxPosition();
 
-        stage->moveToAsync(x0,y0, true); // move to min corner and wait
+            stage->moveToAsync(x0,y0, true); // move to min corner and wait
 
-        iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
-        iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
+            iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
+            iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
 
-        Stage::PositionRecorder recorder;
+            Stage::PositionRecorder recorder;
 
-        stage->subscribe(&recorder);
+            stage->subscribe(&recorder);
 
-        DWORD t0 = ::GetTickCount();
+            DWORD t0 = ::GetTickCount();
 
-        stage->moveToAsync(x,y, false);
+            stage->moveToAsync(x,y, false);
 
-        ::Sleep(1000);
+            ::Sleep(1000);
 
-        Stage::PositionRecorder::Records records;
-        recorder.getRecords(records, true);
+            Stage::PositionRecorder::Records records;
+            recorder.getRecords(records, true);
 
-        bool flagMoving = stage->isMoving();
+            bool flagMoving = stage->isMoving();
 
-        iop::int32 maxSpeedX = stage->XAxis().getMaxSpeed();
-        iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
+            iop::int32 maxSpeedX = stage->XAxis().getMaxSpeed();
+            iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
 
+            iop::int32 oldSpeedX = curSpeedX; // save original speed
 
-        iop::int32 oldSpeedX = curSpeedX; // save original speed
+            curSpeedX = curSpeedX / 2;
 
-        curSpeedX = curSpeedX / 2;
+            stage->XAxis().setCurrentSpeed(curSpeedX);
 
+            // lets move back to min
 
-        stage->XAxis().setCurrentSpeed(curSpeedX);
+            t0 =     ::GetTickCount();
 
-        // lets move back to min
+            ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
 
-        t0 =     ::GetTickCount();
-
-        ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
-
-        if(pAsyncResult){     // discard AsyncResult
+            if(pAsyncResult){     // discard AsyncResult
             pAsyncResult->dispose();
             pAsyncResult=0;
         }
-            ::Sleep(1000);
+                ::Sleep(1000);
 
-            recorder.getRecords(records, true);
+                recorder.getRecords(records, true);
 
-            flagMoving = stage->isMoving();
+                flagMoving = stage->isMoving();
 
-            stage->XAxis().setCurrentSpeed(oldSpeedX); // restore original speed
+                stage->XAxis().setCurrentSpeed(oldSpeedX); // restore original speed
+            }
         }
     }
-    }
     catch (ahm::Exception & ex) {
-          // a hardware model exception occured:
-          QTextStream(stdout) << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << endl;
-   }
-
+     // a hardware model exception occured:
+        QTextStream(stdout) << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << endl;
+    }
 }
 
 void MainWindow::on_actionOpen_console_triggered()
