@@ -770,7 +770,7 @@ outputs debug
     <widget class="QSpinBox" name="s_step_spinbox">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>80</x>
        <y>60</y>
        <width>61</width>
        <height>22</height>
@@ -868,17 +868,27 @@ Stage</string>
       <string>Home Stage</string>
      </property>
     </widget>
-    <widget class="QLabel" name="s_speed_text">
+    <widget class="QDoubleSpinBox" name="s_speed_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="s_set_speed_button">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>90</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Speed</string>
+      <string>Set Speed</string>
      </property>
     </widget>
    </widget>

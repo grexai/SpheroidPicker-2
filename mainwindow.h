@@ -111,6 +111,8 @@ private slots:
 
      void on_height_button_clicked();
 
+     void on_s_set_speed_button_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

@@ -261,6 +261,8 @@ void MainWindow::on_Con_xystage_button_clicked()
                     return;
                 }
             ui->s_stat->setText(con_str);
+            iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
+            ui->s_step_spinbox->setValue(float(curSpeedX));
             }
         }
 }
@@ -285,6 +287,8 @@ void MainWindow::on_s_center_button_clicked()
     stage->moveToAsync(x,y, false);
 }
 
+
+
 void MainWindow::on_exptime_button_clicked()
 {
     imtools->setexposuretime(ui->exptime_spin->value());
@@ -298,4 +302,9 @@ void MainWindow::on_width_button_clicked()
 void MainWindow::on_height_button_clicked()
 {
     imtools->setimagewidth(ui->height_spin->value());
+}
+
+void MainWindow::on_s_set_speed_button_clicked()
+{
+    stage->XAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
 }
