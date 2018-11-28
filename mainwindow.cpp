@@ -27,12 +27,13 @@ void setdarkstyle(){
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
 }
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->graphicsView->setScene(new QGraphicsScene(this));
+    ui->graphicsView->scene()->addItem(&qpxmi);
     imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
@@ -44,8 +45,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_currentpressure(){
-//  float cp = acp->getPipettePressure();
-    float cp = (QRandomGenerator::global()->generate());
+    float cp = acp->getPipettePressure();
+     QTextStream(stdout) << cp << endl;
+    //float cp = (QRandomGenerator::global()->generate());
     QString cps = QString::number(cp);
     ui->lcdNumber->display(cps);
 }
@@ -58,27 +60,35 @@ void MainWindow::show_currentpressure(){
 
 void MainWindow::update_window()
 {
-    cv::Mat cframe;
-    imtools->setvideodevice(0);
     imtools->getCameraframe();
-    auto scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(scene);
-    scene->addPixmap(QPixmap::fromImage( QImage((const unsigned char*) (imtools->getframe().data),imtools->getframe().cols, imtools->getframe().rows, QImage::Format_RGB888)));
-    ui->graphicsView->fitInView( scene->sceneRect(), Qt::KeepAspectRatio);
-
-    //ui->graphicsView->scale(imtools->getframe().cols / ui->graphicsView->sceneRect().width(), imtools->getframe().rows /  ui->graphicsView->sceneRect().height());
-
+    if (qframe != nullptr)
+    {
+        delete[] qframe;
+    }
+    auto qframe = new QImage((const unsigned char*) (imtools->getframe()->data),imtools->getframe()->cols, imtools->getframe()->rows, QImage::Format_RGB888);
+    qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
-
 
 void MainWindow::on_Campushbtn_clicked()
 {
     if ((imtools->iscameraopen)){
+        ui->Campushbtn->setText("Camera on");
         imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
-        imtools->setvideodevice(0);
 
+        imtools->setvideodevice(cameraIndex);
+        if(!imtools->getCamera()->open(cameraIndex))
+              {
+                  QMessageBox::critical(this,
+                                        "Camera Error",
+                                        "Make sure you entered a correct camera index,"
+                                        "<br>or that the camera is not being accessed by another program!");
+                  return;
+              }
+
+        ui->Campushbtn->setText("Camera off");
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
@@ -86,6 +96,7 @@ void MainWindow::on_Campushbtn_clicked()
 
 void MainWindow::on_actionDark_Mode_triggered()
 {
+
     setdarkstyle();
 }
 
@@ -102,7 +113,7 @@ void MainWindow::on_Home_pip_clicked()
 
 void MainWindow::on_Con_pc_clicked()
 {
-    QString port = "COM10";
+    QString port = "COM5";
     acp = new arduinopressurecontroller(qsp_pc,port);
     if (acp->isconnected)
     {
@@ -117,7 +128,7 @@ void MainWindow::on_Con_pc_clicked()
 void MainWindow::on_Con_pip_clicked()
 {
    // serialcom sp(qsp_pip);
-    QString port2 = "COM13"; //13
+    QString port2 = "COM20"; //13
     apipc = new pipetteController(qsp_pip,port2);
     if (apipc->isconnected)
     {
@@ -137,8 +148,7 @@ void MainWindow::on_SetPressure_clicked()
 
 void MainWindow::on_atm_button_clicked()
 {
-    float pr=acp->getPipettePressure();
-    ui->label_3->setText(QString::number(pr));
+    acp->requestPressure(0.0f);
 }
 
 void MainWindow::on_pc_Breakin_button_clicked()
@@ -161,7 +171,7 @@ void MainWindow::on_s_xp_button_clicked()
 {
     iop::int32 x0= stage->XAxis().getCurrentPosition();
     iop::int32 x = ui->s_step_spinbox->value();
-    stage->XAxis().moveToAsync(x0+x);
+    stage->XAxis().moveToAsync(iop::int32(x0+x));
 }
 
 void MainWindow::on_s_xm_button_clicked()
@@ -230,7 +240,8 @@ void MainWindow::on_lcdNumber_overflow()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-    try{
+//    try{
+
         if(theHardwareModel()){
 
             QTextStream(stdout) << "asdsad" << endl;
@@ -245,79 +256,19 @@ void MainWindow::on_Con_xystage_button_clicked()
                 pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
                 stage = new Stage(pStageUnit) ;
 
-            if(!pStageUnit){
-                QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
-                return;
-            }
-
-            stage->printWhatIsSupported();
-            iop::int32 x0 = stage->XAxis().getMinPosition();
-            iop::int32 x1 = stage->XAxis().getMaxPosition();
-
-            iop::int32 y0 = stage->YAxis().getMinPosition();
-            iop::int32 y1 = stage->YAxis().getMaxPosition();
-
-            stage->moveToAsync(x0,y0, true); // move to min corner and wait
-
-            iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
-            iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
-
-            Stage::PositionRecorder recorder;
-
-            stage->subscribe(&recorder);
-
-            DWORD t0 = ::GetTickCount();
-
-            stage->moveToAsync(x,y, false);
-
-            ::Sleep(1000);
-
-            Stage::PositionRecorder::Records records;
-            recorder.getRecords(records, true);
-
-            bool flagMoving = stage->isMoving();
-
-            iop::int32 maxSpeedX = stage->XAxis().getMaxSpeed();
-            iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
-
-            iop::int32 oldSpeedX = curSpeedX; // save original speed
-
-            curSpeedX = curSpeedX / 2;
-
-            stage->XAxis().setCurrentSpeed(curSpeedX);
-
-            // lets move back to min
-
-            t0 =     ::GetTickCount();
-
-            ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
-
-            if(pAsyncResult){     // discard AsyncResult
-            pAsyncResult->dispose();
-            pAsyncResult=0;
-        }
-                ::Sleep(1000);
-
-                recorder.getRecords(records, true);
-
-                flagMoving = stage->isMoving();
-
-                stage->XAxis().setCurrentSpeed(oldSpeedX); // restore original speed
+                if(!pStageUnit){
+                    QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
+                    return;
+                }
+            ui->s_stat->setText(con_str);
             }
         }
-    }
-    catch (ahm::Exception & ex) {
-     // a hardware model exception occured:
-        QTextStream(stdout) << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << endl;
-    }
 }
 
 void MainWindow::on_actionOpen_console_triggered()
 {
     QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
-   // std::cout<< "asdsaedsadsadsa"<< std::endl;
 }
-
 
 void MainWindow::on_s_center_button_clicked()
 {
@@ -332,4 +283,19 @@ void MainWindow::on_s_center_button_clicked()
     iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
 
     stage->moveToAsync(x,y, false);
+}
+
+void MainWindow::on_exptime_button_clicked()
+{
+    imtools->setexposuretime(ui->exptime_spin->value());
+}
+
+void MainWindow::on_width_button_clicked()
+{
+    imtools->setimagewidth(ui->width_spin->value());
+}
+
+void MainWindow::on_height_button_clicked()
+{
+    imtools->setimagewidth(ui->height_spin->value());
 }

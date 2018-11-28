@@ -67,6 +67,7 @@ void pipetteController::moveToZSync(float z_value){
 void pipetteController::setabsoluepositioning(){
     QString msg = "G90";
     apipc_sc.send(msg.append(EOM));
+
 }
 
 void pipetteController::setrelativepositioning(){

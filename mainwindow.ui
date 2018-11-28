@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1859</width>
-    <height>821</height>
+    <width>1722</width>
+    <height>818</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,31 +20,18 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>430</x>
       <y>40</y>
-      <width>1280</width>
+      <width>1081</width>
       <height>720</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Campushbtn">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>50</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string> Camera on</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>440</y>
+      <y>470</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -120,7 +107,7 @@ outputs debug
      <string>Connect XY-Stage</string>
     </property>
    </widget>
-   <widget class="QLabel" name="pc_stat_2">
+   <widget class="QLabel" name="s_stat">
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -146,24 +133,11 @@ outputs debug
      <string>Live Image</string>
     </property>
    </widget>
-   <widget class="QLabel" name="camerasettings_text">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>20</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Camera Settings</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="P_C_box">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>510</y>
+      <y>540</y>
       <width>311</width>
       <height>211</height>
      </rect>
@@ -774,7 +748,7 @@ outputs debug
       <x>20</x>
       <y>140</y>
       <width>181</width>
-      <height>291</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="title">
@@ -783,8 +757,8 @@ outputs debug
     <widget class="QPushButton" name="s_xp_button">
      <property name="geometry">
       <rect>
-       <x>120</x>
-       <y>160</y>
+       <x>130</x>
+       <y>190</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -813,7 +787,7 @@ outputs debug
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>210</y>
+       <y>250</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -826,7 +800,7 @@ outputs debug
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>160</y>
+       <y>190</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -840,7 +814,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>110</y>
+       <y>130</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -865,8 +839,8 @@ Stage</string>
     <widget class="QPushButton" name="s_xm_button">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>160</y>
+       <x>10</x>
+       <y>190</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -894,14 +868,27 @@ Stage</string>
       <string>Home Stage</string>
      </property>
     </widget>
+    <widget class="QLabel" name="s_speed_text">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Speed</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="pip_c_box">
     <property name="geometry">
      <rect>
       <x>210</x>
       <y>140</y>
-      <width>211</width>
-      <height>291</height>
+      <width>201</width>
+      <height>301</height>
      </rect>
     </property>
     <property name="title">
@@ -1080,13 +1067,161 @@ Stage</string>
      </property>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="Camera_settings">
+    <property name="geometry">
+     <rect>
+      <x>1520</x>
+      <y>30</y>
+      <width>171</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Camera Settings</string>
+    </property>
+    <widget class="QPushButton" name="Campushbtn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string> Camera on</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="exptime_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Exp Time</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="width_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Width</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="height_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Height</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="width_spin">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>50</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="singleStep">
+      <number>50</number>
+     </property>
+     <property name="value">
+      <number>1280</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="height_spin">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>90</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>720</number>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="exptime_spin">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>130</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="minimum">
+      <double>-99.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Gain</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>190</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Framerate</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1859</width>
+     <width>1722</width>
      <height>20</height>
     </rect>
    </property>

@@ -3,13 +3,18 @@
 #include <QtCore>
 
 
-cv::Mat imagetools::getframe()
+cv::Mat* imagetools::getframe()
 {
-    return this->frame;
+    return (this->frame);
 }
 
-cv::Mat imagetools::setframe(cv::Mat &input){
-   return this->frame = input;
+void imagetools::setframe(cv::Mat &input){
+    if (this->frame != nullptr){
+     //   delete[] (this->frame);
+        this->frame->release();
+    }
+    this->frame = new cv::Mat();
+    this->frame = &input;
 }
 
 void imagetools::setvideodevice(int devid){
@@ -21,14 +26,20 @@ void imagetools::rmvideodevice(){
     camera->release();
     iscameraopen= camera->isOpened();
     camera = nullptr;
+    delete  camera;
 }
 
-
 void imagetools::getCameraframe(){
-    cv::Mat temp;
-    camera->read(temp);
-    cvtColor(temp,temp,CV_BGR2RGB,0);
-    setframe(temp);
+    if (this->frame != nullptr) { delete frame;}
+    this->frame = new cv::Mat();
+    camera->read(*this->frame);
+    cvtColor(*this->frame,*this->frame,CV_BGR2RGB,0);
+}
+
+void imagetools::freeframe(){
+  // this->getframe()->release();
+    delete this->frame;
+  //  free(this->frame);
 }
 
 /*
@@ -53,28 +64,28 @@ void imagetools::getCameraframe(){
 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
 */
 
-void imagetools::setimagewidth(cv::VideoCapture& device,int imwidth){
-    device.set(3,imwidth);
+void imagetools::setimagewidth(int imwidth){
+   this->camera->set(3,imwidth);
 }
 
-void imagetools::setimageheight(cv::VideoCapture& device, int imheight){
-    device.set(4,imheight);
+void imagetools::setimageheight(int imheight){
+    this->camera->set(4,imheight);
 }
 
-void imagetools::setframerate(cv::VideoCapture& device,int reqframerate){
-    device.set(5,reqframerate);
+void imagetools::setframerate(int reqframerate){
+    this->camera->set(5,reqframerate);
 }
 
-void imagetools::setgain(cv::VideoCapture& device,float gain){
-    device.set(14,gain);
+void imagetools::setgain(float gain){
+   this->camera->set(14,gain);
 }
 
-void imagetools::setexposuretime(cv::VideoCapture& device, float exptime){
-    device.set(15,exptime);
+void imagetools::setexposuretime(float exptime){
+    this->camera->set(15,exptime);
 }
 
-cv::VideoCapture imagetools::getCamera(){
-    return 1;
+cv::VideoCapture* imagetools::getCamera(){
+   return this->camera;
 }
 
 int2coors imagetools::getSphCoors(cv::Mat &img){

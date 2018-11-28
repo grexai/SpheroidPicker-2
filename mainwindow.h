@@ -3,12 +3,12 @@
 #include <QThread>
 #include <QTimer>
 #include <QMainWindow>
-
+#include <QMessageBox>
+#include <QGraphicsPixmapItem>
 #include "imagetools.h"
 #include <arduinopressurecontroller.h>
 #include <PipetteController.h>
 #include <stagecontroller.h>
-
 namespace Ui {
 class MainWindow;
 }
@@ -21,6 +21,8 @@ public:
     QString con_str= "Connected";
 
     QString fail_str = "Failed";
+
+    int cameraIndex=0;
 
     explicit MainWindow(QWidget *parent = nullptr);
 
@@ -103,11 +105,19 @@ private slots:
 
      void on_s_center_button_clicked();
 
-private:
-    QTimer *timer;
-    QTimer *disp_pressure;
+     void on_exptime_button_clicked();
 
-    Ui::MainWindow *ui;
+     void on_width_button_clicked();
+
+     void on_height_button_clicked();
+
+private:
+    QTimer *timer= nullptr;
+    QTimer *disp_pressure= nullptr;
+    QGraphicsScene* scene= nullptr;
+    QGraphicsPixmapItem  qpxmi;
+    QImage* qframe = nullptr;
+    Ui::MainWindow *ui= nullptr;
 
 };
 

@@ -15,27 +15,29 @@ public:
 
     ~imagetools(){}
 
-    void setimagewidth(cv::VideoCapture& device,int imwidth);
+    void setimagewidth(int imwidth);
 
-    void setimageheight(cv::VideoCapture& device, int imheight);
+    void setimageheight( int imheight);
 
-    void setframerate(cv::VideoCapture& device,int reqframerate);
+    void setframerate(int reqframerate);
 
-    void setgain(cv::VideoCapture& device,float gain);
+    void setgain(float gain);
 
-    void setexposuretime(cv::VideoCapture& device, float exptime);
+    void setexposuretime( float exptime);
 
  //   void cameraloop();
 
 //    void SpawnThreadAndLaunch();
 
-    cv::Mat getframe();
+    cv::Mat* getframe();
 
-    cv::Mat setframe(cv::Mat &input);
+    void setframe(cv::Mat &input);
+
+    void freeframe();
 
     void getCameraframe();
 
-    cv::VideoCapture getCamera();
+    cv::VideoCapture* getCamera();
 
     void setvideodevice(int devid);
 
@@ -48,11 +50,11 @@ public:
     bool iscameraopen=false;
 
 protected:
-
     cv::VideoCapture* camera=nullptr;
+    cv::Mat* frame= nullptr;
+    cv::Mat* temp = nullptr;
 private:
 
-    cv::Mat frame;
 
 };
 
