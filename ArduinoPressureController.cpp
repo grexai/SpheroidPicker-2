@@ -53,28 +53,45 @@ void arduinopressurecontroller::checkAckOrSetError(
 
 float arduinopressurecontroller::getPipettePressure(){
     using namespace  std;
+    float pressureValue = 0.0f;
     QString sar = QString::fromStdString(to_string(static_cast<int>(kGetPipettePressure)));
+
     QString ans = this->acp_sc.sendAndReceive(sar,this->EOM);
+
+    QStringList resultStrings =  ans.split(',');
+    QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
+    xRegExp.indexIn( resultStrings.at(1));
+    QStringList xList = xRegExp.capturedTexts();
+    pressureValue =xList.begin()->toFloat();
+
+    /*
     string answer = (ans.toStdString());
     smatch match;
-    regex ansFmt(to_string(static_cast<int>(kGetPipettePressureAnswer)).append(",([0-9]+)"));
-    float pressureValue = 0.0f;
+    //regex ansFmt(to_string(static_cast<int>(kGetPipettePressureAnswer)).append(",([0-9]+).*"));
+    regex ansFmt(to_string(static_cast<int>(kGetPipettePressureAnswer)).append("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)" ));
+
+    QTextStream(stdout) << ans << endl;
+
     size_t commapos = answer.find_first_of(',');
     if (regex_match(answer, match, ansFmt) && commapos!=string::npos)
-        {
+    {
         try
         {
+            QTextStream(stdout) << "dsa" << endl;
             pressureValue = stof(answer.substr(commapos+1));
         }
         catch (...)
         {
+            QTextStream(stdout) << "ds2a" << endl;
             this->error = this->UnknownError;
         }
-        }
-        else
-        {
-            this->error = this->UnknownError;
-        }
+    }
+    else
+    {
+        QTextStream(stdout) << "test" << endl;
+        this->error = this->UnknownError;
+    }
+    */
     return pressureValue;
 
 }

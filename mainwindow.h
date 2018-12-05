@@ -9,6 +9,8 @@
 #include <arduinopressurecontroller.h>
 #include <PipetteController.h>
 #include <stagecontroller.h>
+#include <QGraphicsSceneMouseEvent>
+
 namespace Ui {
 class MainWindow;
 }
@@ -63,6 +65,12 @@ private slots:
 
      void on_Home_pip_clicked();
 
+     void on_p_home_x_clicked();
+
+     void on_p_home_y_clicked();
+
+     void on_p_home_z_clicked();
+
      void on_Con_pc_clicked();
 
      void on_Con_pip_clicked();
@@ -73,7 +81,7 @@ private slots:
 
      void on_atm_button_clicked();
 
-     void on_pc_Breakin_button_clicked();
+     void on_pc_pulse_button_clicked();
 
      void on_get_coors_pushButton_clicked();
 
@@ -97,10 +105,6 @@ private slots:
 
      void on_p_zm_btton_clicked();
 
-     void on_lcdNumber_overflow();
-
-
-
      void on_actionOpen_console_triggered();
 
      void on_s_center_button_clicked();
@@ -112,6 +116,10 @@ private slots:
      void on_height_button_clicked();
 
      void on_s_set_speed_button_clicked();
+
+     void on_save_image_button_clicked();
+
+     void on_s_get_coors_pushButton_clicked();
 
 private:
     QTimer *timer= nullptr;

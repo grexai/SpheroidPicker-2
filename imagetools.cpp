@@ -18,8 +18,8 @@ void imagetools::setframe(cv::Mat &input){
 }
 
 void imagetools::setvideodevice(int devid){
-    camera = new cv::VideoCapture(devid);
-    iscameraopen = camera->isOpened();
+    this->camera = new cv::VideoCapture(devid);
+    iscameraopen = this->camera->isOpened();
 }
 
 void imagetools::rmvideodevice(){
@@ -37,9 +37,7 @@ void imagetools::getCameraframe(){
 }
 
 void imagetools::freeframe(){
-  // this->getframe()->release();
     delete this->frame;
-  //  free(this->frame);
 }
 
 /*
@@ -64,12 +62,15 @@ void imagetools::freeframe(){
 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
 */
 
-void imagetools::setimagewidth(int imwidth){
-   this->camera->set(3,imwidth);
+void imagetools::setimagewidth(float& imwidth){
+
+   QTextStream(stdout)  << "width " << imwidth << endl;
+   this->camera->set(CV_CAP_PROP_FRAME_WIDTH,imwidth);
 }
 
-void imagetools::setimageheight(int imheight){
-    this->camera->set(4,imheight);
+void imagetools::setimageheight(float& imheight){
+     QTextStream(stdout)  << "heights " << imheight << endl;
+     camera->set(CV_CAP_PROP_FRAME_HEIGHT,imheight);
 }
 
 void imagetools::setframerate(int reqframerate){
@@ -136,5 +137,17 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 
 
+// Uses CV saveimg
+void imagetools::saveImg(cv::Mat& outimg, std::string &outname) {
+    outname = outname + ".png";
+    QTextStream(stdout) << QString::fromStdString(outname);
+    std::vector<int> compression_params;
+    //CV_IMWRITE_PNG_COMPRESSION
+    compression_params.push_back(16);
+    compression_params.push_back(0);
+    imwrite(outname, outimg, compression_params);
+
+//    cout << "image saved as " << outname.str() << endl;
+}
 
 //void imagetools::

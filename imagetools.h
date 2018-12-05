@@ -6,7 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <types.h>
-
+#include <QString>
 
 class imagetools
 {
@@ -15,9 +15,9 @@ public:
 
     ~imagetools(){}
 
-    void setimagewidth(int imwidth);
+    void setimagewidth(float& imwidth);
 
-    void setimageheight( int imheight);
+    void setimageheight(float& imheight);
 
     void setframerate(int reqframerate);
 
@@ -48,6 +48,8 @@ public:
     int2coors getSphCoors(cv::Mat &img);
 
     bool iscameraopen=false;
+
+    void saveImg(cv::Mat &outimg, std::string &outname);
 
 protected:
     cv::VideoCapture* camera=nullptr;

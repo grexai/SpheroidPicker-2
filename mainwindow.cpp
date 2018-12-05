@@ -46,21 +46,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_currentpressure(){
     float cp = acp->getPipettePressure();
-     QTextStream(stdout) << cp << endl;
     //float cp = (QRandomGenerator::global()->generate());
-    QString cps = QString::number(cp);
-    ui->lcdNumber->display(cps);
+    ui->lcdNumber->display( QString::number(cp));
 }
 
 void MainWindow::show_currentpressure(){
     update_currentpressure();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
-    disp_pressure->start(250);
+    disp_pressure->start(1000);
 }
+
+void mousePressEvent(QGraphicsSceneMouseEvent *event){
+
+        const QPointF p = event->scenePos();
+        QTextStream(stdout) <<"x: "<< p.x() <<"y: " <<p.y()<<  endl;
+    }
+
 
 void MainWindow::update_window()
 {
     imtools->getCameraframe();
+    //imshow("wtf",*imtools->getframe());
+   //cv:: waitKey(0);
     if (qframe != nullptr)
     {
         delete[] qframe;
@@ -68,6 +75,9 @@ void MainWindow::update_window()
     auto qframe = new QImage((const unsigned char*) (imtools->getframe()->data),imtools->getframe()->cols, imtools->getframe()->rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
+
+ //  QGraphicsSceneMouseEvent* event= new QGraphicsSceneMouseEvent;
+    //mousePressEvent(event);
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -77,8 +87,8 @@ void MainWindow::on_Campushbtn_clicked()
         imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
-
         imtools->setvideodevice(cameraIndex);
+
         if(!imtools->getCamera()->open(cameraIndex))
               {
                   QMessageBox::critical(this,
@@ -89,14 +99,41 @@ void MainWindow::on_Campushbtn_clicked()
               }
 
         ui->Campushbtn->setText("Camera off");
+        float w =1920;
+        float h = 1080;
+        QTextStream(stdout)<< "setting sizes";
+        imtools->setimagewidth(w);
+        imtools->setimageheight(h);
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
 }
 
+void MainWindow::on_exptime_button_clicked()
+{
+    imtools->setexposuretime(ui->exptime_spin->value());
+}
+
+void MainWindow::on_width_button_clicked()
+{
+    disconnect(timer, SIGNAL(timeout()), this,nullptr);
+    float w =  ui->width_spin->value();
+    imtools->setimagewidth(w);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
+    timer->start(20);
+}
+
+void MainWindow::on_height_button_clicked()
+{
+    float h =  ui->height_spin->value();
+    imtools->setimagewidth(h);
+}
+
+
+
+
 void MainWindow::on_actionDark_Mode_triggered()
 {
-
     setdarkstyle();
 }
 
@@ -111,6 +148,21 @@ void MainWindow::on_Home_pip_clicked()
     apipc->goHome(false,false,false);
 }
 
+void MainWindow::on_p_home_x_clicked()
+{
+    apipc->goHome(true,false,false);
+}
+
+void MainWindow::on_p_home_y_clicked()
+{
+    apipc->goHome(false,true,false);
+}
+
+void MainWindow::on_p_home_z_clicked()
+{
+    apipc->goHome(false,false,true);
+}
+
 void MainWindow::on_Con_pc_clicked()
 {
     QString port = "COM5";
@@ -118,7 +170,7 @@ void MainWindow::on_Con_pc_clicked()
     if (acp->isconnected)
     {
         ui->pc_stat->setText(con_str);
-        show_currentpressure();
+       // show_currentpressure();
     }
     else{
         ui->pc_stat->setText(fail_str);
@@ -128,7 +180,7 @@ void MainWindow::on_Con_pc_clicked()
 void MainWindow::on_Con_pip_clicked()
 {
    // serialcom sp(qsp_pip);
-    QString port2 = "COM20"; //13
+    QString port2 = "COM7"; //13
     apipc = new pipetteController(qsp_pip,port2);
     if (apipc->isconnected)
     {
@@ -151,9 +203,9 @@ void MainWindow::on_atm_button_clicked()
     acp->requestPressure(0.0f);
 }
 
-void MainWindow::on_pc_Breakin_button_clicked()
+void MainWindow::on_pc_pulse_button_clicked()
 {
-    acp->breakIn(ui->breakin_value->value(),ui->breakin_time->value());
+    acp->breakIn(ui->pulse_value->value(),ui->pulse_time->value());
 }
 
 void MainWindow::on_get_coors_pushButton_clicked()
@@ -233,11 +285,6 @@ void MainWindow::on_p_zm_btton_clicked()
     apipc->moveToZSync(-(ui->pip_step_spinbox->value()));
 }
 
-void MainWindow::on_lcdNumber_overflow()
-{
-
-}
-
 void MainWindow::on_Con_xystage_button_clicked()
 {
 //    try{
@@ -262,7 +309,7 @@ void MainWindow::on_Con_xystage_button_clicked()
                 }
             ui->s_stat->setText(con_str);
             iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
-            ui->s_step_spinbox->setValue(float(curSpeedX));
+            ui->s_speed_spinbox->setValue(float(curSpeedX));
             }
         }
 }
@@ -288,23 +335,27 @@ void MainWindow::on_s_center_button_clicked()
 }
 
 
-
-void MainWindow::on_exptime_button_clicked()
-{
-    imtools->setexposuretime(ui->exptime_spin->value());
-}
-
-void MainWindow::on_width_button_clicked()
-{
-    imtools->setimagewidth(ui->width_spin->value());
-}
-
-void MainWindow::on_height_button_clicked()
-{
-    imtools->setimagewidth(ui->height_spin->value());
-}
-
 void MainWindow::on_s_set_speed_button_clicked()
 {
     stage->XAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
+    stage->YAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
+}
+
+void MainWindow::on_save_image_button_clicked()
+{
+    std::string asdasd = ui->imagename_lineedit->text().toStdString();
+    cv::Mat tmp = (imtools->getframe())->clone();
+    imshow("asdsa",tmp);
+    cv::waitKey(0);
+    imtools->saveImg(tmp,asdasd);
+}
+
+
+void MainWindow::on_s_get_coors_pushButton_clicked()
+{
+    iop::int32 y0 = stage->YAxis().getCurrentPosition();
+    iop::int32 x0 = stage->XAxis().getCurrentPosition();
+
+    ui->s_xpos_label->setText("X: " + QString::number(x0,'f',2));
+    ui->s_ypos_label->setText("Y: " + QString::number(y0,'f',2));
 }
