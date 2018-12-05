@@ -748,7 +748,7 @@ outputs debug
       <x>20</x>
       <y>140</y>
       <width>181</width>
-      <height>321</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="title">
@@ -891,7 +891,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -904,7 +904,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -917,7 +917,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -930,7 +930,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>270</y>
+       <y>280</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -946,7 +946,7 @@ Stage</string>
       <x>210</x>
       <y>140</y>
       <width>201</width>
-      <height>321</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="title">
@@ -956,7 +956,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>30</y>
+       <y>280</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -981,8 +981,8 @@ Stage</string>
     <widget class="QLabel" name="pipstep_label">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>70</y>
+       <x>20</x>
+       <y>50</y>
        <width>47</width>
        <height>21</height>
       </rect>
@@ -1007,8 +1007,8 @@ Stage</string>
     <widget class="QSpinBox" name="pip_step_spinbox">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>70</y>
+       <x>110</x>
+       <y>50</y>
        <width>43</width>
        <height>22</height>
       </rect>
@@ -1089,7 +1089,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -1102,7 +1102,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -1115,7 +1115,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>300</y>
+       <y>310</y>
        <width>47</width>
        <height>13</height>
       </rect>
@@ -1128,7 +1128,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>100</y>
+       <y>130</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -1141,7 +1141,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>160</y>
+       <y>190</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -1154,7 +1154,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>220</y>
+       <y>250</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -1167,13 +1167,26 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>280</y>
+       <y>290</y>
        <width>91</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
       <string>Positions</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_5">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>100</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>X Max</string>
      </property>
     </widget>
    </widget>
