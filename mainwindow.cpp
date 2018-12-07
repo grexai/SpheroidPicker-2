@@ -7,6 +7,7 @@
 
 
 void setdarkstyle(){
+
     qApp->setStyle(QStyleFactory::create("Fusion"));
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53,53,53));
@@ -25,6 +26,7 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
+
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -56,11 +58,12 @@ void MainWindow::show_currentpressure(){
     disp_pressure->start(1000);
 }
 
-void mousePressEvent(QGraphicsSceneMouseEvent *event){
+void MainWindow::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
 
         const QPointF p = event->scenePos();
+        emit signalTargetCoordinate(event->scenePos());
         QTextStream(stdout) <<"x: "<< p.x() <<"y: " <<p.y()<<  endl;
-    }
+}
 
 
 void MainWindow::update_window()
@@ -104,7 +107,9 @@ void MainWindow::on_Campushbtn_clicked()
         QTextStream(stdout)<< "setting sizes";
         imtools->setimagewidth(w);
         imtools->setimageheight(h);
-        connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
+        ui->graphicsView->setMouseTracking(true);
+
+        connect(timer, SIGNAL(timeout), this, SLOT(update_window()));
         timer->start(20);
     }
 }
@@ -165,7 +170,7 @@ void MainWindow::on_p_home_z_clicked()
 
 void MainWindow::on_Con_pc_clicked()
 {
-    QString port = "COM5";
+    QString port = "COM4";
     acp = new arduinopressurecontroller(qsp_pc,port);
     if (acp->isconnected)
     {
@@ -179,8 +184,7 @@ void MainWindow::on_Con_pc_clicked()
 
 void MainWindow::on_Con_pip_clicked()
 {
-   // serialcom sp(qsp_pip);
-    QString port2 = "COM7"; //13
+    QString port2 = "COM5"; //7//13
     apipc = new pipetteController(qsp_pip,port2);
     if (apipc->isconnected)
     {
@@ -321,7 +325,6 @@ void MainWindow::on_actionOpen_console_triggered()
 
 void MainWindow::on_s_center_button_clicked()
 {
-
     iop::int32 x0 = stage->XAxis().getMinPosition();
     iop::int32 x1 = stage->XAxis().getMaxPosition();
 
@@ -343,11 +346,8 @@ void MainWindow::on_s_set_speed_button_clicked()
 
 void MainWindow::on_save_image_button_clicked()
 {
-    std::string asdasd = ui->imagename_lineedit->text().toStdString();
-    cv::Mat tmp = (imtools->getframe())->clone();
-    imshow("asdsa",tmp);
-    cv::waitKey(0);
-    imtools->saveImg(tmp,asdasd);
+    imtools->saveImg(*(imtools->getframe()),
+                     (ui->imagename_lineedit->text().toStdString()));
 }
 
 

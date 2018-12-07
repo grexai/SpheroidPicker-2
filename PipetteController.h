@@ -49,6 +49,8 @@ public:
     float3coors getcurrentpos(QByteArray& answer); //M114
 
     void moveThereSync(float3coors there);
+
+    void setPipetteposition();
 protected:
 
     serialcom apipc_sc;

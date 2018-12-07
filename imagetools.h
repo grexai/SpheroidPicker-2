@@ -49,7 +49,7 @@ public:
 
     bool iscameraopen=false;
 
-    void saveImg(cv::Mat &outimg, std::string &outname);
+    void saveImg(cv::Mat &outimg, std::string outname);
 
 protected:
     cv::VideoCapture* camera=nullptr;

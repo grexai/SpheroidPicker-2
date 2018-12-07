@@ -114,5 +114,12 @@ void pipetteController::moveThereSync(float3coors there){
 
 }
 
+void pipetteController::setPipetteposition(){
+
+
+
+}
+
+
 
 

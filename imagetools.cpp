@@ -138,14 +138,16 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 
 // Uses CV saveimg
-void imagetools::saveImg(cv::Mat& outimg, std::string &outname) {
+void imagetools::saveImg(cv::Mat& outimg, std::string outname) {
+
     outname = outname + ".png";
     QTextStream(stdout) << QString::fromStdString(outname);
     std::vector<int> compression_params;
+    cv::Mat temp = outimg.clone();
     //CV_IMWRITE_PNG_COMPRESSION
     compression_params.push_back(16);
     compression_params.push_back(0);
-    imwrite(outname, outimg, compression_params);
+    imwrite(outname, temp, compression_params);
 
 //    cout << "image saved as " << outname.str() << endl;
 }
