@@ -63,19 +63,31 @@ void MainWindow::show_currentpressure(){
     disp_pressure->start(1000);
 }
 
+
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     if (obj == ui->graphicsView && true)
        {
          if (event->type() == QEvent::MouseButtonPress)
          {
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
-            QPointF  point_mouse = ui->graphicsView->mapFrom(ui->graphicsView, mouseEvent->pos());
-            QTextStream(stdout) <<"coors x: " <<point_mouse.x() << "y: " << point_mouse.y() << endl;
+           const QPoint  point_mouse = ui->graphicsView->mapFrom(ui->graphicsView, mouseEvent->pos());
+            if(mouseEvent->button() == Qt::RightButton)
+            {
+                this->ui->graphicsView->setContextMenuPolicy(Qt::CustomContextMenu);
+                QTextStream(stdout) << true;
+                connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
+                        this, SLOT(on_graphicsView_customContextMenuRequested(const QPoint &)));
+
+            }
+            else
+            QTextStream(stdout) <<"coors x: " << point_mouse.x() << "    y: " << point_mouse.y() << endl;
             return true;
          }
     }
 
 }
+
+
 
 
 void MainWindow::update_window()
@@ -116,8 +128,9 @@ void MainWindow::on_Campushbtn_clicked()
         QTextStream(stdout)<< "setting sizes";
         imtools->setimagewidth(w);
         imtools->setimageheight(h);
+        setMouseTracking(true);
         ui->graphicsView->installEventFilter(this);
-        QWidget::setMouseTracking(true);
+
 
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
@@ -372,4 +385,19 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
 
     ui->s_xpos_label->setText("X: " + QString::number(x0,'f',2));
     ui->s_ypos_label->setText("Y: " + QString::number(y0,'f',2));
+}
+
+void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
+{
+
+    QTextStream(stdout) << "isthis"<< endl;
+    QMenu contextMenu(("Context menu"), this);
+    QAction action1("Move Here", this);
+//    connect(&action1, SIGNAL(triggered()), this, SLOT());
+    contextMenu.addAction(&action1);
+  //  QAction *a = menu.exec(event->screenPos());
+   // contextMenu.exec(mapToGlobal(ui->graphicsView->viewport()->mapToGlobal(pos);));
+   contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
+  //  contextMenu.exec(mapToGlobal(pos));
+
 }

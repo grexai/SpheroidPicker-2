@@ -59,6 +59,7 @@ protected:
 private slots:
       bool eventFilter(QObject *obj,  QEvent *event);
 
+ //    void ShowContextMenu(const QPoint &pos);
 
      void on_Campushbtn_clicked();
 
@@ -129,6 +130,8 @@ private slots:
      void on_save_image_button_clicked();
 
      void on_s_get_coors_pushButton_clicked();
+
+     void on_graphicsView_customContextMenuRequested(const QPoint &pos);
 
 private:
     QTimer *timer= nullptr;
