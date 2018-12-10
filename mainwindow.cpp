@@ -391,13 +391,11 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
 
     QTextStream(stdout) << "isthis"<< endl;
-    QMenu contextMenu(("Context menu"), this);
-    QAction action1("Move Here", this);
+    QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
+    QAction action1("Move Here", ui->graphicsView->viewport());
 //    connect(&action1, SIGNAL(triggered()), this, SLOT());
     contextMenu.addAction(&action1);
-  //  QAction *a = menu.exec(event->screenPos());
-   // contextMenu.exec(mapToGlobal(ui->graphicsView->viewport()->mapToGlobal(pos);));
    contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
-  //  contextMenu.exec(mapToGlobal(pos));
+
 
 }
