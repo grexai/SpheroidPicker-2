@@ -11,6 +11,7 @@
 #include <stagecontroller.h>
 #include <QGraphicsSceneMouseEvent>
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -34,7 +35,7 @@ public:
 
     void SpawnThreadAndLaunch();
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+ //   void MainWindow::mouseMoveEvent(QMouseEvent *event);
 
     void porttest();
 
@@ -56,6 +57,8 @@ protected:
     imagetools* imtools= nullptr;
 
 private slots:
+      bool eventFilter(QObject *obj,  QEvent *event);
+
 
      void on_Campushbtn_clicked();
 

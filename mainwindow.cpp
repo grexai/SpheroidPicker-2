@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
-
+#include <QMouseEvent>
 //#include "serialcom.h"
 //#include "ArduinoPressureController.h"
 
@@ -36,15 +36,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
+
     imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
+
 
 void MainWindow::update_currentpressure(){
     float cp = acp->getPipettePressure();
@@ -58,11 +63,18 @@ void MainWindow::show_currentpressure(){
     disp_pressure->start(1000);
 }
 
-void MainWindow::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
+    if (obj == ui->graphicsView && true)
+       {
+         if (event->type() == QEvent::MouseButtonPress)
+         {
+            QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
+            QPointF  point_mouse = ui->graphicsView->mapFrom(ui->graphicsView, mouseEvent->pos());
+            QTextStream(stdout) <<"coors x: " <<point_mouse.x() << "y: " << point_mouse.y() << endl;
+            return true;
+         }
+    }
 
-        const QPointF p = event->scenePos();
-        emit signalTargetCoordinate(event->scenePos());
-        QTextStream(stdout) <<"x: "<< p.x() <<"y: " <<p.y()<<  endl;
 }
 
 
@@ -79,8 +91,6 @@ void MainWindow::update_window()
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 
- //  QGraphicsSceneMouseEvent* event= new QGraphicsSceneMouseEvent;
-    //mousePressEvent(event);
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -91,7 +101,6 @@ void MainWindow::on_Campushbtn_clicked()
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
         imtools->setvideodevice(cameraIndex);
-
         if(!imtools->getCamera()->open(cameraIndex))
               {
                   QMessageBox::critical(this,
@@ -107,10 +116,14 @@ void MainWindow::on_Campushbtn_clicked()
         QTextStream(stdout)<< "setting sizes";
         imtools->setimagewidth(w);
         imtools->setimageheight(h);
-        ui->graphicsView->setMouseTracking(true);
+        ui->graphicsView->installEventFilter(this);
+        QWidget::setMouseTracking(true);
 
-        connect(timer, SIGNAL(timeout), this, SLOT(update_window()));
+        connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
+
+
+
     }
 }
 
@@ -312,6 +325,7 @@ void MainWindow::on_Con_xystage_button_clicked()
                     return;
                 }
             ui->s_stat->setText(con_str);
+
             iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
             ui->s_speed_spinbox->setValue(float(curSpeedX));
             }
