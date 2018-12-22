@@ -10,7 +10,7 @@
 #include <PipetteController.h>
 #include <stagecontroller.h>
 #include <QGraphicsSceneMouseEvent>
-
+#include <calibratedialog.h>
 
 namespace Ui {
 class MainWindow;
@@ -38,7 +38,9 @@ public:
  //   void MainWindow::mouseMoveEvent(QMouseEvent *event);
 
     void porttest();
-
+    cv::Mat TM;
+    cv::Mat* imgc;
+    cv::Mat pc;
 signals:
     // The signal of transmit the coordinates of the mouse position
     void signalTargetCoordinate(QPointF point);
@@ -55,6 +57,10 @@ protected:
     ahm::Unit* pRootUnit= nullptr;
     Stage *stage= nullptr;
     imagetools* imtools= nullptr;
+    std::vector<float>* cpos1 = nullptr;
+    std::vector<float>* cpos2 = nullptr;
+    std::vector<float>* cpos3= nullptr;
+    QPoint* point_mouse= nullptr;
 
 private slots:
       bool eventFilter(QObject *obj,  QEvent *event);
@@ -63,9 +69,13 @@ private slots:
 
      void on_Campushbtn_clicked();
 
+     void calib_frame_view();
+
      void update_window();
 
      void update_currentpressure();
+
+     void MoveAction();
 
      void show_currentpressure();
 
@@ -133,6 +143,8 @@ private slots:
 
      void on_graphicsView_customContextMenuRequested(const QPoint &pos);
 
+     void on_actionCalibrate_Pipette_triggered();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -140,6 +152,7 @@ private:
     QGraphicsPixmapItem  qpxmi;
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
+    calibratedialog *calib= nullptr;
 
 };
 

@@ -135,7 +135,14 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 }
 
+void imagetools::addPointToImage(cv::Point point){
+    //QTextStream(stdout) << "asdsad"<< endl;
+   // cv::Mat temp =this->frame->clone() ;
 
+   cv::circle(*this->frame,point, 5, (0,0,255), -1);
+ //   this->setframe(temp);
+
+}
 
 // Uses CV saveimg
 void imagetools::saveImg(cv::Mat& outimg, std::string outname) {

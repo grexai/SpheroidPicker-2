@@ -32,7 +32,9 @@ SOURCES += \
     serialcom.cpp \
     arduinopressurecontroller.cpp \
     imagetools.cpp \
-    PipetteController.cpp
+    PipetteController.cpp \
+    calibratedialog.cpp \
+    comps.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,10 +44,13 @@ HEADERS += \
     imagetools.h \
     types.h \
     PipetteController.h \
-    stagecontroller.h
+    stagecontroller.h \
+    calibratedialog.h \
+    comps.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    calibratedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

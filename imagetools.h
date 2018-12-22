@@ -43,6 +43,8 @@ public:
 
     void rmvideodevice();
 
+    void addPointToImage(cv::Point point);
+
     cv::Mat threshimage(cv::Mat input,int thresh);
 
     int2coors getSphCoors(cv::Mat &img);

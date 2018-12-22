@@ -46,9 +46,9 @@ public:
 
     bool getEndstopstatus(); //M119
 
-    float3coors getcurrentpos(QByteArray& answer); //M114
+    std::vector<float> getcurrentpos(); //M114
 
-    void moveThereSync(float3coors there);
+    void MoveToXYZSync(std::vector<float> coords);
 
     void setPipetteposition();
 protected:

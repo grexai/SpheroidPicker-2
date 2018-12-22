@@ -61,6 +61,7 @@ void pipetteController::moveToYSync(float y_value){
 
 void pipetteController::moveToZSync(float z_value){
     QString msg= "G0";
+    //this->setabsoluepositioning;
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
 
@@ -75,8 +76,9 @@ void pipetteController::setrelativepositioning(){
     apipc_sc.send(msg.append(EOM));
 }
 
-Float3coor pipetteController::getcurrentpos(QByteArray& answer){
+std::vector<float> pipetteController::getcurrentpos(){
 //  apipc_sc.sp.clear();
+   QByteArray answer;
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
     //split strings by :
@@ -90,7 +92,7 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
          xRegExp.indexIn( resultStrings.at(i));
          QStringList xList = xRegExp.capturedTexts();
          try {
-             coors.push_back( xList.begin()->toFloat());
+             coors.push_back( static_cast<float>(xList.begin()->toFloat()));
          }
          catch (...)
          {
@@ -98,21 +100,18 @@ Float3coor pipetteController::getcurrentpos(QByteArray& answer){
             //error extracting coord
          }
     }
-    pipcoors.x = coors.at(0);
-    pipcoors.y = coors.at(1);
-    pipcoors.z = coors.at(2);
-
-    return pipcoors;
+    return coors;
 }
 
-void pipetteController::moveThereSync(float3coors there){
+void pipetteController::MoveToXYZSync(std::vector<float> coords){
     setabsoluepositioning();
-    moveToZSync(there.z+40);
-    moveToXSync(there.x);
-    moveToYSync(there.y);
-    moveToZSync(there.z+20);
+    moveToXSync(coords.at(0));  //X
+    moveToZSync(coords.at(2));  //Z
+    moveToYSync(coords.at(1));  //Y
+
 
 }
+
 
 void pipetteController::setPipetteposition(){
 
