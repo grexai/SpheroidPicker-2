@@ -11,6 +11,7 @@
 #include <stagecontroller.h>
 #include <QGraphicsSceneMouseEvent>
 #include <calibratedialog.h>
+#include <comps.h>
 
 namespace Ui {
 class MainWindow;
@@ -41,6 +42,7 @@ public:
     cv::Mat TM;
     cv::Mat* imgc;
     cv::Mat pc;
+    centers centers;
 signals:
     // The signal of transmit the coordinates of the mouse position
     void signalTargetCoordinate(QPointF point);

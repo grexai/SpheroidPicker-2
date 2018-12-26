@@ -34,7 +34,8 @@ SOURCES += \
     imagetools.cpp \
     PipetteController.cpp \
     calibratedialog.cpp \
-    comps.cpp
+    comps.cpp \
+    controller.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS += \
     PipetteController.h \
     stagecontroller.h \
     calibratedialog.h \
-    comps.h
+    comps.h \
+    controller.h
 
 FORMS += \
         mainwindow.ui \

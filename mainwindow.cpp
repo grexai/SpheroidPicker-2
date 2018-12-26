@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
 #include <QMouseEvent>
-#include <comps.h>
+
 
 
 
@@ -330,7 +330,7 @@ void MainWindow::on_get_coors_pushButton_clicked()
  // cv::Mat cip = (cv::Mat_<int>(2,3) << 960,100,1820,540,980,540);
  // cv::Mat cpp = (cv::Mat_<int>(3,3)<<933,922,970,195,255,151,100,100,85);
 
-    TM = getTMatrix(randmat,cip);
+    TM = getTMatrix(randmat,cip,centers);
     //ic = new cv::Mat;
     imgc= new cv::Mat(1,2,CV_32F);
     *imgc = geticenter(cip);
