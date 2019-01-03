@@ -1378,7 +1378,7 @@ Stage</string>
       <x>1730</x>
       <y>280</y>
       <width>171</width>
-      <height>141</height>
+      <height>161</height>
      </rect>
     </property>
     <property name="title">
@@ -1405,6 +1405,19 @@ Stage</string>
        <width>131</width>
        <height>21</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="start_screening">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start screening</string>
      </property>
     </widget>
    </widget>

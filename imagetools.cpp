@@ -17,10 +17,25 @@ void imagetools::setframe(cv::Mat &input){
     this->frame = &input;
 }
 
+
+
+cv::Mat* imagetools::getdisplayframe(){
+    return (this->dispfrm);
+
+}
+
+
+
 void imagetools::setvideodevice(int devid){
     this->camera = new cv::VideoCapture(devid);
     iscameraopen = this->camera->isOpened();
 }
+
+void imagetools::resetvideodevice(){
+     this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
+}
+
+
 
 void imagetools::rmvideodevice(){
     camera->release();
@@ -33,8 +48,12 @@ void imagetools::getCameraframe(){
     if (this->frame != nullptr) { delete frame;}
     this->frame = new cv::Mat();
     camera->read(*this->frame);
-    cvtColor(*this->frame,*this->frame,CV_BGR2RGB,0);
+    if (this->dispfrm != nullptr) {delete  dispfrm;}
+    this->dispfrm = new cv::Mat();
+    cvtColor(*this->frame,*this->dispfrm,CV_BGR2RGB,0);
 }
+
+
 
 void imagetools::freeframe(){
     delete this->frame;

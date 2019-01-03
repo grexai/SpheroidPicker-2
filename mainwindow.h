@@ -147,6 +147,10 @@ private slots:
 
      void on_actionCalibrate_Pipette_triggered();
 
+     void screensample();
+
+     void on_start_screening_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

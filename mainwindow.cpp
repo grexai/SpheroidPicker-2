@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
 #include <QMouseEvent>
-
+#include <iostream>
 
 
 
@@ -47,8 +47,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-
 
 
 void MainWindow::update_currentpressure(){
@@ -157,7 +155,7 @@ void MainWindow::update_window()
     {
         delete[] qframe;
     }
-    auto qframe = new QImage((const unsigned char*) (imtools->getframe()->data),imtools->getframe()->cols, imtools->getframe()->rows, QImage::Format_RGB888);
+    auto qframe = new QImage((const unsigned char*) (imtools->getdisplayframe()->data),imtools->getdisplayframe()->cols, imtools->getdisplayframe()->rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 
@@ -167,6 +165,7 @@ void MainWindow::on_Campushbtn_clicked()
 {
     if ((imtools->iscameraopen)){
         ui->Campushbtn->setText("Camera on");
+        imtools->resetvideodevice();
         imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
@@ -521,4 +520,38 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
   //  calib->setModal(true);
 
     calib->exec();
+}
+
+void MainWindow::screensample(){
+    if (QDir().exists("Scandata")){
+        QTextStream(stdout) << "this folder already folder exists"<< endl;
+    }
+    else{
+        QDir().mkdir("Scandata");
+    }
+    iop::int32 xp =stage->XAxis().getCurrentPosition();
+    iop::int32 yp= stage->YAxis().getCurrentPosition();
+    int platesize= 30000; //um
+    float  img_w_5p5x = 2742.6; //um
+    float  img_h_5p5x = 1946.6; //um
+    int wmax = platesize/img_w_5p5x; //um
+    int hmax = platesize/img_h_5p5x; //um
+    int counter = 1;
+    for (int  i = 0; i< wmax; i++ ){
+        for (int j = 0; j< hmax; j++ ){
+            stage->XAxis().moveToAsync(iop::int32(xp));
+            ::Sleep(1000); // wait 1 sec1
+            counter+=counter;
+            imtools->saveImg(*(imtools->getframe()),"Scandata/screening"+std::to_string(counter) );
+        }
+    }
+
+}
+
+
+
+
+void MainWindow::on_start_screening_clicked()
+{
+    screensample();
 }

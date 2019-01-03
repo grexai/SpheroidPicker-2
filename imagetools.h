@@ -31,6 +31,8 @@ public:
 
     cv::Mat* getframe();
 
+    cv::Mat* getdisplayframe();
+
     void setframe(cv::Mat &input);
 
     void freeframe();
@@ -40,6 +42,8 @@ public:
     cv::VideoCapture* getCamera();
 
     void setvideodevice(int devid);
+
+    void resetvideodevice();
 
     void rmvideodevice();
 
@@ -56,6 +60,7 @@ public:
 protected:
     cv::VideoCapture* camera=nullptr;
     cv::Mat* frame= nullptr;
+    cv::Mat* dispfrm = nullptr;
     cv::Mat* temp = nullptr;
 private:
 
