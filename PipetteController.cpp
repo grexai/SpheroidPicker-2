@@ -27,25 +27,12 @@ void pipetteController::goHome(bool x, bool y, bool z){
     apipc_sc.send(msg);
 }
 
-void pipetteController::moveAsync(float x, float y, float z,bool movetype){
-    QString msg(QString::null);
-    if (movetype){
-        QString msg= "G0";
-    }
-    else{
-        QString msg = "G1";
-    }
-/*
-    if (x>0){
-       msg.append("X").append(QString::number(x));
-    }
-    if (y>0){
-        msg.append("Y").append(QString::number(y));
-    }
-    if (z>0){
-        msg.append("Z").append(QString::number(z));
-    }
-*/
+void pipetteController::moveAsync(float x, float y, float z){
+
+    QString msg = "G1";
+    msg.append("X").append(QString::number(x));
+    msg.append("Y").append(QString::number(y));
+    msg.append("Z").append(QString::number(z));
     apipc_sc.send(msg);
 }
 

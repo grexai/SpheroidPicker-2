@@ -24,7 +24,7 @@ public:
     //sets acceleration in: mmperminute
     void setfeedrate(int acceleration); //G0
     // move Linear or interpolated default movement type is linear else Interpolated movement
-    void moveAsync(float x, float y, float z,bool movetype = true); // G0
+    void moveAsync(float x, float y, float z); // G0
 
     void moveToXSync(float x_value);
 

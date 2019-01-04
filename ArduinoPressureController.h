@@ -10,11 +10,20 @@
 class arduinopressurecontroller
 {
 public:
-    arduinopressurecontroller(QSerialPort& i_qsp,QString& nport): acp_sc(i_qsp){
+    arduinopressurecontroller(QSerialPort& i_qsp,QString& nport): acp_sc(i_qsp)
+    {
         isconnected = this->acp_sc.openport(nport);
-        while (this->acp_sc.sp.waitForReadyRead(100));
-        this->acp_sc.recive();
-        this->acp_sc.sp_flush(); }
+        if(isconnected)
+        {
+            while (this->acp_sc.sp.waitForReadyRead(100));
+            this->acp_sc.recive();
+            this->acp_sc.sp_flush();
+        }
+        else
+        {
+            isconnected = false;
+        }
+    }
 
     ~arduinopressurecontroller(){}
 

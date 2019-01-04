@@ -35,8 +35,6 @@ void imagetools::resetvideodevice(){
      this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
 }
 
-
-
 void imagetools::rmvideodevice(){
     camera->release();
     iscameraopen= camera->isOpened();
@@ -52,8 +50,6 @@ void imagetools::getCameraframe(){
     this->dispfrm = new cv::Mat();
     cvtColor(*this->frame,*this->dispfrm,CV_BGR2RGB,0);
 }
-
-
 
 void imagetools::freeframe(){
     delete this->frame;

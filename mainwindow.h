@@ -12,6 +12,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <calibratedialog.h>
 #include <comps.h>
+#include <controller.h>
 
 namespace Ui {
 class MainWindow;
@@ -51,6 +52,8 @@ public slots:
 
 
 protected:
+    controller* ctrl = nullptr;
+
     arduinopressurecontroller* acp= nullptr ;
     pipetteController* apipc= nullptr;
     QSerialPort qsp_pip;

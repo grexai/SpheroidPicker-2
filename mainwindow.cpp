@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
+    ctrl = new controller;
 
 }
 
@@ -70,10 +71,9 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
             if(point_mouse!= nullptr){
                 delete point_mouse;
-                point_mouse  = new QPoint;
+                point_mouse = new QPoint;
             }else{
-
-                point_mouse  = new QPoint;
+                point_mouse = new QPoint;
             }
             *point_mouse = ui->graphicsView->mapFrom(ui->graphicsView, mouseEvent->pos());
             if(mouseEvent->button() == Qt::RightButton)
@@ -253,6 +253,7 @@ void MainWindow::on_p_home_z_clicked()
 
 void MainWindow::on_Con_pc_clicked()
 {
+/*
     QString port = "COM5"; //AKOS //5
     acp = new arduinopressurecontroller(qsp_pc,port);
     if (acp->isconnected)
@@ -263,6 +264,18 @@ void MainWindow::on_Con_pc_clicked()
     else{
         ui->pc_stat->setText(fail_str);
     }
+*/
+
+    bool isconnected = ctrl->connect_pressure_controller();
+    if (isconnected)
+    {
+        ui->pc_stat->setText(con_str);
+       // show_currentpressure();
+    }
+    else{
+        ui->pc_stat->setText(fail_str);
+    }
+
 }
 
 void MainWindow::on_Con_pip_clicked()
@@ -282,17 +295,20 @@ void MainWindow::on_Con_pip_clicked()
 
 void MainWindow::on_SetPressure_clicked()
 {
-    acp->requestPressure(ui->pressure_value->value());
+    ctrl->request_pressure(ui->pressure_value->value());
+  //  acp->requestPressure(ui->pressure_value->value());
 }
 
 void MainWindow::on_atm_button_clicked()
 {
-    acp->requestPressure(0.0f);
+    ctrl->request_atm();
+    //acp->requestPressure(0.0f);
 }
 
 void MainWindow::on_pc_pulse_button_clicked()
 {
-    acp->breakIn(ui->pulse_value->value(),ui->pulse_time->value());
+    ctrl->vaccum_pulse(ui->pulse_value->value(),ui->pulse_time->value());
+    //acp->breakIn(ui->pulse_value->value(),ui->pulse_time->value());
 }
 
 void MainWindow::on_get_coors_pushButton_clicked()
@@ -304,32 +320,49 @@ void MainWindow::on_get_coors_pushButton_clicked()
    // ui->xc_label->setText("X: " + QString::number(randx.x,'f',2));
    // ui->yc_label->setText("Y: " + QString::number(randx.y,'f',2));
    // ui->zc_label->setText("Z: " + QString::number(randx.z,'f',2));
-    float ipdata[6]=  {960.0f,100.0f,1820.0f,540.0f,980.0f,540.0f};
-
 
     float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
-      cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
+    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
+    /*
+    // image coordinates 2 x 3 matrix image
+    //expected format
 
-    float cpdata[9]= {933.0f,922.0f,970.0f,195.0f,255.0f,151.0f,100.0f,100.0f,85.0f};
-    float randtest[9] = {1,2,3,4,5,6,7,8,9};
-    std::vector<float> rV = {1.0f,2.0f,3.0f};
-    std::vector<float> rV3 = {4.0f,5.0f,6.0f};
-  //  cv::Mat randmat;
+      Center point
+         ||
+         ||
+        \  /
+         \/
+
+       | x1  x2  x3 |
+       | y1  y2  y3 |
+    */
+
+
+    // pushing saved pipette positions to a Matrix
     cv::Mat randmat;
     randmat.push_back(*cpos1);
     randmat.push_back(*cpos2);
     randmat.push_back(*cpos3);
-    std::cout << randmat << "before reshape"<<endl;
-   randmat =  randmat.reshape(0,3);
-   cv::transpose(randmat,randmat);
-  //  randmat=randmat.reshape(3,3);
+    std::cout << randmat << "before reshape"<< endl;
+    /*
+    // converting to pipette coordinates a 3 x 3 matrix
+      Center point
+         ||
+         ||
+        \  /
+         \/
+
+       | x1  x2  x3 |
+       | y1  y2  y3 |
+       | z1  z2  z3 |
+    */
+
+    randmat =  randmat.reshape(0,3);
+    cv::transpose(randmat,randmat);
+
     std::cout << randmat<< "randmat"<< std::endl;
-    cv::Mat cpp = cv::Mat(3,3,CV_32F,cpdata);
 
- // cv::Mat cip = (cv::Mat_<int>(2,3) << 960,100,1820,540,980,540);
- // cv::Mat cpp = (cv::Mat_<int>(3,3)<<933,922,970,195,255,151,100,100,85);
-
-    TM = getTMatrix(randmat,cip,centers);
+    TM = calcTMatrix(randmat,cip,centers);
     //ic = new cv::Mat;
     imgc= new cv::Mat(1,2,CV_32F);
     *imgc = geticenter(cip);
@@ -392,9 +425,12 @@ void MainWindow::on_p_ym_button_clicked()
 
 void MainWindow::on_p_zp_button_clicked()
 {
-
+/*
     apipc->setrelativepositioning();
     apipc->moveToZSync(ui->pip_step_spinbox->value());
+*/
+    ctrl->pipette_movez_sync(ui->pip_step_spinbox->value());
+
 }
 
 
@@ -406,6 +442,8 @@ void MainWindow::on_p_zm_btton_clicked()
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
+    /*
+     *
 //    try{
 
         if(theHardwareModel()){
@@ -431,7 +469,16 @@ void MainWindow::on_Con_xystage_button_clicked()
             iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
             ui->s_speed_spinbox->setValue(float(curSpeedX));
             }
-        }
+        }*/
+    bool isconnected = ctrl->connect_tango_stage();
+    if (isconnected)
+    {
+        ui->pc_stat->setText(con_str);
+       // show_currentpressure();
+    }
+    else{
+        ui->pc_stat->setText(fail_str);
+    }
 }
 
 void MainWindow::on_actionOpen_console_triggered()
@@ -456,8 +503,11 @@ void MainWindow::on_s_center_button_clicked()
 
 void MainWindow::on_s_set_speed_button_clicked()
 {
+    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
+    /*
     stage->XAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
     stage->YAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
+    */
 }
 
 void MainWindow::on_save_image_button_clicked()
@@ -465,7 +515,6 @@ void MainWindow::on_save_image_button_clicked()
     imtools->saveImg(*(imtools->getframe()),
                      (ui->imagename_lineedit->text().toStdString()));
 }
-
 
 void MainWindow::on_s_get_coors_pushButton_clicked()
 {
@@ -486,7 +535,10 @@ void MainWindow::MoveAction(){
 
       *imgc= geticenter(cip);
     std::cout << *imgc << std::endl;
-    cv::Mat pipc = getonimgpipettecoors(TM,mouse,*imgc,pc);
+
+    std:: cout<< "now we will strike : "<< std::endl;
+    std::cout << centers.img << std::endl;
+    cv::Mat pipc = calconimgpipettecoors(TM,mouse,*imgc,pc);
     std::cout << pipc << "pipette coors" << std::endl;
    // pipc.at<float>(0,0);
       QTextStream(stdout) << pipc.at<float>(0,1) << endl;
@@ -518,8 +570,8 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
     calib->Iscalibrating= true;
   //  calib->setModal(true);
-
-    calib->exec();
+    calib->show();
+    //calib->exec();
 }
 
 void MainWindow::screensample(){
@@ -537,8 +589,8 @@ void MainWindow::screensample(){
     int wmax = platesize/img_w_5p5x; //um
     int hmax = platesize/img_h_5p5x; //um
     int counter = 1;
-    for (int  i = 0; i< wmax; i++ ){
-        for (int j = 0; j< hmax; j++ ){
+    for (int j = 0; j< hmax; j++ ){
+        for (int  i = 0; i< wmax; i++ ){
             stage->XAxis().moveToAsync(iop::int32(xp));
             ::Sleep(1000); // wait 1 sec1
             counter+=counter;

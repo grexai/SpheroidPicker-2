@@ -35,7 +35,7 @@ SOURCES += \
     PipetteController.cpp \
     calibratedialog.cpp \
     comps.cpp \
-    controller.cpp
+    controller.cpp \
 
 HEADERS += \
         mainwindow.h \
@@ -48,7 +48,7 @@ HEADERS += \
     stagecontroller.h \
     calibratedialog.h \
     comps.h \
-    controller.h
+    controller.h \
 
 FORMS += \
         mainwindow.ui \

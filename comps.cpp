@@ -1,7 +1,7 @@
 #include "comps.h"
 
 
-extern cv::Mat getpcenter(cv::Mat& cppoints){
+cv::Mat getpcenter(const cv::Mat& cppoints){
     //eCenter
     std::cout<< "pc" << std::endl;
     cv::Mat pcenter(cv::Mat_<float>(3,1));
@@ -11,7 +11,7 @@ extern cv::Mat getpcenter(cv::Mat& cppoints){
     return pcenter;
 }
 
-extern cv::Mat geticenter(cv::Mat& imagepoints){
+cv::Mat geticenter(const cv::Mat& imagepoints){
     std::cout<< "ic" << std::endl;
     cv::Mat icenter(cv::Mat_<float>(2,1));
     icenter = imagepoints.col(0);
@@ -19,7 +19,7 @@ extern cv::Mat geticenter(cv::Mat& imagepoints){
     return icenter;
 }
 
-extern cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims){
+cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims){
     int l = in_vec.size();
     int h= coordims;
     int w= l/coordims;
@@ -29,7 +29,7 @@ extern cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims){
     return outputMatrix;
 }
 
-extern cv::Mat getTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
+cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
     std::cout<< "input cpp :"<< std::endl << cppoints << std::endl
              << "input imgp "<< std::endl<< imagepoints<< std::endl;
 
@@ -66,7 +66,7 @@ extern cv::Mat getTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& center
 
 };
 
-extern cv::Mat getonimgpipettecoors(cv::Mat T,std::vector<float>mpos,
+cv::Mat calconimgpipettecoors(cv::Mat T,std::vector<float>mpos,
                                                cv::Mat& icenter,cv::Mat& pcenter){
     cv::Mat pipcoors;
     cv::Mat mousecoors;//(cv::Mat_<float>(2,1));
