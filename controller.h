@@ -30,6 +30,8 @@ public:
 
     void vaccum_pulse(const float vacuum,float time);
 
+    float get_pressure();
+
     bool connect_pipette_controller();
 
     void pipette_movex_sync(const float x);
@@ -40,19 +42,27 @@ public:
 
     void pipette_move_async(const std::vector<float>coords);
 
+    void pipette_home();
+
+    void pipette_home_x();
+
+    void pipette_home_y();
+
+    void pipette_home_z();
+
     std::vector<float> pipette_get_coordinates();
 
     bool connect_tango_stage();
 
     void center_stage();
 
-    void stage_move_x_async(const int x);
+    void stage_move_x_async(int x);
 
-    void stage_move_y_async(const int y);
+    void stage_move_y_async(int y);
 
-    void stage_move_to_x_async(const int x);
+    void stage_move_to_x_async( int x);
 
-    void stage_move_to_y_async(const int y);
+    void stage_move_to_y_async( int y);
 
     void stage_set_speed(const float speed);
 

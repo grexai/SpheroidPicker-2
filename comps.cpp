@@ -63,7 +63,6 @@ cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
 
     return T;
 
-
 };
 
 cv::Mat calconimgpipettecoors(cv::Mat T,std::vector<float>mpos,

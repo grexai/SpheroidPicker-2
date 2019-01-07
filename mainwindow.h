@@ -49,18 +49,17 @@ signals:
     void signalTargetCoordinate(QPointF point);
 
 public slots:
-
+    void screensample();
 
 protected:
     controller* ctrl = nullptr;
-
-    arduinopressurecontroller* acp= nullptr ;
-    pipetteController* apipc= nullptr;
-    QSerialPort qsp_pip;
-    QSerialPort qsp_pc;
-    ahm::Unit* pStageUnit= nullptr;
-    ahm::Unit* pRootUnit= nullptr;
-    Stage *stage= nullptr;
+    //arduinopressurecontroller* acp= nullptr ;
+  //  pipetteController* apipc= nullptr;
+  //  QSerialPort qsp_pip;
+  //  QSerialPort qsp_pc;
+   // ahm::Unit* pStageUnit= nullptr;
+  //  ahm::Unit* pRootUnit= nullptr;
+  //  Stage *stage= nullptr;
     imagetools* imtools= nullptr;
     std::vector<float>* cpos1 = nullptr;
     std::vector<float>* cpos2 = nullptr;
@@ -150,9 +149,11 @@ private slots:
 
      void on_actionCalibrate_Pipette_triggered();
 
-     void screensample();
+
 
      void on_start_screening_clicked();
+
+     void on_pushButton_5_clicked();
 
 private:
     QTimer *timer= nullptr;
@@ -162,7 +163,6 @@ private:
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-
 };
 
 #endif // MAINWINDOW_H

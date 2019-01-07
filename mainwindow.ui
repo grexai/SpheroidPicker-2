@@ -1223,6 +1223,19 @@ Stage</string>
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButton_5">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>20</y>
+       <width>80</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>GETTM</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
