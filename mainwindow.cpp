@@ -357,6 +357,8 @@ void MainWindow::on_actionOpen_console_triggered()
 
 void MainWindow::on_s_center_button_clicked()
 {
+
+
     /*
     iop::int32 x0 = stage->XAxis().getMinPosition();
     iop::int32 x1 = stage->XAxis().getMaxPosition();
@@ -380,7 +382,7 @@ void MainWindow::on_s_set_speed_button_clicked()
 
 void MainWindow::on_save_image_button_clicked()
 {
-    imtools->saveImg(*(imtools->getframe()),
+    imtools->saveImg((imtools->getframe()),
                      (ui->imagename_lineedit->text().toStdString()));
 }
 
@@ -463,12 +465,12 @@ void MainWindow::screensample(){
 
     for (int j = 0; j< hmax; j++ ){
         for (int  i = 0; i< wmax; i++ ){
-        //    ctrl->stage_move_x_async(i);
-          //  ctrl->stage_move_y_async(j);
-            Sleep(1000);
+            ctrl->stage_move_x_async(i);
+            ctrl->stage_move_y_async(j);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + std::to_string(counter);
-            imtools->saveImg(*(imtools->getframe()),num2str.c_str());
+            imtools->saveImg((imtools->currentFrame.get()),num2str.c_str());
             counter += 1;
         }
     }
@@ -482,8 +484,8 @@ void spawnthread(){
 
 void MainWindow::on_start_screening_clicked()
 {
-      std::thread t1(&MainWindow::screensample,this);
-      t1.detach();
+    std::thread t1(&MainWindow::screensample,this);
+    t1.detach();
 }
 
 void MainWindow::on_pushButton_5_clicked()
@@ -536,4 +538,5 @@ void MainWindow::on_pushButton_5_clicked()
     *imgc = geticenter(cip);
     pc= getpcenter(randmat);
     QTextStream(stdout)<<"done" << endl;
+
 }

@@ -7,7 +7,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <types.h>
 #include <QString>
-
+#include <QtCore>
 class imagetools
 {
 public:
@@ -39,6 +39,8 @@ public:
 
     void getCameraframe();
 
+    cv::Mat* get_current_frm();
+
     cv::VideoCapture* getCamera();
 
     void setvideodevice(int devid);
@@ -55,9 +57,11 @@ public:
 
     bool iscameraopen=false;
 
-    void saveImg(cv::Mat &outimg, std::string outname);
+    void saveImg(cv::Mat* outimg, std::string outname);
 
+    QSharedPointer<cv::Mat> currentFrame;
 protected:
+    std::mutex mFrameBufferMutex;
     cv::VideoCapture* camera=nullptr;
     cv::Mat* frame= nullptr;
     cv::Mat* dispfrm = nullptr;

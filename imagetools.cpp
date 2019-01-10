@@ -1,6 +1,5 @@
 #include "imagetools.h"
 #include <thread>
-#include <QtCore>
 
 
 cv::Mat* imagetools::getframe()
@@ -17,14 +16,10 @@ void imagetools::setframe(cv::Mat &input){
     this->frame = &input;
 }
 
-
-
 cv::Mat* imagetools::getdisplayframe(){
     return (this->dispfrm);
 
 }
-
-
 
 void imagetools::setvideodevice(int devid){
     this->camera = new cv::VideoCapture(devid);
@@ -35,8 +30,6 @@ void imagetools::resetvideodevice(){
      this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
 }
 
-
-
 void imagetools::rmvideodevice(){
     camera->release();
     iscameraopen= camera->isOpened();
@@ -44,13 +37,22 @@ void imagetools::rmvideodevice(){
     delete  camera;
 }
 
+cv::Mat* imagetools::get_current_frm(){
+    return this->currentFrame.get();
+}
+
 void imagetools::getCameraframe(){
     if (this->frame != nullptr) { delete frame;}
     this->frame = new cv::Mat();
-    camera->read(*this->frame);
+//    currentFrame = QSharedPointer<cv::Mat> (new cv::Mat);
+    QSharedPointer<cv::Mat> temp( new cv::Mat );
+    camera->read(*temp);
+    std::unique_lock<std::mutex> frameBufferLock(mFrameBufferMutex);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik
+    std::swap(currentFrame,temp);
+    frameBufferLock.unlock();
     if (this->dispfrm != nullptr) {delete  dispfrm;}
     this->dispfrm = new cv::Mat();
-    cvtColor(*this->frame,*this->dispfrm,CV_BGR2RGB,0);
+    cvtColor(*this->currentFrame.get(),*this->dispfrm,CV_BGR2RGB,0);
 }
 
 void imagetools::freeframe(){
@@ -158,18 +160,21 @@ void imagetools::addPointToImage(cv::Point point)
 }
 
 // Uses CV saveimg
-void imagetools::saveImg(cv::Mat& outimg, std::string outname)
+void imagetools::saveImg(cv::Mat* outimg, std::string outname)
 {
     outname = outname + ".png";
     QTextStream(stdout) << QString::fromStdString(outname);
     std::vector<int> compression_params;
-    cv::Mat temp = outimg.clone();
+  //  cv::Mat temp = currentFrame.get()->clone();
     //CV_IMWRITE_PNG_COMPRESSION
     compression_params.push_back(16);
     compression_params.push_back(0);
-    imwrite(outname, temp, compression_params);
+   // currentFrame.
+   // imshow("adsad",);
+    imwrite(outname, *currentFrame.get(), compression_params);
 
 //    cout << "image saved as " << outname.str() << endl;
+
 }
 
 //void imagetools::
