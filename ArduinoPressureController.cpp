@@ -16,11 +16,8 @@ void arduinopressurecontroller::requestPressure(const float pressure){
     //ss << fixed << setprecision(2) << pressure;
     QString sar =  QString::fromStdString(to_string(static_cast<int>(kSetRequestedPressure)).append(",")
            .append(to_string(pressure)));
-
     QString ans = this->acp_sc.sendAndReceive(sar,this->EOM);
     this->checkAckOrSetError(ans);
-
-
 }
 
 void arduinopressurecontroller::checkAckOrSetError(

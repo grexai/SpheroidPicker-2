@@ -14,6 +14,7 @@
 #include <comps.h>
 #include <controller.h>
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -26,7 +27,7 @@ public:
     QString con_str= "Connected";
 
     QString fail_str = "Failed";
-
+    QThread thread;
     int cameraIndex=0;
 
     explicit MainWindow(QWidget *parent = nullptr);
@@ -39,17 +40,20 @@ public:
 
  //   void MainWindow::mouseMoveEvent(QMouseEvent *event);
 
+
     void porttest();
     cv::Mat TM;
     cv::Mat* imgc;
     cv::Mat pc;
     centers centers;
+
+
 signals:
     // The signal of transmit the coordinates of the mouse position
     void signalTargetCoordinate(QPointF point);
 
 public slots:
-    void screensample();
+
 
 protected:
     controller* ctrl = nullptr;
@@ -154,7 +158,9 @@ private slots:
      void on_start_screening_clicked();
 
      void on_pushButton_5_clicked();
+ //    void startWorker();
 
+     void screensample();
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -163,6 +169,12 @@ private:
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
+
+
+    //TEST
+
+    QTimer *timer1= nullptr ;
+    QThread *thread1= nullptr;
 };
 
 #endif // MAINWINDOW_H

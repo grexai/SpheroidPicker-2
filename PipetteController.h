@@ -32,7 +32,6 @@ public:
 
     void moveToZSync(float z_value);
 
-
     //G28
     void goHome(bool x, bool y, bool z);
 

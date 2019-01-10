@@ -42,7 +42,7 @@ float controller::get_pressure()
 
 bool controller::connect_pipette_controller()
 {
-    QString port = "COM22";
+    QString port = "COM21";
     apipc = new pipetteController(QSP_apipc,port);
     if (apipc->isconnected)
     {
@@ -103,8 +103,6 @@ std::vector<float> controller::pipette_get_coordinates(){
    return apipc->getcurrentpos();
 }
 
-
-
 // STAGE
 
 bool controller::connect_tango_stage(){
@@ -137,12 +135,15 @@ bool controller::connect_tango_stage(){
 
 void controller::stage_move_x_async(const int x)
 {
-    stage->XAxis().moveAsync((iop::int32)x);
+   int x0 = this->stage_get_x_coords();
+   this->stage_move_to_x_async(x0+x);
+
 }
 
 void controller::stage_move_y_async(const int y)
 {
-    stage->YAxis().moveAsync((iop::int32)y);
+    int y0 = this->stage_get_y_coords();
+    this->stage_move_to_y_async(y0+y);
 }
 
 void controller::stage_move_to_x_async(const int x)
@@ -159,6 +160,42 @@ void controller::stage_set_speed(const float speed)
 {
     stage->XAxis().setCurrentSpeed((iop::int32)speed);
     stage->YAxis().setCurrentSpeed((iop::int32)speed);
+}
+
+int controller::stage_get_x_speed()
+{
+    return int(stage->XAxis().getCurrentSpeed());
+}
+
+int controller::stage_get_y_speed()
+{
+    return int(stage->YAxis().getCurrentSpeed());
+}
+
+std::vector<int> controller::stage_get_speed()
+{
+    std::vector<int> speedvec;
+    speedvec.push_back(this->stage_get_x_speed());
+    speedvec.push_back(this->stage_get_y_speed());
+    return speedvec;
+}
+
+int controller::stage_get_x_coords()
+{
+    return int(stage->XAxis().getCurrentPosition());
+}
+
+int controller::stage_get_y_coords()
+{
+    return int(stage->YAxis().getCurrentPosition());
+}
+
+std::vector<int>  controller::stage_get_coords()
+{
+    std::vector<int> coords;
+    coords.push_back(this->stage_get_x_coords());
+    coords.push_back(this->stage_get_y_coords());
+    return coords;
 }
 
 

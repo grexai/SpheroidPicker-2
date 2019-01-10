@@ -66,7 +66,17 @@ public:
 
     void stage_set_speed(const float speed);
 
+    int stage_get_x_speed();
 
+    int stage_get_y_speed();
+
+    std::vector<int> stage_get_speed();
+
+    int stage_get_x_coords();
+
+    int stage_get_y_coords();
+
+    std::vector<int> stage_get_coords();
 
 protected:
     cv::Mat TM;
@@ -83,8 +93,6 @@ protected:
     ahm::Unit* pStageUnit= nullptr;
     ahm::Unit* pRootUnit= nullptr;
     Stage *stage= nullptr;
-
-
 
 };
 

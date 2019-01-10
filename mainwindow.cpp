@@ -88,36 +88,35 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
             return true;
          }
     }
-
 }
 
 void MainWindow::calib_frame_view(){
     using namespace cv;
     if (calib->Iscalibrating == 1)
     {
-        Point pmid = Point(imtools->getframe()->cols/2,100 );
+        Point pmid = Point(imtools->getdisplayframe()->cols/2,100 );
 
         if (calib->clicks==0)
         {
             imtools->addPointToImage(pmid);
         }
         if (calib->clicks==1){
-            imtools->addPointToImage(Point(100,imtools->getframe()->rows-100));
+            imtools->addPointToImage(Point(100,imtools->getdisplayframe()->rows-100));
             if(cpos1== nullptr)
                {
                cpos1 = new std::vector<float>;
                *cpos1 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
+               QTextStream(stdout ) << "point 1 saved:" ;//<< cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
                }
 
         }
         if (calib->clicks==2){
-            imtools->addPointToImage(Point(imtools->getframe()->cols-100,imtools->getframe()->rows-100));
+            imtools->addPointToImage(Point(imtools->getdisplayframe()->cols-100,imtools->getdisplayframe()->rows-100));
             if(cpos2== nullptr)
             {
                cpos2 = new std::vector<float>;
                *cpos2 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<" "<<cpos2->at(1)<< " "<< cpos2->at(2) <<endl;
+               QTextStream(stdout ) << "point 2 saved: ";// << cpos2->at(0) <<" "<<cpos2->at(1)<< " "<< cpos2->at(2) <<endl;
             }
         }
         if (calib->clicks==3)
@@ -126,7 +125,8 @@ void MainWindow::calib_frame_view(){
             {
                 cpos3 = new std::vector<float>;
                 *cpos3 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<" "<<cpos3->at(1)<< " "<< cpos3->at(2) <<endl;
+                QTextStream(stdout ) << "point 3 saved: x: " ;//<< cpos3->at(0) <<" "<<cpos3->at(1)<< " "<< cpos3->at(2) <<endl;
+              //  calib->clicks=0;
             }
         }
     }
@@ -152,7 +152,7 @@ void MainWindow::on_Campushbtn_clicked()
 {
     if ((imtools->iscameraopen)){
         ui->Campushbtn->setText("Camera on");
-        imtools->resetvideodevice();
+     //   imtools->resetvideodevice();
         imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
@@ -175,12 +175,8 @@ void MainWindow::on_Campushbtn_clicked()
         setMouseTracking(true);
         ui->graphicsView->installEventFilter(this);
 
-
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
-
-
-
     }
 }
 
@@ -191,11 +187,8 @@ void MainWindow::on_exptime_button_clicked()
 
 void MainWindow::on_width_button_clicked()
 {
-    disconnect(timer, SIGNAL(timeout()), this,nullptr);
     float w =  ui->width_spin->value();
     imtools->setimagewidth(w);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
-    timer->start(20);
 }
 
 void MainWindow::on_height_button_clicked()
@@ -203,9 +196,6 @@ void MainWindow::on_height_button_clicked()
     float h =  ui->height_spin->value();
     imtools->setimagewidth(h);
 }
-
-
-
 
 void MainWindow::on_actionDark_Mode_triggered()
 {
@@ -269,30 +259,23 @@ void MainWindow::on_Con_pip_clicked()
 void MainWindow::on_SetPressure_clicked()
 {
     ctrl->request_pressure(ui->pressure_value->value());
-  //  acp->requestPressure(ui->pressure_value->value());
 }
 
 void MainWindow::on_atm_button_clicked()
 {
     ctrl->request_atm();
-    //acp->requestPressure(0.0f);
+
 }
 
 void MainWindow::on_pc_pulse_button_clicked()
 {
     ctrl->vaccum_pulse(ui->pulse_value->value(),ui->pulse_time->value());
-    //acp->breakIn(ui->pulse_value->value(),ui->pulse_time->value());
+
 }
 
 void MainWindow::on_get_coors_pushButton_clicked()
 {
-
-   // Float3coor rc;
-   // Float3coor randx = apipc->getcurrentpos();
-   // std::vector<float> randx = apipc->getcurrentpos();
-
-      std::vector<float> randx= ctrl->pipette_get_coordinates();
-
+    std::vector<float> randx= ctrl->pipette_get_coordinates();
     ui->xc_label->setText("X: " + QString::number(randx.at(0),'f',2));
     ui->yc_label->setText("Y: " + QString::number(randx.at(1),'f',2));
     ui->zc_label->setText("Z: " + QString::number(randx.at(2),'f',2));
@@ -300,140 +283,67 @@ void MainWindow::on_get_coors_pushButton_clicked()
 
 void MainWindow::on_s_xp_button_clicked()
 {
-
-    iop::int32 x = ui->s_step_spinbox->value();
-    ctrl->stage_move_x_async(x);
-  /*
-    iop::int32 x0= stage->XAxis().getCurrentPosition();
-    iop::int32 x = ui->s_step_spinbox->value();
-    stage->XAxis().moveToAsync(iop::int32(x0+x));
-*/
+    ctrl->stage_move_x_async(ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_s_xm_button_clicked()
 {
-    iop::int32 x = ui->s_step_spinbox->value();
-    ctrl->stage_move_x_async(-x);
-    /*
-    iop::int32 x0= stage->XAxis().getCurrentPosition();
-    iop::int32 x = ui->s_step_spinbox->value();
-    stage->XAxis().moveToAsync(x0-x);
-*/
+
+    ctrl->stage_move_x_async(-(ui->s_step_spinbox->value()));
+
 }
 
 void MainWindow::on_s_yp_button_clicked()
 {
-    /*
-    iop::int32 y0= stage->YAxis().getCurrentPosition();
-    iop::int32 y = ui->s_step_spinbox->value();
-    stage->YAxis().moveToAsync(y0+y);
-    */
-    iop::int32 y = ui->s_step_spinbox->value();
-    ctrl->stage_move_x_async(y);
+
+    ctrl->stage_move_y_async(ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_s_ym_button_clicked()
 {
-    /*
-    iop::int32 y0= stage->YAxis().getCurrentPosition();
-    iop::int32 y = ui->s_step_spinbox->value();
-    stage->YAxis().moveToAsync(y0-y);
-    */
-    iop::int32 y = ui->s_step_spinbox->value();
-    ctrl->stage_move_x_async(-y);
 
-
+    ctrl->stage_move_y_async(-ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_p_xp_button_clicked()
 {
     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
- /*   apipc->setrelativepositioning();
-    apipc->moveToXSync(ui->pip_step_spinbox->value());*/
 }
 
 void MainWindow::on_p_xm_button_clicked()
 {
     ctrl->pipette_movex_sync(-(ui->pip_step_spinbox->value()));
-    /*
-    apipc->setrelativepositioning();
-    apipc->moveToXSync(-(ui->pip_step_spinbox->value()));
-*/
+
 }
 
 void MainWindow::on_p_yp_button_clicked()
 {
-    /*
-    apipc->setrelativepositioning();
-    apipc->moveToYSync(ui->pip_step_spinbox->value());
-    */
     ctrl->pipette_movey_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_ym_button_clicked()
 {
     ctrl->pipette_movey_sync(-(ui->pip_step_spinbox->value()));
-    /*
-    apipc->setrelativepositioning();
-    apipc->moveToYSync(-(ui->pip_step_spinbox->value()));
-
-    */
 }
 
 void MainWindow::on_p_zp_button_clicked()
 {
-/*
-    apipc->setrelativepositioning();
-    apipc->moveToZSync(ui->pip_step_spinbox->value());
-*/
     ctrl->pipette_movez_sync(ui->pip_step_spinbox->value());
-
 }
 
 
 void MainWindow::on_p_zm_btton_clicked()
 {
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
-    /*
-    apipc->setrelativepositioning();
-    apipc->moveToZSync(-(ui->pip_step_spinbox->value()));*/
 }
 
 void MainWindow::on_Con_xystage_button_clicked()
 {
-    /*
-     *
-//    try{
 
-        if(theHardwareModel()){
-
-            QTextStream(stdout) << "asdsad" << endl;
-
-            iop::string name = "";
-
-            pRootUnit = theHardwareModel()->getUnit("");
-
-            QTextStream(stdout) << pRootUnit << endl;
-
-            if(pRootUnit){
-                pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);
-                stage = new Stage(pStageUnit) ;
-
-                if(!pStageUnit){
-                    QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
-                    return;
-                }
-            ui->s_stat->setText(con_str);
-
-            iop::int32 curSpeedX = stage->XAxis().getCurrentSpeed();
-            ui->s_speed_spinbox->setValue(float(curSpeedX));
-            }
-        }*/
     bool isconnected = ctrl->connect_tango_stage();
-    if (isconnected)
+    if (isconnected==true)
     {
         ui->s_stat->setText(con_str);
-       // show_currentpressure();
     }
     else{
         ui->s_stat->setText(fail_str);
@@ -466,10 +376,6 @@ void MainWindow::on_s_center_button_clicked()
 void MainWindow::on_s_set_speed_button_clicked()
 {
     ctrl->stage_set_speed(ui->s_speed_spinbox->value());
-    /*
-    stage->XAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
-    stage->YAxis().setCurrentSpeed((iop::int32)(ui->s_speed_spinbox->value()));
-    */
 }
 
 void MainWindow::on_save_image_button_clicked()
@@ -480,13 +386,9 @@ void MainWindow::on_save_image_button_clicked()
 
 void MainWindow::on_s_get_coors_pushButton_clicked()
 {
-    /*
-    iop::int32 y0 = stage->YAxis().getCurrentPosition();
-    iop::int32 x0 = stage->XAxis().getCurrentPosition();
-
-    ui->s_xpos_label->setText("X: " + QString::number(x0,'f',2));
-    ui->s_ypos_label->setText("Y: " + QString::number(y0,'f',2));
-    */
+    std::vector<int> coords = ctrl->stage_get_coords();
+    ui->s_xpos_label->setText("X: " + QString::number(coords.at(0),'f',2));
+    ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
 }
 
 void MainWindow::MoveAction(){
@@ -506,10 +408,6 @@ void MainWindow::MoveAction(){
     std::cout << pipc << "pipette coors" << std::endl;
    // pipc.at<float>(0,0);
       QTextStream(stdout) << pipc.at<float>(0,1) << endl;
- //   apipc->setabsoluepositioning();
-//    apipc->moveToZSync(static_cast<float>(pipc.at<float>(0,2)));
-//    apipc->moveToXSync(static_cast<float>(pipc.at<float>(0,0)));
-//    apipc->moveToYSync(static_cast<float>(pipc.at<float>(0,1)));
       ctrl->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
       ctrl->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
       ctrl->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
@@ -536,9 +434,7 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
     calib->Iscalibrating= true;
-  //  calib->setModal(true);
     calib->show();
-    //calib->exec();
 }
 
 void MainWindow::screensample(){
@@ -548,39 +444,46 @@ void MainWindow::screensample(){
     else{
         QDir().mkdir("Scandata");
     }
-    iop::int32 xp;// =stage->XAxis().getCurrentPosition();
-    iop::int32 yp;//= stage->YAxis().getCurrentPosition();
-    int xpos=10,ypos=10;
+
+    //X 710798   Y-805545
+    iop::int32 xp = 710798;// =stage->XAxis().getCurrentPosition();
+    iop::int32 yp = 805545;//= stage->YAxis().getCurrentPosition();
+    int xpos=710798,ypos=-805545;
+ // ctrl->stage_move_to_x_async(xpos);
+ // ctrl->stage_move_to_y_async(-ypos);
     int platesize= 30000; //um
     float  img_w_5p5x = 2742.6; //um
     float  img_h_5p5x = 1946.6; //um
     int wmax = platesize/img_w_5p5x; //um
     int hmax = platesize/img_h_5p5x; //um
+
+    QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
+    std::string folder ="Scandata/screening";
+
     for (int j = 0; j< hmax; j++ ){
         for (int  i = 0; i< wmax; i++ ){
-            ctrl->stage_move_x_async(xpos);
-            ::Sleep(1000); // wait 1 sec1
-            counter+=counter;
-            imtools->saveImg(*(imtools->getframe()),"Scandata/screening"+std::to_string(counter) );
+        //    ctrl->stage_move_x_async(i);
+          //  ctrl->stage_move_y_async(j);
+            Sleep(1000);
+            std::cout<< "c" << counter << std::endl;
+            std::string num2str= folder + std::to_string(counter);
+            imtools->saveImg(*(imtools->getframe()),num2str.c_str());
+            counter += 1;
         }
-        ctrl->stage_move_y_async(ypos);
-        ::Sleep(1000); // wait 1 sec1
-        counter+=counter;
-        imtools->saveImg(*(imtools->getframe()),"Scandata/screening"+std::to_string(counter) );
-
-
-
     }
-
 }
 
 
 
+void spawnthread(){
+
+}
 
 void MainWindow::on_start_screening_clicked()
 {
-    this->screensample();
+      std::thread t1(&MainWindow::screensample,this);
+      t1.detach();
 }
 
 void MainWindow::on_pushButton_5_clicked()

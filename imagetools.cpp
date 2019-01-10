@@ -35,6 +35,8 @@ void imagetools::resetvideodevice(){
      this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
 }
 
+
+
 void imagetools::rmvideodevice(){
     camera->release();
     iscameraopen= camera->isOpened();
@@ -79,12 +81,12 @@ void imagetools::freeframe(){
 
 void imagetools::setimagewidth(float& imwidth){
 
-   QTextStream(stdout)  << "width " << imwidth << endl;
+   //QTextStream(stdout)  << "width " << imwidth << endl;
    this->camera->set(CV_CAP_PROP_FRAME_WIDTH,imwidth);
 }
 
 void imagetools::setimageheight(float& imheight){
-     QTextStream(stdout)  << "heights " << imheight << endl;
+   //  QTextStream(stdout)  << "heights " << imheight << endl;
      camera->set(CV_CAP_PROP_FRAME_HEIGHT,imheight);
 }
 
@@ -140,28 +142,24 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
         // Print individual stats for component 1 (component 0 is background)
         cout << "Component 1 stats:" << endl;
 
-        std::cout << "CC_STAT_LEFT   = " << stats.at<int>(3, cv::CC_STAT_LEFT) << endl;
-        cout << "CC_STAT_TOP    = " << stats.at<int>(3, cv::CC_STAT_TOP) << endl;
-        cout << "CC_STAT_WIDTH  = " << stats.at<int>(3,cv:: CC_STAT_WIDTH) << endl;
-        cout << "CC_STAT_HEIGHT = " << stats.at<int>(3,cv:: CC_STAT_HEIGHT) << endl;
-        cout << "CC_STAT_AREA   = " << stats.at<int>(79,cv:: CC_STAT_AREA) << endl;
+        std::cout << "CC_STAT_LEFT   = " << stats.at<int>(1, cv::CC_STAT_LEFT) << endl;
+        cout << "CC_STAT_TOP    = " << stats.at<int>(1, cv::CC_STAT_TOP) << endl;
+        cout << "CC_STAT_WIDTH  = " << stats.at<int>(1,cv:: CC_STAT_WIDTH) << endl;
+        cout << "CC_STAT_HEIGHT = " << stats.at<int>(1,cv:: CC_STAT_HEIGHT) << endl;
+        cout << "CC_STAT_AREA   = " << stats.at<int>(1,cv:: CC_STAT_AREA) << endl;
 
     return sphcoors;
 
 }
 
-void imagetools::addPointToImage(cv::Point point){
-    //QTextStream(stdout) << "asdsad"<< endl;
-   // cv::Mat temp =this->frame->clone() ;
-
-   cv::circle(*this->frame,point, 5, (0,0,255), -1);
- //   this->setframe(temp);
-
+void imagetools::addPointToImage(cv::Point point)
+{
+   cv::circle(*this->dispfrm,point, 5, (0,0,255), -1);
 }
 
 // Uses CV saveimg
-void imagetools::saveImg(cv::Mat& outimg, std::string outname) {
-
+void imagetools::saveImg(cv::Mat& outimg, std::string outname)
+{
     outname = outname + ".png";
     QTextStream(stdout) << QString::fromStdString(outname);
     std::vector<int> compression_params;
