@@ -155,6 +155,7 @@ void Axis::printWhatIsSupported() {
         if (m_pDirectedControlValueAsync) {
             try {
                 if (direction<0) {
+
                     m_pDirectedControlValueAsync->startTowardsMin();
                 }
                 else {

@@ -133,18 +133,7 @@ bool controller::connect_tango_stage(){
     }
 }
 
-void controller::stage_move_x_async(const int x)
-{
-   int x0 = this->stage_get_x_coords();
-   this->stage_move_to_x_async(x0+x);
 
-}
-
-void controller::stage_move_y_async(const int y)
-{
-    int y0 = this->stage_get_y_coords();
-    this->stage_move_to_y_async(y0+y);
-}
 
 void controller::stage_move_to_x_async(const int x)
 {
@@ -153,8 +142,21 @@ void controller::stage_move_to_x_async(const int x)
 
 void controller::stage_move_to_y_async(const int y)
 {
-    stage->YAxis().moveToAsync((iop::int32)y);
+    stage->YAxis().moveToAsync(((iop::int32)y));
 }
+
+
+void controller::stage_move_to_x_sync(const int x)
+{
+    stage->XAxis().moveTo((iop::int32)x);
+}
+
+void controller::stage_move_to_y_sync(const int y)
+{
+    stage->YAxis().moveTo(((iop::int32)y));
+}
+
+
 
 void controller::stage_set_speed(const float speed)
 {
@@ -182,6 +184,8 @@ std::vector<int> controller::stage_get_speed()
 
 int controller::stage_get_x_coords()
 {
+    iop::int32 xp1= stage->XAxis().getCurrentPosition();
+    std::cout<< "asdsad"<<xp1 <<std::endl;
     return int(stage->XAxis().getCurrentPosition());
 }
 
@@ -198,4 +202,14 @@ std::vector<int>  controller::stage_get_coords()
     return coords;
 }
 
+void controller::stage_move_x_async(const int x)
+{
+   int x0 = this->stage_get_x_coords();
+   this->stage_move_to_x_async(x0+x);
+}
 
+void controller::stage_move_y_async(const int y)
+{
+    int y0 = this->stage_get_y_coords();
+    this->stage_move_to_y_async(y0+y);
+}

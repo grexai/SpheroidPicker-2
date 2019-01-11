@@ -44,7 +44,7 @@ cv::Mat* imagetools::get_current_frm(){
 void imagetools::getCameraframe(){
     if (this->frame != nullptr) { delete frame;}
     this->frame = new cv::Mat();
-//    currentFrame = QSharedPointer<cv::Mat> (new cv::Mat);
+//  currentFrame = QSharedPointer<cv::Mat> (new cv::Mat);
     QSharedPointer<cv::Mat> temp( new cv::Mat );
     camera->read(*temp);
     std::unique_lock<std::mutex> frameBufferLock(mFrameBufferMutex);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik

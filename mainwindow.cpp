@@ -136,8 +136,6 @@ void MainWindow::update_window()
 {
     imtools->getCameraframe();
     calib_frame_view();
-    //imshow("wtf",*imtools->getframe());
-   //cv:: waitKey(0);
     if (qframe != nullptr)
     {
         delete[] qframe;
@@ -283,13 +281,13 @@ void MainWindow::on_get_coors_pushButton_clicked()
 
 void MainWindow::on_s_xp_button_clicked()
 {
-    ctrl->stage_move_x_async(ui->s_step_spinbox->value());
+    ctrl->stage_move_x_async(-ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_s_xm_button_clicked()
 {
 
-    ctrl->stage_move_x_async(-(ui->s_step_spinbox->value()));
+    ctrl->stage_move_x_async((ui->s_step_spinbox->value()));
 
 }
 
@@ -446,33 +444,42 @@ void MainWindow::screensample(){
     else{
         QDir().mkdir("Scandata");
     }
-
     //X 710798   Y-805545
     iop::int32 xp = 710798;// =stage->XAxis().getCurrentPosition();
     iop::int32 yp = 805545;//= stage->YAxis().getCurrentPosition();
-    int xpos=710798,ypos=-805545;
- // ctrl->stage_move_to_x_async(xpos);
- // ctrl->stage_move_to_y_async(-ypos);
-    int platesize= 30000; //um
-    float  img_w_5p5x = 2742.6; //um
-    float  img_h_5p5x = 1946.6; //um
-    int wmax = platesize/img_w_5p5x; //um
-    int hmax = platesize/img_h_5p5x; //um
+    int xpos=ctrl->stage_get_x_coords();
 
+    int ypos=ctrl->stage_get_y_coords();
+    std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
+
+    int platesize= 300000; //    /100nm
+    float  img_w_5p5x = 27426; //  //100nm
+    float  img_h_5p5x = 19466; //  um
+    int wmax = platesize/img_w_5p5x; // um
+    int hmax = platesize/img_h_5p5x; // um
+    ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     std::string folder ="Scandata/screening";
 
-    for (int j = 0; j< hmax; j++ ){
-        for (int  i = 0; i< wmax; i++ ){
-            ctrl->stage_move_x_async(i);
-            ctrl->stage_move_y_async(j);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    for (int j = 0; j< hmax; j++ )
+    {
+        for (int  i = 0; i< wmax; i++)
+        {
+            QTextStream(stdout)<< "i" << i << endl;
+            ctrl->stage_move_to_x_sync(xpos+img_w_5p5x*i);
+            QThread::sleep(2);
             std::cout<< "c" << counter << std::endl;
-            std::string num2str= folder + std::to_string(counter);
+            std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
             imtools->saveImg((imtools->currentFrame.get()),num2str.c_str());
             counter += 1;
         }
+        ctrl->stage_set_speed(20000.0f);
+        ctrl->stage_move_to_y_sync(ypos+img_h_5p5x*j);
+        ctrl->stage_set_speed(7500.0f);
+       // std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+       // QThread::sleep(5);
+
     }
 }
 

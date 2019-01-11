@@ -64,6 +64,10 @@ public:
 
     void stage_move_to_y_async( int y);
 
+    void stage_move_to_x_sync( int x);
+
+    void stage_move_to_y_sync( int y);
+
     void stage_set_speed(const float speed);
 
     int stage_get_x_speed();
