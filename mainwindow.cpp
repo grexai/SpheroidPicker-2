@@ -49,7 +49,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
 void MainWindow::update_currentpressure(){
     float cp = ctrl->get_pressure();
     //float cp = (QRandomGenerator::global()->generate());
@@ -61,7 +60,6 @@ void MainWindow::show_currentpressure(){
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
     disp_pressure->start(1000);
 }
-
 
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     if (obj == ui->graphicsView && true)
@@ -172,7 +170,6 @@ void MainWindow::on_Campushbtn_clicked()
         imtools->setimageheight(h);
         setMouseTracking(true);
         ui->graphicsView->installEventFilter(this);
-
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
     }
@@ -262,7 +259,6 @@ void MainWindow::on_SetPressure_clicked()
 void MainWindow::on_atm_button_clicked()
 {
     ctrl->request_atm();
-
 }
 
 void MainWindow::on_pc_pulse_button_clicked()
@@ -281,25 +277,21 @@ void MainWindow::on_get_coors_pushButton_clicked()
 
 void MainWindow::on_s_xp_button_clicked()
 {
-    ctrl->stage_move_x_async(-ui->s_step_spinbox->value());
+    ctrl->stage_move_x_async(ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_s_xm_button_clicked()
 {
-
-    ctrl->stage_move_x_async((ui->s_step_spinbox->value()));
-
+    ctrl->stage_move_x_async(-(ui->s_step_spinbox->value()));
 }
 
 void MainWindow::on_s_yp_button_clicked()
 {
-
     ctrl->stage_move_y_async(ui->s_step_spinbox->value());
 }
 
 void MainWindow::on_s_ym_button_clicked()
 {
-
     ctrl->stage_move_y_async(-ui->s_step_spinbox->value());
 }
 
@@ -346,6 +338,7 @@ void MainWindow::on_Con_xystage_button_clicked()
     else{
         ui->s_stat->setText(fail_str);
     }
+    ui->s_speed_spinbox->setValue(double(ctrl->stage_get_x_speed()));
 }
 
 void MainWindow::on_actionOpen_console_triggered()
@@ -355,21 +348,7 @@ void MainWindow::on_actionOpen_console_triggered()
 
 void MainWindow::on_s_center_button_clicked()
 {
-
-
-    /*
-    iop::int32 x0 = stage->XAxis().getMinPosition();
-    iop::int32 x1 = stage->XAxis().getMaxPosition();
-
-    iop::int32 y0 = stage->YAxis().getMinPosition();
-    iop::int32 y1 = stage->YAxis().getMaxPosition();
-
-    iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
-    iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
-
-
-    stage->moveToAsync(x,y, false);
-*/
+    ctrl->stage_go_center();
 }
 
 
@@ -448,10 +427,8 @@ void MainWindow::screensample(){
     iop::int32 xp = 710798;// =stage->XAxis().getCurrentPosition();
     iop::int32 yp = 805545;//= stage->YAxis().getCurrentPosition();
     int xpos=ctrl->stage_get_x_coords();
-
     int ypos=ctrl->stage_get_y_coords();
     std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-
     int platesize= 300000; //    /100nm
     float  img_w_5p5x = 27426; //  //100nm
     float  img_h_5p5x = 19466; //  um
@@ -461,14 +438,13 @@ void MainWindow::screensample(){
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     std::string folder ="Scandata/screening";
-
     for (int j = 0; j< hmax; j++ )
     {
         for (int  i = 0; i< wmax; i++)
         {
             QTextStream(stdout)<< "i" << i << endl;
             ctrl->stage_move_to_x_sync(xpos+img_w_5p5x*i);
-            QThread::sleep(2);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
             imtools->saveImg((imtools->currentFrame.get()),num2str.c_str());
@@ -477,9 +453,6 @@ void MainWindow::screensample(){
         ctrl->stage_set_speed(20000.0f);
         ctrl->stage_move_to_y_sync(ypos+img_h_5p5x*j);
         ctrl->stage_set_speed(7500.0f);
-       // std::this_thread::sleep_for(std::chrono::milliseconds(6000));
-       // QThread::sleep(5);
-
     }
 }
 
@@ -528,22 +501,22 @@ void MainWindow::on_pushButton_5_clicked()
          ||
         \  /
          \/
-
        | x1  x2  x3 |
        | y1  y2  y3 |
        | z1  z2  z3 |
     */
-
     randmat =  randmat.reshape(0,3);
     cv::transpose(randmat,randmat);
-
     std::cout << randmat<< "randmat"<< std::endl;
-
     TM = calcTMatrix(randmat,cip,centers);
     //ic = new cv::Mat;
     imgc= new cv::Mat(1,2,CV_32F);
     *imgc = geticenter(cip);
     pc= getpcenter(randmat);
     QTextStream(stdout)<<"done" << endl;
+}
 
+void MainWindow::on_C_m_clicked()
+{
+    ctrl->connect_microscope_unit();
 }

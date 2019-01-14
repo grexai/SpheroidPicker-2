@@ -8,6 +8,7 @@
 #include <comps.h>
 #include <QString>
 #include <QSerialPort>
+#include <propertyreader.h>
 
 class controller
 {
@@ -82,22 +83,38 @@ public:
 
     std::vector<int> stage_get_coords();
 
+    int stage_get_x_min_pos();
+
+    int stage_get_x_max_pos();
+
+    int stage_get_y_min_pos();
+
+    int stage_get_y_max_pos();
+
+    void stage_go_center();
+
+    void stage_run_iniciatlions();
+
+    bool connect_microscope_unit();
+
 protected:
-    cv::Mat TM;
-    cv::Mat* img_c_p;
-    cv::Mat pipette_c_p;
-    centers centers;
-    //serials
+    propertyreader* propreader=nullptr;
+    //serial ports
     QSerialPort QSP_apc;
     QSerialPort QSP_apipc;
     //ardino drivers
-    pipetteController* apipc;
     arduinopressurecontroller* apc;
-    //Stage
+    pipetteController* apipc;
+    // pipette coordinate transformation
+    cv::Mat TM;  // transformation matrix img <==> pipette coordinates
+    cv::Mat* img_c_p;  //imgcenter points
+    cv::Mat pipette_c_p; // pipettecenter points
+    centers centers; // center structure
+    //Stage drivers
+
     ahm::Unit* pStageUnit= nullptr;
     ahm::Unit* pRootUnit= nullptr;
     Stage *stage= nullptr;
-
 };
 
 #endif // CONTROLLER_H

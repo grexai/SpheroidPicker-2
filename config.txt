@@ -1,0 +1,6 @@
+#Configuration file for spheroid picker
+#sad
+
+ports.pressurecontroller="COM5"
+ports.pipette="COM21"
+

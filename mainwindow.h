@@ -161,6 +161,8 @@ private slots:
  //    void startWorker();
 
      void screensample();
+     void on_C_m_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

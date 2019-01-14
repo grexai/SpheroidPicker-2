@@ -95,8 +95,6 @@ void pipetteController::MoveToXYZSync(std::vector<float> coords){
     moveToXSync(coords.at(0));  //X
     moveToZSync(coords.at(2));  //Z
     moveToYSync(coords.at(1));  //Y
-
-
 }
 
 

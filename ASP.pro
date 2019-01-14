@@ -36,6 +36,7 @@ SOURCES += \
     calibratedialog.cpp \
     comps.cpp \
     controller.cpp \
+    propertyreader.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,6 +50,7 @@ HEADERS += \
     calibratedialog.h \
     comps.h \
     controller.h \
+    propertyreader.h
 
 FORMS += \
         mainwindow.ui \
