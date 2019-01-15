@@ -7,7 +7,7 @@
 #include <QGraphicsPixmapItem>
 #include "imagetools.h"
 #include <arduinopressurecontroller.h>
-#include <PipetteController.h>
+#include <arduinogcode.h>
 #include <stagecontroller.h>
 #include <QGraphicsSceneMouseEvent>
 #include <calibratedialog.h>
@@ -99,12 +99,6 @@ private slots:
 
      void on_p_home_z_clicked();
 
-     void on_Con_pc_clicked();
-
-     void on_Con_pip_clicked();
-
-     void on_Con_xystage_button_clicked();
-
      void on_SetPressure_clicked();
 
      void on_atm_button_clicked();
@@ -151,17 +145,14 @@ private slots:
 
      void on_graphicsView_customContextMenuRequested(const QPoint &pos);
 
-     void on_actionCalibrate_Pipette_triggered();
-
-
-
      void on_start_screening_clicked();
 
      void on_pushButton_5_clicked();
- //    void startWorker();
 
      void screensample();
-     void on_C_m_clicked();
+
+     void on_actionCalibrate_Pipette_triggered();
+     void on_actionSpheroid_picker_triggered();
 
 private:
     QTimer *timer= nullptr;

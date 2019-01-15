@@ -8,6 +8,7 @@ bool serialcom::openport(QString& com){
     this->sp.setStopBits(QSerialPort::OneStop);
     this->sp.setFlowControl(QSerialPort::NoFlowControl);
     this->sp.open(QIODevice::ReadWrite);
+
     if ( sp.isOpen() && sp.isWritable() )
     {
        return true;

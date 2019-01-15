@@ -4,10 +4,7 @@
 #include <QMouseEvent>
 #include <iostream>
 
-
-
 void setdarkstyle(){
-
     qApp->setStyle(QStyleFactory::create("Fusion"));
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53,53,53));
@@ -26,7 +23,6 @@ void setdarkstyle(){
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
-
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -169,6 +165,7 @@ void MainWindow::on_Campushbtn_clicked()
         imtools->setimagewidth(w);
         imtools->setimageheight(h);
         setMouseTracking(true);
+        //ui->s_xm_button->installEventFilter(this)
         ui->graphicsView->installEventFilter(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(20);
@@ -221,33 +218,6 @@ void MainWindow::on_p_home_y_clicked()
 void MainWindow::on_p_home_z_clicked()
 {
     ctrl->pipette_home_z();
-
-}
-
-void MainWindow::on_Con_pc_clicked()
-{
-    bool isconnected = ctrl->connect_pressure_controller();
-    if (isconnected)
-    {
-        ui->pc_stat->setText(con_str);
-       // show_currentpressure();
-    }
-    else{
-        ui->pc_stat->setText(fail_str);
-    }
-
-}
-
-void MainWindow::on_Con_pip_clicked()
-{
-    bool isconnected = ctrl->connect_pipette_controller();
-    if (isconnected)
-    {
-        ui->pip_stat->setText(con_str);
-    }
-    else{
-        ui->pip_stat->setText(fail_str);
-    }
 
 }
 
@@ -325,20 +295,6 @@ void MainWindow::on_p_zp_button_clicked()
 void MainWindow::on_p_zm_btton_clicked()
 {
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
-}
-
-void MainWindow::on_Con_xystage_button_clicked()
-{
-
-    bool isconnected = ctrl->connect_tango_stage();
-    if (isconnected==true)
-    {
-        ui->s_stat->setText(con_str);
-    }
-    else{
-        ui->s_stat->setText(fail_str);
-    }
-    ui->s_speed_spinbox->setValue(double(ctrl->stage_get_x_speed()));
 }
 
 void MainWindow::on_actionOpen_console_triggered()
@@ -516,7 +472,8 @@ void MainWindow::on_pushButton_5_clicked()
     QTextStream(stdout)<<"done" << endl;
 }
 
-void MainWindow::on_C_m_clicked()
+
+void MainWindow::on_actionSpheroid_picker_triggered()
 {
-    ctrl->connect_microscope_unit();
+       ctrl->connect_microscope_unit();
 }

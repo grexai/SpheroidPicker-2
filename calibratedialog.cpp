@@ -1,6 +1,6 @@
 #include "calibratedialog.h"
 #include "ui_calibratedialog.h"
-#include "PipetteController.h"
+#include "arduinogcode.h"
 #include "imagetools.h"
 #include "mainwindow.h"
 

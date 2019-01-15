@@ -17,8 +17,8 @@ std::string s_param(std::map<std::string, std::string>& settings, std::string pa
     return settings[param];
 
 }
-
 template<typename Out>
+
 void split(const std::string &s, char delim, Out result) {
     using namespace  std;
     stringstream ss;
@@ -57,7 +57,6 @@ void propertyreader::read_settings(std::string settings_file_path,
     }
 
 void propertyreader::apply_settings(std::map<std::string, std::string>& settings) {
-    std::cout<< s_param(settings,"ports.pipette");
     cfg.port_pipette=s_param(settings,"ports.pipette");
     cfg.port_pressurecontrooler=s_param(settings,"ports.pressurecontroller");
 }

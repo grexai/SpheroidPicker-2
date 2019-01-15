@@ -12,8 +12,7 @@ const int arduinopressurecontroller::UnknownError = INT_MAX;
 void arduinopressurecontroller::requestPressure(const float pressure){
     using namespace std;
     QString cmd= QString::number(kSetRequestedPressure).append(",").QString::number(pressure);
-  //  QString ans = this->acp_sc.sendAndReceive(cmd,this->EOM);
-    //ss << fixed << setprecision(2) << pressure;
+
     QString sar =  QString::fromStdString(to_string(static_cast<int>(kSetRequestedPressure)).append(",")
            .append(to_string(pressure)));
     QString ans = this->acp_sc.sendAndReceive(sar,this->EOM);
@@ -97,11 +96,8 @@ float arduinopressurecontroller::getPipettePressure(){
 }
 
 void arduinopressurecontroller::breakIn(const float vacuumValue,const float delaySeconds){
-    using namespace  std;
-
-    QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).append(",")
+   using namespace  std;
+   QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).append(",")
            .append(to_string(vacuumValue).append(",").append(to_string(delaySeconds))));
-
-    //QTextStream(stdout) << cmd << endl;
    QString ans= this->acp_sc.sendAndReceive(cmd,this->EOM);
 };

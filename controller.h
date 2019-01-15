@@ -2,7 +2,7 @@
 #define CONTROLLER_H
 #include "imagetools.h"
 #include <arduinopressurecontroller.h>
-#include <PipetteController.h>
+#include <arduinogcode.h>
 #include <stagecontroller.h>
 #include <calibratedialog.h>
 #include <comps.h>
@@ -96,6 +96,8 @@ public:
     void stage_run_iniciatlions();
 
     bool connect_microscope_unit();
+
+    bool connect_screening_microscope();
 
 protected:
     propertyreader* propreader=nullptr;

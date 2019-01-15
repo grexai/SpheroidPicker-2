@@ -32,11 +32,11 @@ SOURCES += \
     serialcom.cpp \
     arduinopressurecontroller.cpp \
     imagetools.cpp \
-    PipetteController.cpp \
     calibratedialog.cpp \
     comps.cpp \
     controller.cpp \
-    propertyreader.cpp
+    propertyreader.cpp \
+    arduinogcode.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,12 +45,12 @@ HEADERS += \
     arduinopressurecontroller.h \
     imagetools.h \
     types.h \
-    PipetteController.h \
     stagecontroller.h \
     calibratedialog.h \
     comps.h \
     controller.h \
-    propertyreader.h
+    propertyreader.h \
+    arduinogcode.h
 
 FORMS += \
         mainwindow.ui \
@@ -75,9 +75,6 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../
 else:unix: PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/libahmcore.a'
 
 unix|win32: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcorelocator
-
-INCLUDEPATH += $$PWD/'../../../Libraries/Leica sdk/C++/include'
-DEPENDPATH += $$PWD/'../../../Libraries/Leica sdk/C++/lib64'
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341d

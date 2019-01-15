@@ -6,16 +6,16 @@
 bool controller::connect_pressure_controller()
 {
     QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
-    QTextStream(stdout)<< port<< endl;
-   //QTextStream(stdout) << *propreader->cfg->port_pressurecontrooler<< endl;
     apc = new arduinopressurecontroller(QSP_apc,port);
 
-    if (apc->isconnected)
+    if (apc->isconnected == true)
     {
+       QTextStream(stdout)<< "Pressure controller connected"<< endl;
        return true;
        // show_currentpressure();
     }
     else{
+        QTextStream(stdout)<< "Could not connect to pressure controller"<< endl;
         return false;
     }
 }
@@ -46,15 +46,15 @@ bool controller::connect_pipette_controller()
 {
     QString port = QString::fromStdString(propreader->cfg.port_pipette);
     apipc = new pipetteController(QSP_apipc,port);
-    if (apipc->isconnected)
+    if (apipc->isconnected == true)
     {
+       QTextStream(stdout)<< "Pipette connected"<< endl;
        return true;
-       // show_currentpressure();
     }
     else{
+        QTextStream(stdout)<< "could not connect to pipette"<< endl;
         return false;
     }
-
 }
 
 void controller::pipette_movex_sync(const float x)
@@ -124,14 +124,13 @@ bool controller::connect_tango_stage(){
                     QTextStream(stdout) << "stage_sample: no stage found!" << endl;
                     return false;
                 }
-
-
             }
             else
             {
                 QTextStream(stdout) << "there is something strange: no unit was delivered" << endl;
                 return false;
             }
+                QTextStream(stdout)<< "Stage controller connected"<< endl;
                 return true;
             }
     }catch (ahm::Exception & ex) {
@@ -348,20 +347,15 @@ bool controller::connect_microscope_unit()
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
+    this->connect_pipette_controller() ;
+    this->connect_pressure_controller();
+    this->connect_tango_stage();
+    return true;
+}
 
-    bool apipc=this->connect_pipette_controller();
-    QTextStream(stdout) << "pipette unit succesfully connected"<< endl;
+bool controller::connect_screening_microscope(){
 
-    bool apc = this->connect_pressure_controller();
-    QTextStream(stdout) << "pressurecontroller unit succesfully connected"<< endl;
 
-    bool ts =this->connect_tango_stage();
-    QTextStream(stdout) << "stage succesfully connected"<< endl;
-
-    if (apipc && apc && ts)
-    {
-        QTextStream(stdout) << "all microscope unit succesfully connected"<< endl;
-        return true;
-    }else
     return false;
 }
+
