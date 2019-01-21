@@ -40,12 +40,42 @@ float controller::get_pressure()
     return apc->getPipettePressure();
 }
 
+void controller::get_pressure_thread()
+{
+    while (1){
+        this->get_pressure();
+    }
+}
+
+void controller::spawn_pressure_thread()
+{
+    std::thread t_getpressure(&controller::get_pressure,this);
+}
+
 // Pipette
+
+
+class pipette_driver:  arduinogcode{
+public:
+    void movex(){
+
+    }
+
+};
+
+pipette_driver pd(arduinogcode apic);
+
+
+class screening_microscope_driver:  arduinogcode{
+
+};
+
+
 
 bool controller::connect_pipette_controller()
 {
     QString port = QString::fromStdString(propreader->cfg.port_pipette);
-    apipc = new pipetteController(QSP_apipc,port);
+    apipc = new arduinogcode(QSP_apipc,port);
     if (apipc->isconnected == true)
     {
        QTextStream(stdout)<< "Pipette connected"<< endl;
@@ -281,8 +311,7 @@ void controller::stage_run_iniciatlions()
 
     stage->moveToAsync(x, y, false);
 
- //   ::Sleep(1000);
-
+    std::this_thread::sleep_for(std::chrono::microseconds(1000) );
     Stage::PositionRecorder::Records records;
     recorder.getRecords(records, true);
 
@@ -322,8 +351,7 @@ void controller::stage_run_iniciatlions()
         pAsyncResult->dispose();
         pAsyncResult = 0;
     }
-//    ::Sleep(1000);
-
+    std::this_thread::sleep_for(std::chrono::microseconds(1000) );
     recorder.getRecords(records, true);
 
     flagMoving = stage->isMoving();

@@ -76,23 +76,66 @@ else:unix: PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/libah
 
 unix|win32: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcorelocator
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341d
-else:unix: LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
+# OPENCV
 
-INCLUDEPATH += $$PWD/'../../../Libraries/OpenCV/opencv/build/include'
-DEPENDPATH += $$PWD/'../../../Libraries/OpenCV/opencv/build/x64/vc15/lib'
+INCLUDEPATH += $$PWD/'../../../Libraries\opencv-3.4.5\build\install\include'
 
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/libopencv_world341.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/libopencv_world341d.a
-
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/opencv_world341.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/opencv_world341d.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/libopencv_world341.a
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341d
-else:unix: LIBS += -L$$PWD/../../../Libraries/OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world341
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_core345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_core345
 
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgproc345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_imgproc345
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_highgui345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_highgui345
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgcodecs345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_imgcodecs345
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_videoio345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_videoio345
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_ml345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_ml345
+
+
+
+
+
+
+
+#INCLUDEPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
+DEPENDPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_core345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_core345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_core345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_core345.lib
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/libopencv_imgproc345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/libopencv_imgproc345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_imgproc345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_imgproc345.lib
+
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_highgui345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_highgui345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_highgui345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_highgui345.lib
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_imgcodecs345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_imgcodecs345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_imgcodecs345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_imgcodecs345.lib
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_ml345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_ml345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_ml345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_ml345.lib
+
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_ml345.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_ml345.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_video345.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_video345.lib

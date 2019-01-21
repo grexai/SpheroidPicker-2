@@ -33,6 +33,10 @@ public:
 
     float get_pressure();
 
+    void get_pressure_thread();
+
+    void spawn_pressure_thread();
+
     bool connect_pipette_controller();
 
     void pipette_movex_sync(const float x);
@@ -106,7 +110,7 @@ protected:
     QSerialPort QSP_apipc;
     //ardino drivers
     arduinopressurecontroller* apc;
-    pipetteController* apipc;
+    arduinogcode* apipc;
     // pipette coordinate transformation
     cv::Mat TM;  // transformation matrix img <==> pipette coordinates
     cv::Mat* img_c_p;  //imgcenter points

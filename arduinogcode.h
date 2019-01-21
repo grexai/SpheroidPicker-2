@@ -3,10 +3,10 @@
 #include "serialcom.h"
 #include "types.h"
 //#include <stagecontroller.h>
-class pipetteController
+class arduinogcode
 {
 public:
-    pipetteController(QSerialPort& i_qsp,QString& nport): apipc_sc(i_qsp){
+    arduinogcode(QSerialPort& i_qsp,QString& nport): apipc_sc(i_qsp){
 
         isconnected = this->apipc_sc.openport(nport);
     if(isconnected){
@@ -17,7 +17,7 @@ public:
     }else
         isconnected= false;
     }
-    ~pipetteController(){}
+    ~arduinogcode(){}
     bool isconnected = false;
 
     QString EOM= "\r\n"; //end of message

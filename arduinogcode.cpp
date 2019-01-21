@@ -6,13 +6,13 @@
 //  https://reprap.org/wiki/G-code //
 //*********************************//
 
-void pipetteController::setfeedrate(int acceleration){
+void arduinogcode::setfeedrate(int acceleration){
     QString msg = "G0F";
     msg= msg.append(QString::number(acceleration)).append(EOM);
     apipc_sc.send(msg);
 }
 
-void pipetteController::goHome(bool x, bool y, bool z){
+void arduinogcode::goHome(bool x, bool y, bool z){
     QString msg = "G28";
     if (x){
         msg.append("X");
@@ -27,7 +27,7 @@ void pipetteController::goHome(bool x, bool y, bool z){
     apipc_sc.send(msg);
 }
 
-void pipetteController::moveAsync(float x, float y, float z){
+void arduinogcode::moveAsync(float x, float y, float z){
 
     QString msg = "G1";
     msg.append("X").append(QString::number(x));
@@ -36,34 +36,34 @@ void pipetteController::moveAsync(float x, float y, float z){
     apipc_sc.send(msg);
 }
 
-void pipetteController::moveToXSync(float x_value){
+void arduinogcode::moveToXSync(float x_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
 }
 
-void pipetteController::moveToYSync(float y_value){
+void arduinogcode::moveToYSync(float y_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("Y").append(QString::number(y_value,'f',2)).append(EOM));
 }
 
-void pipetteController::moveToZSync(float z_value){
+void arduinogcode::moveToZSync(float z_value){
     QString msg= "G0";
     //this->setabsoluepositioning;
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
 
-void pipetteController::setabsoluepositioning(){
+void arduinogcode::setabsoluepositioning(){
     QString msg = "G90";
     apipc_sc.send(msg.append(EOM));
 
 }
 
-void pipetteController::setrelativepositioning(){
+void arduinogcode::setrelativepositioning(){
     QString msg = "G91";
     apipc_sc.send(msg.append(EOM));
 }
 
-std::vector<float> pipetteController::getcurrentpos(){
+std::vector<float> arduinogcode::getcurrentpos(){
 //  apipc_sc.sp.clear();
    QByteArray answer;
     QString msg = "M114";
@@ -90,7 +90,7 @@ std::vector<float> pipetteController::getcurrentpos(){
     return coors;
 }
 
-void pipetteController::MoveToXYZSync(std::vector<float> coords){
+void arduinogcode::MoveToXYZSync(std::vector<float> coords){
     setabsoluepositioning();
     moveToXSync(coords.at(0));  //X
     moveToZSync(coords.at(2));  //Z
@@ -98,7 +98,7 @@ void pipetteController::MoveToXYZSync(std::vector<float> coords){
 }
 
 
-void pipetteController::setPipetteposition(){
+void arduinogcode::setPipetteposition(){
 
 
 

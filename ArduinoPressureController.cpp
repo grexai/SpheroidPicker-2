@@ -96,8 +96,9 @@ float arduinopressurecontroller::getPipettePressure(){
 }
 
 void arduinopressurecontroller::breakIn(const float vacuumValue,const float delaySeconds){
-   using namespace  std;
-   QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).append(",")
+    using namespace  std;
+
+    QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).append(",")
            .append(to_string(vacuumValue).append(",").append(to_string(delaySeconds))));
    QString ans= this->acp_sc.sendAndReceive(cmd,this->EOM);
 };

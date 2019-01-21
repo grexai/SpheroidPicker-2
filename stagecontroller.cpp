@@ -55,8 +55,6 @@ extern void printCheck(iop::string text, void *ptr) {
 
 // end tools
 
-
-
 // Stage axis wrapper class
 
 void Axis::printWhatIsSupported() {
@@ -295,13 +293,8 @@ void Axis::printWhatIsSupported() {
         return pUnit != 0 && pUnit->type()->isA(ahm::MICROSCOPE_Y_UNIT);
     }
 
-
-
-
-
-
-        bool Stage::isInProgress(ahm::AsyncResult* pAsyncResult) {
-            return pAsyncResult != NULL && pAsyncResult->state() == ahm::AsyncResult::INPROGRESS;
+    bool Stage::isInProgress(ahm::AsyncResult* pAsyncResult) {
+        return pAsyncResult != NULL && pAsyncResult->state() == ahm::AsyncResult::INPROGRESS;
         }
 
         bool Stage::isMoving() {

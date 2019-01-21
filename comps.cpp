@@ -2,7 +2,6 @@
 
 
 cv::Mat getpcenter(const cv::Mat& cppoints){
-    //eCenter
     std::cout<< "pc" << std::endl;
     cv::Mat pcenter(cv::Mat_<float>(3,1));
 
@@ -38,8 +37,6 @@ cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
     centers.img = geticenter(imagepoints);
     centers.pipette = getpcenter(cppoints);
 
-   // Mat Pz= Mat (cv::Mat_<int>(2,3));
-  //  Mat Ez= Mat (cv::Mat_<int>(3,3));
     Mat Ez= Mat (3,3,CV_32F);
     Mat Pz = Mat(2,3,CV_32F);
 
@@ -81,7 +78,5 @@ cv::Mat calconimgpipettecoors(cv::Mat T,std::vector<float>mpos,
     pipcoors = TM_mic+pcenter;
     std::cout<< pipcoors<< std::endl<< "TM*mousecoorsminusicenterpluspcenter"<<std::endl;
 //   pipcoors =  T* (mousecoors-icenter)+pcenter;
-
-
     return pipcoors;
 }

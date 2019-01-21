@@ -132,27 +132,21 @@ public:
 
     iop::int32 getMaxSpeed() ; // min position in micro steps
 
-
     // what is supported
     bool isAsyncSupported() const ;
 
     bool isDirectedAsyncVelSupported() const;
-
 
     bool eventsSupported() const ;
 
     // converters
     iop::float64 toMicrons(iop::int32 pos) ; // convert native steps to microns
 
-
     iop::int32 toNativePosition(iop::float64 dMicrons) ;// convert microns to native steps
-
 
     iop::float64 toMicronsPerSecond(iop::int32 speed) ; // convert native speed to microns/s
 
-
     iop::int32 toNativeSpeed(iop::float64 dMicronsPerSecond);// convert microns/s to native speed
-
 
     // events
     void subscribeEvents(ahm::EventSink *pEventSink) ;
@@ -162,7 +156,6 @@ public:
     static bool isX(ahm::Unit *pUnit);
 
     static bool isY(ahm::Unit *pUnit);
-
 
 private:
     ahm::Unit *m_pAxisUnit;
@@ -208,6 +201,7 @@ public:
     typedef std::vector<Record> Records;
 
     virtual void onEvent(ahm::Unit* pSender, ahm::Event* pEvent);
+
     virtual void onShutdown(ahm::Unit* sender) ;
 
     void clear();
@@ -221,6 +215,7 @@ private:
 
 
 void print(std::ostream & out, const PositionRecorder::Record& record, DWORD t0) ;
+
 void subscribe(ahm::EventSink* pEventSink) ;
 
 void unsubscribe(PositionRecorder& recorder);

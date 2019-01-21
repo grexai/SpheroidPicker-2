@@ -412,8 +412,6 @@ void MainWindow::screensample(){
     }
 }
 
-
-
 void spawnthread(){
 
 }
