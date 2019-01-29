@@ -55,25 +55,42 @@ void controller::spawn_pressure_thread()
 // Pipette
 
 
-class pipette_driver:  arduinogcode{
+class pipette_driver: public arduinogcode{
 public:
     void movex(){
 
     }
 
 };
-
-pipette_driver pd(arduinogcode apic);
-
-
-class screening_microscope_driver:  arduinogcode{
+//pipette_driver* pd(arduinogcode apic);
+class i_stagecontroll {
+public:
+    virtual void move_x()=0;
 
 };
 
+class microscope  : public arduinogcode, public virtual i_stagecontroll{
+public:
+    void move_x() override{
 
+    }
+};
+
+class TangoStage : public virtual i_stagecontroll{
+public:
+    void move_x() override{
+
+    }
+};
+
+
+i_stagecontroll* asd  = new TangoStage();
+//asd->move_x
 
 bool controller::connect_pipette_controller()
 {
+i_stagecontroll* asd  = new TangoStage();
+asd->move_x();
     QString port = QString::fromStdString(propreader->cfg.port_pipette);
     apipc = new arduinogcode(QSP_apipc,port);
     if (apipc->isconnected == true)
@@ -144,7 +161,6 @@ bool controller::connect_tango_stage(){
         {
             iop::string name = "";
             pRootUnit = theHardwareModel()->getUnit("");
-            QTextStream(stdout) << pRootUnit << endl;
             if(pRootUnit)
             {
                 pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);

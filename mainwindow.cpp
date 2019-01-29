@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_currentpressure(){
     float cp = ctrl->get_pressure();
-    //float cp = (QRandomGenerator::global()->generate());
+   // float cp = (QRandomGenerator::global()->generate());
     ui->lcdNumber->display( QString::number(cp));
 }
 
@@ -55,6 +55,7 @@ void MainWindow::show_currentpressure(){
     update_currentpressure();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
     disp_pressure->start(1000);
+
 }
 
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
@@ -88,29 +89,29 @@ void MainWindow::calib_frame_view(){
     using namespace cv;
     if (calib->Iscalibrating == 1)
     {
-        Point pmid = Point(imtools->getdisplayframe()->cols/2,100 );
+        Point pmid = Point(imtools->get_display_frm()->cols/2,100 );
 
         if (calib->clicks==0)
         {
             imtools->addPointToImage(pmid);
         }
         if (calib->clicks==1){
-            imtools->addPointToImage(Point(100,imtools->getdisplayframe()->rows-100));
+            imtools->addPointToImage(Point(100,imtools->get_display_frm()->rows-100));
             if(cpos1== nullptr)
                {
                cpos1 = new std::vector<float>;
                *cpos1 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 1 saved:" ;//<< cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
+               QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
                }
 
         }
         if (calib->clicks==2){
-            imtools->addPointToImage(Point(imtools->getdisplayframe()->cols-100,imtools->getdisplayframe()->rows-100));
+            imtools->addPointToImage(Point(imtools->get_display_frm()->cols-100,imtools->get_display_frm()->rows-100));
             if(cpos2== nullptr)
             {
                cpos2 = new std::vector<float>;
                *cpos2 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 2 saved: ";// << cpos2->at(0) <<" "<<cpos2->at(1)<< " "<< cpos2->at(2) <<endl;
+               QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<" "<<cpos2->at(1)<< " "<< cpos2->at(2) <<endl;
             }
         }
         if (calib->clicks==3)
@@ -119,37 +120,43 @@ void MainWindow::calib_frame_view(){
             {
                 cpos3 = new std::vector<float>;
                 *cpos3 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 3 saved: x: " ;//<< cpos3->at(0) <<" "<<cpos3->at(1)<< " "<< cpos3->at(2) <<endl;
-              //  calib->clicks=0;
+                QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<" "<<cpos3->at(1)<< " "<< cpos3->at(2) <<endl;
+        //    emit(calib->Iscalibrating=false);
             }
+           // calib->clicks=0;
         }
+
     }
 }
 
 void MainWindow::update_window()
 {
-    imtools->getCameraframe();
-    calib_frame_view();
-    if (qframe != nullptr)
-    {
-        delete[] qframe;
-    }
-    auto qframe = new QImage((const unsigned char*) (imtools->getdisplayframe()->data),imtools->getdisplayframe()->cols, imtools->getdisplayframe()->rows, QImage::Format_RGB888);
+    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cameracv->get_current_frm());
+   // calib_frame_view();
+
+    //if (qframe != nullptr)
+    //{
+    delete qframe;
+    //}
+    qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
+
 
 }
 
 void MainWindow::on_Campushbtn_clicked()
 {
-    if ((imtools->iscameraopen)){
+
+    cameracv = new CameraCV(cameraIndex);
+    if ((Iscameraopen==true)){
         ui->Campushbtn->setText("Camera on");
-     //   imtools->resetvideodevice();
-        imtools->rmvideodevice();
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
+        cameracv->~CameraCV();
+        Iscameraopen= false;
     }else{
-        imtools->setvideodevice(cameraIndex);
-        if(!imtools->getCamera()->open(cameraIndex))
+      //  imtools->setvideodevice(cameraIndex);
+        if(!cameracv->getCamera()->open(cameraIndex))
               {
                   QMessageBox::critical(this,
                                         "Camera Error",
@@ -162,31 +169,33 @@ void MainWindow::on_Campushbtn_clicked()
         float w =1920;
         float h = 1080;
         QTextStream(stdout)<< "setting sizes";
-        imtools->setimagewidth(w);
-        imtools->setimageheight(h);
+        cameracv->setimagewidth(w);
+        cameracv->setimageheight(h);
         setMouseTracking(true);
-        //ui->s_xm_button->installEventFilter(this)
+
         ui->graphicsView->installEventFilter(this);
+        cameracv->spawnCameraLoop();
+        Iscameraopen = cameracv->is_camera_open();
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
-        timer->start(20);
+        timer->start(16);
     }
 }
 
 void MainWindow::on_exptime_button_clicked()
 {
-    imtools->setexposuretime(ui->exptime_spin->value());
+    cameracv->setexposuretime(ui->exptime_spin->value());
 }
 
 void MainWindow::on_width_button_clicked()
 {
     float w =  ui->width_spin->value();
-    imtools->setimagewidth(w);
+    cameracv->setimagewidth(w);
 }
 
 void MainWindow::on_height_button_clicked()
 {
     float h =  ui->height_spin->value();
-    imtools->setimagewidth(h);
+    cameracv->setimagewidth(h);
 }
 
 void MainWindow::on_actionDark_Mode_triggered()
@@ -315,7 +324,7 @@ void MainWindow::on_s_set_speed_button_clicked()
 
 void MainWindow::on_save_image_button_clicked()
 {
-    imtools->saveImg((imtools->getframe()),
+    imtools->saveImg((cameracv->get_current_frm().get()),
                      (ui->imagename_lineedit->text().toStdString()));
 }
 
@@ -327,30 +336,28 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
 }
 
 void MainWindow::MoveAction(){
+
     QTextStream(stdout) << "move action" << endl;
     std::vector<float> mouse ;
     mouse.push_back(point_mouse->x()*1.5f);
     mouse.push_back(point_mouse->y()*1.5f);
     float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
     cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
-
     *imgc= geticenter(cip);
     std::cout << *imgc << std::endl;
-
     std:: cout<< "now we will strike : "<< std::endl;
     std::cout << centers.img << std::endl;
     cv::Mat pipc = calconimgpipettecoors(TM,mouse,*imgc,pc);
     std::cout << pipc << "pipette coors" << std::endl;
-   // pipc.at<float>(0,0);
-      QTextStream(stdout) << pipc.at<float>(0,1) << endl;
-      ctrl->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
-      ctrl->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
-      ctrl->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
+    // pipc.at<float>(0,0);
+    QTextStream(stdout) << pipc.at<float>(0,1) << endl;
+    ctrl->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
+    ctrl->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
+    ctrl->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
 }
 
 void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
-
     QTextStream(stdout) << "isthis"<< endl;
     QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
     QAction action1("Move Here", ui->graphicsView->viewport());
@@ -403,7 +410,7 @@ void MainWindow::screensample(){
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
-            imtools->saveImg((imtools->currentFrame.get()),num2str.c_str());
+            imtools->saveImg((cameracv->get_current_frm().get()),num2str.c_str());
             counter += 1;
         }
         ctrl->stage_set_speed(20000.0f);
@@ -464,9 +471,9 @@ void MainWindow::on_pushButton_5_clicked()
     std::cout << randmat<< "randmat"<< std::endl;
     TM = calcTMatrix(randmat,cip,centers);
     //ic = new cv::Mat;
-    imgc= new cv::Mat(1,2,CV_32F);
+    imgc = new cv::Mat(1,2,CV_32F);
     *imgc = geticenter(cip);
-    pc= getpcenter(randmat);
+    pc = getpcenter(randmat);
     QTextStream(stdout)<<"done" << endl;
 }
 

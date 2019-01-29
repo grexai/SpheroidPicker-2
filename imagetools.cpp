@@ -1,7 +1,5 @@
 #include "imagetools.h"
 #include <thread>
-
-
 cv::Mat* imagetools::getframe()
 {
     return (this->frame);
@@ -16,48 +14,6 @@ void imagetools::setframe(cv::Mat &input){
     this->frame = &input;
 }
 
-cv::Mat* imagetools::getdisplayframe(){
-    return (this->dispfrm);
-
-}
-
-void imagetools::setvideodevice(int devid){
-    this->camera = new cv::VideoCapture(devid);
-    iscameraopen = this->camera->isOpened();
-}
-
-void imagetools::resetvideodevice(){
-     this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
-}
-
-void imagetools::rmvideodevice(){
-    camera->release();
-    iscameraopen= camera->isOpened();
-    camera = nullptr;
-    delete  camera;
-}
-
-cv::Mat* imagetools::get_current_frm(){
-    return this->currentFrame.get();
-}
-
-void imagetools::getCameraframe(){
-    if (this->frame != nullptr) { delete frame;}
-    this->frame = new cv::Mat();
-//  currentFrame = QSharedPointer<cv::Mat> (new cv::Mat);
-    QSharedPointer<cv::Mat> temp( new cv::Mat );
-    camera->read(*temp);
-    std::unique_lock<std::mutex> frameBufferLock(mFrameBufferMutex);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik
-    std::swap(currentFrame,temp);
-    frameBufferLock.unlock();
-    if (this->dispfrm != nullptr) {delete  dispfrm;}
-    this->dispfrm = new cv::Mat();
-    cvtColor(*this->currentFrame.get(),*this->dispfrm,CV_BGR2RGB,0);
-}
-
-void imagetools::freeframe(){
-    delete this->frame;
-}
 
 /*
 0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
@@ -80,32 +36,15 @@ void imagetools::freeframe(){
 17. CV_CAP_PROP_WHITE_BALANCE Currently unsupported
 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
 */
-
-void imagetools::setimagewidth(float& imwidth){
-
-   //QTextStream(stdout)  << "width " << imwidth << endl;
-   this->camera->set(CV_CAP_PROP_FRAME_WIDTH,imwidth);
+cv::Mat* imagetools::get_display_frm()
+{
+    return this->dispfrm.get();
 }
 
-void imagetools::setimageheight(float& imheight){
-   //  QTextStream(stdout)  << "heights " << imheight << endl;
-     camera->set(CV_CAP_PROP_FRAME_HEIGHT,imheight);
-}
-
-void imagetools::setframerate(int reqframerate){
-    this->camera->set(5,reqframerate);
-}
-
-void imagetools::setgain(float gain){
-   this->camera->set(14,gain);
-}
-
-void imagetools::setexposuretime(float exptime){
-    this->camera->set(15,exptime);
-}
-
-cv::VideoCapture* imagetools::getCamera(){
-   return this->camera;
+cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput){
+    cv::Mat rgb;
+    cvtColor(*pinput.get(),rgb,CV_BGR2RGB,0);
+    return rgb;
 }
 
 int2coors imagetools::getSphCoors(cv::Mat &img){
@@ -156,7 +95,7 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 void imagetools::addPointToImage(cv::Point point)
 {
-   cv::circle(*this->dispfrm,point, 5, (0,0,255), -1);
+   cv::circle(*this->get_display_frm(),point, 5, (0,0,255), -1);
 }
 
 // Uses CV saveimg
@@ -171,7 +110,7 @@ void imagetools::saveImg(cv::Mat* outimg, std::string outname)
     compression_params.push_back(0);
    // currentFrame.
    // imshow("adsad",);
-    imwrite(outname, *currentFrame.get(), compression_params);
+    imwrite(outname, *outimg, compression_params);
 
 //    cout << "image saved as " << outname.str() << endl;
 

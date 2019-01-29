@@ -15,43 +15,14 @@ public:
 
     ~imagetools(){}
 
-    void setimagewidth(float& imwidth);
-
-    void setimageheight(float& imheight);
-
-    void setframerate(int reqframerate);
-
-    void setgain(float gain);
-
-    void setexposuretime( float exptime);
-
- //   void cameraloop();
-
-//    void SpawnThreadAndLaunch();
 
     cv::Mat* getframe();
 
-    cv::Mat* getdisplayframe();
-
     void setframe(cv::Mat &input);
 
-    void freeframe();
-
-    void getCameraframe();
-
-    cv::Mat* get_current_frm();
-
-    cv::VideoCapture* getCamera();
-
-    void setvideodevice(int devid);
-
-    void resetvideodevice();
-
-    void rmvideodevice();
+    cv::Mat* get_display_frm();
 
     void addPointToImage(cv::Point point);
-
-    cv::Mat threshimage(cv::Mat input,int thresh);
 
     int2coors getSphCoors(cv::Mat &img);
 
@@ -59,13 +30,14 @@ public:
 
     void saveImg(cv::Mat* outimg, std::string outname);
 
-    QSharedPointer<cv::Mat> currentFrame;
+    cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput);
+
 protected:
-    std::mutex mFrameBufferMutex;
-    cv::VideoCapture* camera=nullptr;
     cv::Mat* frame= nullptr;
-    cv::Mat* dispfrm = nullptr;
+    QSharedPointer<cv::Mat> dispfrm = nullptr;
     cv::Mat* temp = nullptr;
+    std::mutex mFrameBufferMutex;
+    std::mutex m_disp_frm_mutex;
 private:
 
 

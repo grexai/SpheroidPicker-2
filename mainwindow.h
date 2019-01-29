@@ -13,7 +13,7 @@
 #include <calibratedialog.h>
 #include <comps.h>
 #include <controller.h>
-
+#include <cameracv.h>
 
 namespace Ui {
 class MainWindow;
@@ -24,10 +24,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
     QString con_str= "Connected";
 
     QString fail_str = "Failed";
     QThread thread;
+    bool Iscameraopen= false;
     int cameraIndex=0;
 
     explicit MainWindow(QWidget *parent = nullptr);
@@ -57,13 +59,7 @@ public slots:
 
 protected:
     controller* ctrl = nullptr;
-    //arduinopressurecontroller* acp= nullptr ;
-  //  pipetteController* apipc= nullptr;
-  //  QSerialPort qsp_pip;
-  //  QSerialPort qsp_pc;
-   // ahm::Unit* pStageUnit= nullptr;
-  //  ahm::Unit* pRootUnit= nullptr;
-  //  Stage *stage= nullptr;
+    CameraCV* cameracv = nullptr;
     imagetools* imtools= nullptr;
     std::vector<float>* cpos1 = nullptr;
     std::vector<float>* cpos2 = nullptr;
@@ -153,6 +149,8 @@ private slots:
 
      void on_actionCalibrate_Pipette_triggered();
      void on_actionSpheroid_picker_triggered();
+
+
 
 private:
     QTimer *timer= nullptr;

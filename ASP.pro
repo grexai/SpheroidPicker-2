@@ -36,7 +36,9 @@ SOURCES += \
     comps.cpp \
     controller.cpp \
     propertyreader.cpp \
-    arduinogcode.cpp
+    arduinogcode.cpp \
+    deeplearning.cpp \
+    cameracv.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -50,7 +52,9 @@ HEADERS += \
     comps.h \
     controller.h \
     propertyreader.h \
-    arduinogcode.h
+    arduinogcode.h \
+    deeplearning.h \
+    cameracv.h \
 
 FORMS += \
         mainwindow.ui \
@@ -103,6 +107,8 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 
 
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_dnn345
 
 
 
