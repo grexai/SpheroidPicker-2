@@ -9,7 +9,7 @@
 #include <QString>
 #include <QSerialPort>
 #include <propertyreader.h>
-
+#include <QThread>
 class controller
 {
 public:
@@ -33,7 +33,9 @@ public:
 
     float get_pressure();
 
-    void get_pressure_thread();
+    void req_pressure_loop();
+
+    QSharedPointer<float> get_current_pressure();
 
     void spawn_pressure_thread();
 
@@ -102,7 +104,6 @@ public:
     bool connect_microscope_unit();
 
     bool connect_screening_microscope();
-
 protected:
     propertyreader* propreader=nullptr;
     //serial ports
@@ -111,13 +112,16 @@ protected:
     //ardino drivers
     arduinopressurecontroller* apc;
     arduinogcode* apipc;
+    std::mutex m_pressurevaluebuff;
+    QSharedPointer<float> current_pressure;
+    std::thread m_get_pressure_t;
     // pipette coordinate transformation
     cv::Mat TM;  // transformation matrix img <==> pipette coordinates
     cv::Mat* img_c_p;  //imgcenter points
     cv::Mat pipette_c_p; // pipettecenter points
     centers centers; // center structure
     //Stage drivers
-
+    QThread *m_pthread= nullptr;
     ahm::Unit* pStageUnit= nullptr;
     ahm::Unit* pRootUnit= nullptr;
     Stage *stage= nullptr;

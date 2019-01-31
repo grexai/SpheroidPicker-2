@@ -73,7 +73,7 @@ private slots:
 
      void on_Campushbtn_clicked();
 
-     void calib_frame_view();
+     void calib_frame_view(cv::Mat& disp);
 
      void update_window();
 

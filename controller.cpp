@@ -10,9 +10,10 @@ bool controller::connect_pressure_controller()
 
     if (apc->isconnected == true)
     {
+
        QTextStream(stdout)<< "Pressure controller connected"<< endl;
+
        return true;
-       // show_currentpressure();
     }
     else{
         QTextStream(stdout)<< "Could not connect to pressure controller"<< endl;
@@ -40,16 +41,33 @@ float controller::get_pressure()
     return apc->getPipettePressure();
 }
 
-void controller::get_pressure_thread()
-{
+void controller::req_pressure_loop(){
     while (1){
-        this->get_pressure();
+        QSharedPointer<float> temp(new float);
+        *temp = this->get_pressure();
+        std::unique_lock<std::mutex> pressurevaluelock(m_pressurevaluebuff);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik
+        std::swap(current_pressure,temp);
+        pressurevaluelock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
+}
+
+QSharedPointer<float> controller::get_current_pressure(){
+    std::unique_lock<std::mutex> pressurevaluelock(m_pressurevaluebuff);
+    return this->current_pressure;
 }
 
 void controller::spawn_pressure_thread()
 {
-    std::thread t_getpressure(&controller::get_pressure,this);
+    m_pthread = QThread::create([this]{req_pressure_loop();});
+
+    m_pthread->setObjectName("pressure");
+    m_pthread->start();
+ //   std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  //  connect(thread, &QThread::started, gui, &Gui::threadHasStarted);
+ //   thread->start();
+//    m_get_pressure_t =std::thread(&controller::req_pressure_loop, this);
+ //   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 // Pipette
@@ -95,11 +113,11 @@ asd->move_x();
     apipc = new arduinogcode(QSP_apipc,port);
     if (apipc->isconnected == true)
     {
-       QTextStream(stdout)<< "Pipette connected"<< endl;
+       QTextStream(stdout)<< "Pipette connected!"<< endl;
        return true;
     }
     else{
-        QTextStream(stdout)<< "could not connect to pipette"<< endl;
+        QTextStream(stdout)<< "Could not connect to pipette!"<< endl;
         return false;
     }
 }
@@ -318,7 +336,6 @@ void controller::stage_run_iniciatlions()
 
     std::cout << "moving to center " << x << "," << y << std::endl;
 
-
     Stage::PositionRecorder recorder;
 
     stage->subscribe(&recorder);
@@ -398,8 +415,6 @@ bool controller::connect_microscope_unit()
 }
 
 bool controller::connect_screening_microscope(){
-
-
     return false;
 }
 

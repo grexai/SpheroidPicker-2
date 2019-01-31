@@ -22,7 +22,7 @@ public:
 
     cv::Mat* get_display_frm();
 
-    void addPointToImage(cv::Point point);
+    void addPointToImage(cv::Mat& img,cv::Point point);
 
     int2coors getSphCoors(cv::Mat &img);
 

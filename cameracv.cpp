@@ -5,12 +5,18 @@ mActive(true)
 {
     {
         this->setvideodevice(devid);
+        this->camera->open(devid);
+
+        //+ cv::CAP_DSHOW);
     }
 }
 
 CameraCV::~CameraCV(){
     mActive = false;
-    if(mBGThread.joinable()) mBGThread.join();
+    if(mBGThread.joinable())
+    {
+        mBGThread.join();
+    }
     this->rmvideodevice();
 }
 
@@ -48,9 +54,8 @@ void CameraCV::resetvideodevice(){
 
 void CameraCV::rmvideodevice(){
     camera->release();
- //   iscameraopen= camera->isOpened();
-    camera = nullptr;
-    delete  camera;
+    QTextStream(stdout) << camera->isOpened();
+    camera->~VideoCapture();
 }
 
 QSharedPointer<cv::Mat> CameraCV::get_current_frm(){
@@ -61,16 +66,14 @@ QSharedPointer<cv::Mat> CameraCV::get_current_frm(){
 void CameraCV::getCameraframe(){
     while(mActive== true)
     {
-        if (this->frame != nullptr) { delete frame;}
-        this->frame = new cv::Mat();
-
         QSharedPointer<cv::Mat> temp( new cv::Mat );
+
         camera->read(*temp);
+        //*temp = camera->grab();
+ //       camera->retrieve(*temp);
         std::unique_lock<std::mutex> frameBufferLock(mFrameBufferMutex);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik
         std::swap(currentFrame,temp);
         frameBufferLock.unlock();
-
-
     }
 }
 
@@ -79,7 +82,7 @@ void CameraCV::spawnCameraLoop()
    // mActive= true;
     mBGThread = std::thread(&CameraCV::getCameraframe, this);
   //  mBGThread.detach();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //ez elinditja a hatter szalat
+  //  std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //ez elinditja a hatter szalat
 
 }
 

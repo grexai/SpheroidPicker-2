@@ -43,7 +43,7 @@ cv::Mat* imagetools::get_display_frm()
 
 cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput){
     cv::Mat rgb;
-    cvtColor(*pinput.get(),rgb,CV_BGR2RGB,0);
+    cvtColor(*pinput,rgb,CV_BGR2RGB,0);
     return rgb;
 }
 
@@ -93,9 +93,9 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 }
 
-void imagetools::addPointToImage(cv::Point point)
+void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
 {
-   cv::circle(*this->get_display_frm(),point, 5, (0,0,255), -1);
+   cv::circle(img,point, 5, (0,0,255), -1);
 }
 
 // Uses CV saveimg

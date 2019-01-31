@@ -65,16 +65,15 @@ void arduinogcode::setrelativepositioning(){
 
 std::vector<float> arduinogcode::getcurrentpos(){
 //  apipc_sc.sp.clear();
-   QByteArray answer;
+    QByteArray answer;
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
+    std::vector<float> coors;
     //split strings by :
     QString s(answer);
     QStringList resultStrings =  s.split(':');
-    float3coors pipcoors;
     // get floating point number regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-    std::vector<float> coors;
     for (int i=1;i<4;i++){
          xRegExp.indexIn( resultStrings.at(i));
          QStringList xList = xRegExp.capturedTexts();

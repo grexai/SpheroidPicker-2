@@ -33,20 +33,16 @@ cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
              << "input imgp "<< std::endl<< imagepoints<< std::endl;
 
     using namespace  cv;
-
-    centers.img = geticenter(imagepoints);
-    centers.pipette = getpcenter(cppoints);
-
     Mat Ez= Mat (3,3,CV_32F);
     Mat Pz = Mat(2,3,CV_32F);
 
     for (int  i=0 ; i<3; i++){
-        Ez.col(i)= cppoints.col(i) - centers.pipette;
+        Ez.col(i)= cppoints.col(i) - getpcenter(cppoints);
     }
     std::cout<< Ez << std::endl;
 
     for (int  i=0 ; i<3; i++){
-        Pz.col(i)= imagepoints.col(i) - centers.img;
+        Pz.col(i)= imagepoints.col(i) - geticenter(imagepoints);
     }
 
     std::cout << "Pz" << std::endl << Pz<< std::endl;

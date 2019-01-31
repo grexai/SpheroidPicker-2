@@ -46,16 +46,21 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_currentpressure(){
-    float cp = ctrl->get_pressure();
-   // float cp = (QRandomGenerator::global()->generate());
-    ui->lcdNumber->display( QString::number(cp));
+  //  float cp = (QRandomGenerator::global()->generate());
+  /*  if (ctrl->get_current_pressure()==nullptr){
+        return;
+    }else
+    {
+*/
+    ui->lcdNumber->display( QString::number(ctrl->get_pressure()));
+   // ui->lcdNumber->display( "13");
+    //}
 }
 
 void MainWindow::show_currentpressure(){
-    update_currentpressure();
+   // ctrl->spawn_pressure_thread();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
-    disp_pressure->start(1000);
-
+    disp_pressure->start(500);
 }
 
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
@@ -85,18 +90,18 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     }
 }
 
-void MainWindow::calib_frame_view(){
+void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
     if (calib->Iscalibrating == 1)
     {
-        Point pmid = Point(imtools->get_display_frm()->cols/2,100 );
+        Point pmid = Point(disp.cols/2,100 );
 
         if (calib->clicks==0)
         {
-            imtools->addPointToImage(pmid);
+            imtools->addPointToImage(disp,pmid);
         }
         if (calib->clicks==1){
-            imtools->addPointToImage(Point(100,imtools->get_display_frm()->rows-100));
+            imtools->addPointToImage(disp,Point(100,disp.rows-100));
             if(cpos1== nullptr)
                {
                cpos1 = new std::vector<float>;
@@ -106,7 +111,7 @@ void MainWindow::calib_frame_view(){
 
         }
         if (calib->clicks==2){
-            imtools->addPointToImage(Point(imtools->get_display_frm()->cols-100,imtools->get_display_frm()->rows-100));
+            imtools->addPointToImage(disp,Point(disp.cols-100,disp.rows-100));
             if(cpos2== nullptr)
             {
                cpos2 = new std::vector<float>;
@@ -131,11 +136,14 @@ void MainWindow::calib_frame_view(){
 
 void MainWindow::update_window()
 {
-    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cameracv->get_current_frm());
-   // calib_frame_view();
+    auto cfrm=  cameracv->get_current_frm();
+    if (cfrm == nullptr)
+    {
+        return;
+    }
 
-    //if (qframe != nullptr)
-    //{
+        cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
+        calib_frame_view(displayfrm);
     delete qframe;
     //}
     qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
@@ -151,9 +159,9 @@ void MainWindow::on_Campushbtn_clicked()
     cameracv = new CameraCV(cameraIndex);
     if ((Iscameraopen==true)){
         ui->Campushbtn->setText("Camera on");
-        disconnect(timer, SIGNAL(timeout()), this,nullptr);
         cameracv->~CameraCV();
         Iscameraopen= false;
+        disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
       //  imtools->setvideodevice(cameraIndex);
         if(!cameracv->getCamera()->open(cameraIndex))
@@ -252,6 +260,7 @@ void MainWindow::on_get_coors_pushButton_clicked()
     ui->xc_label->setText("X: " + QString::number(randx.at(0),'f',2));
     ui->yc_label->setText("Y: " + QString::number(randx.at(1),'f',2));
     ui->zc_label->setText("Z: " + QString::number(randx.at(2),'f',2));
+
 }
 
 void MainWindow::on_s_xp_button_clicked()
@@ -481,4 +490,7 @@ void MainWindow::on_pushButton_5_clicked()
 void MainWindow::on_actionSpheroid_picker_triggered()
 {
        ctrl->connect_microscope_unit();
+    //   ctrl->spawn_pressure_thread();
+     // show_currentpressure();
+
 }
