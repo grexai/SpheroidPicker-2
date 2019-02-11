@@ -411,6 +411,7 @@ bool controller::connect_microscope_unit()
     this->connect_pipette_controller() ;
     this->connect_pressure_controller();
     this->connect_tango_stage();
+//  this->spawn_pressure_thread();
     return true;
 }
 
