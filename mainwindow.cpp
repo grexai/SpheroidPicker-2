@@ -102,34 +102,37 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
         }
         if (calib->clicks==1){
             imtools->addPointToImage(disp,Point(100,disp.rows-100));
-            if(cpos1== nullptr)
-               {
-               cpos1 = new std::vector<float>;
-               *cpos1 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
-               }
+            if(cpos1 != nullptr)
+            {
+               delete cpos1;
+            }
+            cpos1 = new std::vector<float>;
+            *cpos1 = ctrl->pipette_get_coordinates();
+            QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
 
         }
         if (calib->clicks==2){
             imtools->addPointToImage(disp,Point(disp.cols-100,disp.rows-100));
-            if(cpos2== nullptr)
+            if(cpos2!= nullptr)
             {
-               cpos2 = new std::vector<float>;
-               *cpos2 = ctrl->pipette_get_coordinates();
-               QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<" "<<cpos2->at(1)<< " "<< cpos2->at(2) <<endl;
+                delete cpos2;
             }
+            cpos2 = new std::vector<float>;
+            *cpos2 = ctrl->pipette_get_coordinates();
+            QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
+
         }
         if (calib->clicks==3)
         {
-            if(cpos3 == nullptr)
+            if(cpos3 != nullptr)
             {
-                cpos3 = new std::vector<float>;
-                *cpos3 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<" "<<cpos3->at(1)<< " "<< cpos3->at(2) <<endl;
-        //    emit(calib->Iscalibrating=false);
+                delete cpos3;
             }
-           // calib->clicks=0;
+            cpos3 = new std::vector<float>;
+            *cpos3 = ctrl->pipette_get_coordinates();
+            QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
         }
+
 
     }
 }
@@ -142,8 +145,8 @@ void MainWindow::update_window()
         return;
     }
 
-        cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
-        calib_frame_view(displayfrm);
+    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
+    calib_frame_view(displayfrm);
     delete qframe;
     //}
     qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
@@ -260,7 +263,6 @@ void MainWindow::on_get_coors_pushButton_clicked()
     ui->xc_label->setText("X: " + QString::number(randx.at(0),'f',2));
     ui->yc_label->setText("Y: " + QString::number(randx.at(1),'f',2));
     ui->zc_label->setText("Z: " + QString::number(randx.at(2),'f',2));
-
 }
 
 void MainWindow::on_s_xp_button_clicked()
@@ -350,19 +352,7 @@ void MainWindow::MoveAction(){
     std::vector<float> mouse ;
     mouse.push_back(point_mouse->x()*1.5f);
     mouse.push_back(point_mouse->y()*1.5f);
-    float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
-    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
-    *imgc= geticenter(cip);
-    std::cout << *imgc << std::endl;
-    std:: cout<< "now we will strike : "<< std::endl;
-    std::cout << centers.img << std::endl;
-    cv::Mat pipc = calconimgpipettecoors(TM,mouse,*imgc,pc);
-    std::cout << pipc << "pipette coors" << std::endl;
-    // pipc.at<float>(0,0);
-    QTextStream(stdout) << pipc.at<float>(0,1) << endl;
-    ctrl->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
-    ctrl->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
-    ctrl->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
+    ctrl->pipette_move_to_img_coordinates(mouse);
 }
 
 void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
@@ -440,57 +430,17 @@ void MainWindow::on_start_screening_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-
-    float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
-    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
-    /*
-    // image coordinates 2 x 3 matrix image
-    //expected format
-
-      Center point
-         ||
-         ||
-        \  /
-         \/
-
-       | x1  x2  x3 |
-       | y1  y2  y3 |
-    */
-
-
-    // pushing saved pipette positions to a Matrix
-    cv::Mat randmat;
-    randmat.push_back(*cpos1);
-    randmat.push_back(*cpos2);
-    randmat.push_back(*cpos3);
-    std::cout << randmat << "before reshape"<< endl;
-    /*
-    // converting to pipette coordinates a 3 x 3 matrix
-      Center point
-         ||
-         ||
-        \  /
-         \/
-       | x1  x2  x3 |
-       | y1  y2  y3 |
-       | z1  z2  z3 |
-    */
-    randmat =  randmat.reshape(0,3);
-    cv::transpose(randmat,randmat);
-    std::cout << randmat<< "randmat"<< std::endl;
-    TM = calcTMatrix(randmat,cip,centers);
-    //ic = new cv::Mat;
-    imgc = new cv::Mat(1,2,CV_32F);
-    *imgc = geticenter(cip);
-    pc = getpcenter(randmat);
-    QTextStream(stdout)<<"done" << endl;
+    ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
 }
-
 
 void MainWindow::on_actionSpheroid_picker_triggered()
 {
-       ctrl->connect_microscope_unit();
-    //   ctrl->spawn_pressure_thread();
-     // show_currentpressure();
+    ctrl->connect_microscope_unit();
 
 }
+/*
+void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
+{
+    //ctrl->pipette_set_speed(arg1);
+}
+*/

@@ -49,6 +49,8 @@ public:
 
     void pipette_move_async(const std::vector<float>coords);
 
+    void pipette_set_speed(const int speed);
+
     void pipette_home();
 
     void pipette_home_x();
@@ -58,6 +60,12 @@ public:
     void pipette_home_z();
 
     std::vector<float> pipette_get_coordinates();
+
+    void pipette_move_to_img_coordinates(std::vector<float> coords);
+
+    void pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2 , std::vector<float>*pos3);
+
+//TJC     void saveTM();
 
     bool connect_tango_stage();
 
@@ -119,7 +127,16 @@ protected:
     cv::Mat TM;  // transformation matrix img <==> pipette coordinates
     cv::Mat* img_c_p;  //imgcenter points
     cv::Mat pipette_c_p; // pipettecenter points
-    centers centers; // center structure
+    centers* center; // center structure
+    cv::Mat* imgc;
+    cv::Mat* pc;
+
+    std::vector<float>* cpos1 = nullptr;
+
+    std::vector<float>* cpos2 = nullptr;
+
+    std::vector<float>* cpos3= nullptr;
+
     //Stage drivers
     QThread *m_pthread= nullptr;
     ahm::Unit* pStageUnit= nullptr;

@@ -29,7 +29,6 @@ QByteArray  serialcom::recive(){
     std::lock_guard<std::mutex> lock(comm_mutex);
     QByteArray answer = sp.readLine();
     sp.waitForReadyRead(100);
-
     return answer;
 }
 
@@ -48,5 +47,6 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
 }
 
 void serialcom::sp_flush(){
+    std::lock_guard<std::mutex> lock(comm_mutex);
     sp.flush();
 }

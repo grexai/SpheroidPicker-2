@@ -1,5 +1,5 @@
 #include "controller.h"
-
+#include <comps.h>
 
 // Pressure controller
 
@@ -140,15 +140,19 @@ void controller::pipette_movez_sync(const float z)
     apipc->moveToZSync(z);
 }
 
-void controller::pipette_move_async(const std::vector<float> coords){
+void controller::pipette_move_async(const std::vector<float> coords)
+{
     apipc->setabsoluepositioning();
     apipc->moveAsync(coords.at(0),coords.at(1),coords.at(2));
 }
 
+void controller::pipette_set_speed(const int speed)
+{
+    apipc->setfeedrate(speed);
+}
+
 void controller::pipette_home(){
-
     apipc->goHome(false,false,false);
-
 }
 
 void controller::pipette_home_x()
@@ -168,6 +172,71 @@ void controller::pipette_home_z()
 
 std::vector<float> controller::pipette_get_coordinates(){
    return apipc->getcurrentpos();
+}
+
+void controller::pipette_move_to_img_coordinates(std::vector<float> coords){
+    float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
+    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
+    *imgc= geticenter(cip);
+    std::cout <<"pointer imgc"<< *imgc << std::endl;
+    std::cout << "center->img: "<< center->img << std::endl;
+    cv::Mat pipc = calconimgpipettecoors(TM,coords,*imgc,*pc);
+    QTextStream(stdout) <<"calculated pipette coords; "<<"X:"<<pipc.at<float>(0,0)<<"Y:"<< pipc.at<float>(0,1) <<"Z:" << pipc.at<float>(0,1) << endl;
+    this->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
+    this->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
+    this->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
+}
+
+void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2 , std::vector<float>*pos3){
+
+    float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
+    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
+    /***********************************************
+    // image coordinates 2 x 3 matrix image
+    //expected format
+
+      Center point
+         ||
+         ||
+        \  /
+         \/
+
+       | x1  x2  x3 |
+       | y1  y2  y3 |
+    *************************************************/
+
+
+    // pushing saved pipette positions to a Matrix
+    cv::Mat pipette_mat;
+    pipette_mat.push_back(*pos1);
+    pipette_mat.push_back(*pos2);
+    pipette_mat.push_back(*pos3);
+    std::cout << pipette_mat << "before reshape"<< endl;
+    /*******************************************
+    // converting to pipette coordinates a 3 x 3 matrix
+      Center point
+         ||
+         ||
+        \  /
+         \/
+       | x1  x2  x3 |
+       | y1  y2  y3 |
+       | z1  z2  z3 |
+    *******************************************/
+    pipette_mat =  pipette_mat.reshape(0,3);
+    cv::transpose(pipette_mat,pipette_mat);
+
+    std::cout << pipette_mat<< "pipette_mat"<< std::endl;
+    center = new centers;
+    TM = calcTMatrix(pipette_mat,cip,*center);
+
+    imgc = new cv::Mat;
+            //(1,2,CV_32F);
+    *imgc = geticenter(cip);
+    pc = new cv::Mat;
+    *pc = getpcenter(pipette_mat);
+    QTextStream(stdout)<<"done" << endl;
+
 }
 
 // STAGE

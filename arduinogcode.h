@@ -18,6 +18,7 @@ public:
         isconnected= false;
     }
     ~arduinogcode(){}
+
     bool isconnected = false;
 
     QString EOM= "\r\n"; //end of message
