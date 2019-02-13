@@ -47,6 +47,8 @@ public:
 
     void pipette_movez_sync(const float z);
 
+    void pipette_move(const std::vector<float>coords);
+
     void pipette_move_async(const std::vector<float>coords);
 
     void pipette_set_speed(const int speed);

@@ -33,6 +33,7 @@ void arduinogcode::moveAsync(float x, float y, float z){
     msg.append("X").append(QString::number(x));
     msg.append("Y").append(QString::number(y));
     msg.append("Z").append(QString::number(z));
+    msg.append(this->EOM);
     apipc_sc.send(msg);
 }
 

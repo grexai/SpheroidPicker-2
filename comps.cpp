@@ -34,8 +34,8 @@ cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
     using namespace  cv;
     Mat Ez= Mat (3,3,CV_32F);
     Mat Pz = Mat(2,3,CV_32F);
-    centers.img= getpcenter(cppoints);
-    centers.pipette = geticenter(imagepoints);
+    centers.img= getpcenter(imagepoints);
+    centers.pipette = geticenter(cppoints);
     std::cout << "calcTM  imagecenters:" << centers.img <<
                  "pipettecenters: " << centers.pipette<<std::endl;
 

@@ -152,6 +152,8 @@ private slots:
 
 
 
+     void on_p_set_speed_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

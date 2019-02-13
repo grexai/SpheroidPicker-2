@@ -11,6 +11,7 @@ public:
         isconnected = this->apipc_sc.openport(nport);
     if(isconnected){
         while (this->apipc_sc.sp.waitForReadyRead(1000));
+
         this->apipc_sc.sp.clear();
         this->apipc_sc.send(EOM);
         this->apipc_sc.sp_flush();
@@ -51,6 +52,7 @@ public:
     void MoveToXYZSync(std::vector<float> coords);
 
     void setPipetteposition();
+
 protected:
 
     serialcom apipc_sc;

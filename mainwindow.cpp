@@ -102,36 +102,36 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
         }
         if (calib->clicks==1){
             imtools->addPointToImage(disp,Point(100,disp.rows-100));
-            if(cpos1 != nullptr)
+            if(cpos1 == nullptr)
             {
-               delete cpos1;
+                cpos1 = new std::vector<float>;
+                *cpos1 = ctrl->pipette_get_coordinates();
+                QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
+
             }
-            cpos1 = new std::vector<float>;
-            *cpos1 = ctrl->pipette_get_coordinates();
-            QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
 
         }
         if (calib->clicks==2){
             imtools->addPointToImage(disp,Point(disp.cols-100,disp.rows-100));
-            if(cpos2!= nullptr)
+            if(cpos2== nullptr)
             {
-                delete cpos2;
+                cpos2 = new std::vector<float>;
+                *cpos2 = ctrl->pipette_get_coordinates();
+                QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
+
             }
-            cpos2 = new std::vector<float>;
-            *cpos2 = ctrl->pipette_get_coordinates();
-            QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
 
         }
         if (calib->clicks==3)
         {
-            if(cpos3 != nullptr)
+            if(cpos3 == nullptr)
             {
-                delete cpos3;
+                cpos3 = new std::vector<float>;
+                *cpos3 = ctrl->pipette_get_coordinates();
+                QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
+
             }
-            cpos3 = new std::vector<float>;
-            *cpos3 = ctrl->pipette_get_coordinates();
-            QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
-        }
+           }
 
 
     }
@@ -386,12 +386,10 @@ void MainWindow::screensample(){
         QDir().mkdir("Scandata");
     }
     //X 710798   Y-805545
-    iop::int32 xp = 710798;// =stage->XAxis().getCurrentPosition();
-    iop::int32 yp = 805545;//= stage->YAxis().getCurrentPosition();
     int xpos=ctrl->stage_get_x_coords();
     int ypos=ctrl->stage_get_y_coords();
     std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-    int platesize= 300000; //    /100nm
+    int platesize= 300000; //    //100nm
     float  img_w_5p5x = 27426; //  //100nm
     float  img_h_5p5x = 19466; //  um
     int wmax = platesize/img_w_5p5x; // um
@@ -438,9 +436,8 @@ void MainWindow::on_actionSpheroid_picker_triggered()
     ctrl->connect_microscope_unit();
 
 }
-/*
-void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
+
+void MainWindow::on_p_set_speed_clicked()
 {
-    //ctrl->pipette_set_speed(arg1);
+    ctrl->pipette_set_speed(ui->p_set_speed_spinbox->value());
 }
-*/
