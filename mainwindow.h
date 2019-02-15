@@ -154,6 +154,10 @@ private slots:
 
      void on_p_set_speed_clicked();
 
+     void on_p_set_speed_spinbox_valueChanged(int arg1);
+
+     void on_pip_step_spinbox_valueChanged(int arg1);
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

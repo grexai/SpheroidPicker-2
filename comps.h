@@ -10,8 +10,8 @@
 #include <QTextStream>
 
 typedef struct{
-    cv::Mat img;
-    cv::Mat pipette;
+    cv::Mat img = cv::Mat(2,1,CV_32F);
+    cv::Mat pipette = cv::Mat(3,1,CV_32F);
 } centers;
 
 cv::Mat getpcenter(const cv::Mat& cppoints);

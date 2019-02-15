@@ -441,3 +441,14 @@ void MainWindow::on_p_set_speed_clicked()
 {
     ctrl->pipette_set_speed(ui->p_set_speed_spinbox->value());
 }
+
+void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
+{
+     QTextStream(stdout)<< "speed changed to: " << arg1 ;
+     ctrl->pipette_set_speed(arg1);
+}
+
+void MainWindow::on_pip_step_spinbox_valueChanged(int arg1)
+{
+
+}
