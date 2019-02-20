@@ -90,8 +90,6 @@ cv::VideoCapture* CameraCV::getCamera(){
    return this->camera;
 }
 
-
-
 void CameraCV::freeframe(){
     delete this->frame;
 }

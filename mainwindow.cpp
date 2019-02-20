@@ -3,6 +3,7 @@
 #include <QStyleFactory>
 #include <QMouseEvent>
 #include <iostream>
+#include <QStyle>
 
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -27,7 +28,9 @@ void setdarkstyle(){
 
 void MainWindow::setdefault()
 {
-    //qApp->setPalette(qApp->setStyleSheet(;
+   qApp->setPalette(this->style()->standardPalette());
+   qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+   qApp->setStyleSheet("");
 }
 
 
@@ -139,9 +142,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
                 QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
 
             }
-           }
-
-
+        }
     }
 }
 
