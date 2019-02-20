@@ -46,9 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
     ctrl = new controller;
-    setdarkstyle();
-    std::cout<< "AKOS EDITION" << std::endl;
-
+  //  setdarkstyle();
 }
 
 MainWindow::~MainWindow()
