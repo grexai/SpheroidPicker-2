@@ -107,8 +107,8 @@ i_stagecontroll* asd  = new TangoStage();
 
 bool controller::connect_pipette_controller()
 {
-i_stagecontroll* asd  = new TangoStage();
-asd->move_x();
+//i_stagecontroll* asd  = new TangoStage();
+//asd->move_x();
     QString port = QString::fromStdString(propreader->cfg.port_pipette);
     apipc = new arduinogcode(QSP_apipc,port);
     if (apipc->isconnected == true)
@@ -183,19 +183,15 @@ std::vector<float> controller::pipette_get_coordinates(){
 }
 
 void controller::pipette_move_to_img_coordinates(std::vector<float> coords){
-    float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
-    cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
-    *imgc= geticenter(cip);
-    std::cout <<"pointer imgc"<< *imgc <<
-                std::endl;
-    std::cout << "center->img: "<< center->img << std::endl;
-    std::cout<<"center->pip:" << center->pipette<< std::endl;
-    cv::Mat pipc = calconimgpipettecoors(TM,coords,center->img,center->pipette);
-    QTextStream(stdout) <<"calculated pipette coords; "<<"X:"<<pipc.at<float>(0,0)<<"Y:"<< pipc.at<float>(0,1) <<"Z:" << pipc.at<float>(0,1) << endl;
+   // float ipdata2[6] = {960.0f,100.0f,1820.0f,100.0f,980.0f,980.0f};
+   // cv::Mat cip = cv::Mat(2,3,CV_32F,ipdata2);
+  //  *imgc = geticenter(cip);
+  //  std::cout <<"pointer imgc"<< *imgc << std::endl;
+    std::cout << "center->img: "<< m_centers.img << std::endl;
+    std::cout<<"center->pip:" << m_centers.pipette<< std::endl;
+    cv::Mat pipc = calconimgpipettecoors(TM,coords,m_centers.img,m_centers.pipette);
+    QTextStream(stdout) <<"calculated pipette coords; "<<"X: "<<pipc.at<float>(0,0)<<" Y: "<< pipc.at<float>(0,1) <<" Z:" << pipc.at<float>(0,2) << endl;
     this->pipette_move(pipc);
-    // this->pipette_movez_sync(static_cast<float>(pipc.at<float>(0,2)));
-   // this->pipette_movex_sync(static_cast<float>(pipc.at<float>(0,0)));
-   // this->pipette_movey_sync(static_cast<float>(pipc.at<float>(0,1)));
 }
 
 void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2 , std::vector<float>*pos3){
@@ -214,6 +210,7 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
 
        | x1  x2  x3 |
        | y1  y2  y3 |
+
     *************************************************/
 
 
@@ -238,14 +235,12 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
     cv::transpose(pipette_mat,pipette_mat);
 
     std::cout << pipette_mat<< "pipette_mat"<< std::endl;
-    center = new centers;
-    TM = calcTMatrix(pipette_mat,cip,*center);
 
-    imgc = new cv::Mat;
+  //  m_centers.img = geticenter(cip);
+  //  m_centers.pipette = getpcenter(pipette_mat);
+    TM = calcTMatrix(pipette_mat,cip,m_centers);
+
             //(1,2,CV_32F);
-    *imgc = geticenter(cip);
-    pc = new cv::Mat;
-    *pc = getpcenter(pipette_mat);
     QTextStream(stdout)<<"done" << endl;
 
 }

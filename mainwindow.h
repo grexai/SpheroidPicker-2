@@ -35,7 +35,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow();
-
+    void setdefault();
     void displayImage();
 
     void SpawnThreadAndLaunch();
@@ -45,9 +45,6 @@ public:
 
     void porttest();
     cv::Mat TM;
-    cv::Mat* imgc;
-    cv::Mat pc;
-    centers centers;
 
 
 signals:
@@ -133,8 +130,6 @@ private slots:
 
      void on_height_button_clicked();
 
-     void on_s_set_speed_button_clicked();
-
      void on_save_image_button_clicked();
 
      void on_s_get_coors_pushButton_clicked();
@@ -148,15 +143,14 @@ private slots:
      void screensample();
 
      void on_actionCalibrate_Pipette_triggered();
+
      void on_actionSpheroid_picker_triggered();
-
-
-
-     void on_p_set_speed_clicked();
 
      void on_p_set_speed_spinbox_valueChanged(int arg1);
 
-     void on_pip_step_spinbox_valueChanged(int arg1);
+     void on_s_speed_spinbox_valueChanged(double arg1);
+
+     void on_actionLight_triggered();
 
 private:
     QTimer *timer= nullptr;

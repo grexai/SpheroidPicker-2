@@ -9,10 +9,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <QTextStream>
 
-typedef struct{
-    cv::Mat img = cv::Mat(2,1,CV_32F);
-    cv::Mat pipette = cv::Mat(3,1,CV_32F);
-} centers;
+struct centers{
+    cv::Mat img ;//= cv::Mat(2,1,CV_32F);
+    cv::Mat pipette;// = cv::Mat(3,1,CV_32F);
+};
 
 cv::Mat getpcenter(const cv::Mat& cppoints);
 

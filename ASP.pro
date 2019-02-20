@@ -113,7 +113,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 
 
 #INCLUDEPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
-DEPENDPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
+#DEPENDPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
 
 #win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_core345.a
 #else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_core345.a

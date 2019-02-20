@@ -25,6 +25,12 @@ void setdarkstyle(){
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
 }
 
+void MainWindow::setdefault()
+{
+    //qApp->setPalette(qApp->setStyleSheet(;
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -37,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
     ctrl = new controller;
+    setdarkstyle();
+    std::cout<< "AKOS EDITION" << std::endl;
 
 }
 
@@ -153,7 +161,6 @@ void MainWindow::update_window()
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 
-
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -214,6 +221,11 @@ void MainWindow::on_actionDark_Mode_triggered()
     setdarkstyle();
 }
 
+void MainWindow::on_actionLight_triggered()
+{
+    setdefault();
+}
+
 
 void MainWindow::on_actionExit_triggered()
 {
@@ -259,7 +271,7 @@ void MainWindow::on_pc_pulse_button_clicked()
 
 void MainWindow::on_get_coors_pushButton_clicked()
 {
-    std::vector<float> randx= ctrl->pipette_get_coordinates();
+    std::vector<float> randx = ctrl->pipette_get_coordinates();
     ui->xc_label->setText("X: " + QString::number(randx.at(0),'f',2));
     ui->yc_label->setText("Y: " + QString::number(randx.at(1),'f',2));
     ui->zc_label->setText("Z: " + QString::number(randx.at(2),'f',2));
@@ -328,10 +340,7 @@ void MainWindow::on_s_center_button_clicked()
 }
 
 
-void MainWindow::on_s_set_speed_button_clicked()
-{
-    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
-}
+
 
 void MainWindow::on_save_image_button_clicked()
 {
@@ -374,6 +383,7 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
+
     calib->Iscalibrating= true;
     calib->show();
 }
@@ -437,18 +447,16 @@ void MainWindow::on_actionSpheroid_picker_triggered()
 
 }
 
-void MainWindow::on_p_set_speed_clicked()
-{
-    ctrl->pipette_set_speed(ui->p_set_speed_spinbox->value());
-}
-
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 {
      QTextStream(stdout)<< "speed changed to: " << arg1 ;
      ctrl->pipette_set_speed(arg1);
 }
 
-void MainWindow::on_pip_step_spinbox_valueChanged(int arg1)
-{
 
+void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
+{
+     ctrl->stage_set_speed((float)arg1);
 }
+
+

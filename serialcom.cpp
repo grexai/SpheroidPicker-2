@@ -41,7 +41,6 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
     sp.waitForReadyRead(30);
     sp.write(byte_command);
     sp.waitForBytesWritten(30);
-
     QByteArray answer = sp.readAll();
     while ( sp.waitForReadyRead(50)){
         answer.append(sp.readAll());

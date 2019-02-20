@@ -127,11 +127,11 @@ protected:
     std::thread m_get_pressure_t;
     // pipette coordinate transformation
     cv::Mat TM;  // transformation matrix img <==> pipette coordinates
-    cv::Mat* img_c_p;  //imgcenter points
-    cv::Mat pipette_c_p; // pipettecenter points
-    centers* center; // center structure
-    cv::Mat* imgc;
-    cv::Mat* pc;
+ //   cv::Mat* img_c_p;  //imgcenter points
+ //   cv::Mat pipette_c_p; // pipettecenter points
+    centers m_centers; // center structure
+  //  cv::Mat imgc;
+ //   cv::Mat pc;
 
     std::vector<float>* cpos1 = nullptr;
 

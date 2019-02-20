@@ -3,17 +3,21 @@
 
 cv::Mat getpcenter(const cv::Mat& cppoints){
     std::cout<< "pc" << std::endl;
-    cv::Mat pcenter(cv::Mat_<float>(3,1));
-
-    pcenter = cppoints.col(0);
+    cv::Mat tmp = cppoints.col(0);
+    cv::Mat pcenter;//(cv::Mat_<float>(3,1));
+    tmp.copyTo(pcenter);
+    std::cout <<"memory check"<< (unsigned int)(pcenter.data) << " vs " << (unsigned int)(cppoints.col(0).data) << std::endl;
     std::cout<< pcenter << std::endl;
     return pcenter;
 }
 
 cv::Mat geticenter(const cv::Mat& imagepoints){
     std::cout<< "ic" << std::endl;
-    cv::Mat icenter(cv::Mat_<float>(2,1));
-    icenter = imagepoints.col(0);
+    cv::Mat tmp;
+    tmp = imagepoints.col(0);
+    cv::Mat icenter;//(cv::Mat_<float>(2,1));
+    tmp.copyTo(icenter);
+    std::cout <<"memory check"<< (unsigned int)(icenter.data) << " vs " << (unsigned int)(imagepoints.col(0).data) << std::endl;
     std::cout<< icenter << std::endl;
     return icenter;
 }
@@ -28,25 +32,26 @@ cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims){
     return outputMatrix;
 }
 
-cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers& centers){
+cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers &centers){
     std::cout<< "input cpp :"<< std::endl << cppoints << std::endl
              << "input imgp "<< std::endl<< imagepoints<< std::endl;
     using namespace  cv;
-    Mat Ez= Mat (3,3,CV_32F);
+    //IMAGE
     Mat Pz = Mat(2,3,CV_32F);
-    centers.img= getpcenter(imagepoints);
-    centers.pipette = geticenter(cppoints);
+    //PIPETTE
+    Mat Ez= Mat (3,3,CV_32F);
+    centers.img= geticenter(imagepoints);
+    centers.pipette = getpcenter(cppoints);
     std::cout << "calcTM  imagecenters:" << centers.img <<
                  "pipettecenters: " << centers.pipette<<std::endl;
 
     for (int  i=0 ; i<3; i++){
-        Ez.col(i)= cppoints.col(i) - getpcenter(cppoints);
+        Ez.col(i)= cppoints.col(i) - centers.pipette;
     }
  //   std::cout<< Ez << std::endl;
     for (int  i=0 ; i<3; i++){
-        Pz.col(i)= imagepoints.col(i) - geticenter(imagepoints);
+        Pz.col(i)= imagepoints.col(i) - centers.img;
     }
-//    std::cout << "Pz" << std::endl << Pz<< std::endl;
     Mat Pinv ;
     invert(Pz, Pinv, DECOMP_SVD);
     Mat T = Ez * Pinv;

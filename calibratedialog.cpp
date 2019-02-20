@@ -39,5 +39,7 @@ void calibratedialog::on_pushButton_clicked()
 void calibratedialog::on_buttonBox_accepted()
 {
    Iscalibrating = false;
-  // delete ui;
+   this->~calibratedialog();
+
+
 }
