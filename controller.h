@@ -13,8 +13,13 @@
 class controller
 {
 public:
-    controller(){}
-    ~controller(){}
+    controller(){
+
+    }
+    ~controller(){
+
+
+    }
     void getTmatrix();
     void getimg_c_p();
     void getpipette_c_p();

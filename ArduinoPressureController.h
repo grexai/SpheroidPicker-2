@@ -16,7 +16,8 @@ public:
         if(isconnected)
         {
             while (this->acp_sc.sp.waitForReadyRead(100));
-            this->acp_sc.recive();
+          //  this->acp_sc.recive();
+            this->acp_sc.sp.clear();
             this->acp_sc.sp_flush();
         }
         else

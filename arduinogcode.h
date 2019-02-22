@@ -9,14 +9,15 @@ public:
     arduinogcode(QSerialPort& i_qsp,QString& nport): apipc_sc(i_qsp){
 
         isconnected = this->apipc_sc.openport(nport);
-    if(isconnected){
-        while (this->apipc_sc.sp.waitForReadyRead(1000));
+        if(isconnected){
+            while (this->apipc_sc.sp.waitForReadyRead(1000));
 
-        this->apipc_sc.sp.clear();
-        this->apipc_sc.send(EOM);
-        this->apipc_sc.sp_flush();
-    }else
-        isconnected= false;
+            this->apipc_sc.sp.clear();
+            this->apipc_sc.send(EOM);
+            this->apipc_sc.sp_flush();
+         }else{
+            isconnected= false;
+        }
     }
     ~arduinogcode(){}
 

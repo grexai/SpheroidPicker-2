@@ -1,7 +1,7 @@
 #include <stagecontroller.h>
-
-
-// ITK HYDRA
+//TESTED ON
+//  ITK HYDRA
+//  TANGO STAGE
 
 // tools
 // findUnit: tool function to find a unit with a given type id in the unit tree

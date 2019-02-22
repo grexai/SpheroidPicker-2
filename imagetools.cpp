@@ -1,5 +1,6 @@
 #include "imagetools.h"
 #include <thread>
+
 cv::Mat* imagetools::getframe()
 {
     return (this->frame);
@@ -13,7 +14,6 @@ void imagetools::setframe(cv::Mat &input){
     this->frame = new cv::Mat();
     this->frame = &input;
 }
-
 
 /*
 0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
@@ -36,6 +36,7 @@ void imagetools::setframe(cv::Mat &input){
 17. CV_CAP_PROP_WHITE_BALANCE Currently unsupported
 18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
 */
+
 cv::Mat* imagetools::get_display_frm()
 {
     return this->dispfrm.get();

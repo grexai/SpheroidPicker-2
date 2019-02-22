@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
     ctrl = new controller;
-  //  setdarkstyle();
+    setdarkstyle();
+    std::cout << "AKOS EDITION v1.1" << std::endl;
 }
 
 MainWindow::~MainWindow()
@@ -116,7 +117,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
                 cpos1 = new std::vector<float>;
                 *cpos1 = ctrl->pipette_get_coordinates();
                 QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
-
             }
 
         }
@@ -127,7 +127,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
                 cpos2 = new std::vector<float>;
                 *cpos2 = ctrl->pipette_get_coordinates();
                 QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
-
             }
 
         }
@@ -138,7 +137,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
                 cpos3 = new std::vector<float>;
                 *cpos3 = ctrl->pipette_get_coordinates();
                 QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
-
             }
         }
     }
@@ -151,15 +149,12 @@ void MainWindow::update_window()
     {
         return;
     }
-
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     calib_frame_view(displayfrm);
     delete qframe;
-    //}
     qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
-
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -225,7 +220,6 @@ void MainWindow::on_actionLight_triggered()
     setdefault();
 }
 
-
 void MainWindow::on_actionExit_triggered()
 {
     QCoreApplication::exit(0);
@@ -265,7 +259,6 @@ void MainWindow::on_atm_button_clicked()
 void MainWindow::on_pc_pulse_button_clicked()
 {
     ctrl->vaccum_pulse(ui->pulse_value->value(),ui->pulse_time->value());
-
 }
 
 void MainWindow::on_get_coors_pushButton_clicked()
@@ -330,16 +323,13 @@ void MainWindow::on_p_zm_btton_clicked()
 
 void MainWindow::on_actionOpen_console_triggered()
 {
-    QTextStream(stdout) << "yo program  has succesfully crashed. is not works" << endl;
+    QTextStream(stdout) << "your program  has succesfully crashed." << endl;
 }
 
 void MainWindow::on_s_center_button_clicked()
 {
     ctrl->stage_go_center();
 }
-
-
-
 
 void MainWindow::on_save_image_button_clicked()
 {
@@ -370,19 +360,15 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
     QAction action1("Move Here", ui->graphicsView->viewport());
     connect(&action1, SIGNAL(triggered()), this, SLOT(MoveAction()));
     QAction action2("Pick up", ui->graphicsView->viewport());
-
     QAction action3("Deploy", ui->graphicsView->viewport());
     contextMenu.addAction(&action1);
     contextMenu.addAction(&action2);
     contextMenu.addAction(&action3);
     contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
-
 }
-
 
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
-
     calib->Iscalibrating= true;
     calib->show();
 }
@@ -425,10 +411,6 @@ void MainWindow::screensample(){
     }
 }
 
-void spawnthread(){
-
-}
-
 void MainWindow::on_start_screening_clicked()
 {
     std::thread t1(&MainWindow::screensample,this);
@@ -457,5 +439,3 @@ void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 {
      ctrl->stage_set_speed((float)arg1);
 }
-
-
