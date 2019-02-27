@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <iostream>
 #include <QStyle>
+#include <deeplearning.h>
 
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -28,8 +29,8 @@ void setdarkstyle(){
 
 void MainWindow::setdefault()
 {
-   qApp->setPalette(this->style()->standardPalette());
    qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+   qApp->setPalette(this->style()->standardPalette());
    qApp->setStyleSheet("");
 }
 
@@ -392,6 +393,7 @@ void MainWindow::screensample(){
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
+    cv::Mat Mimage = cv::Mat::zeros(hmax*1080,wmax*1920,CV_8UC3);
     std::string folder ="Scandata/screening";
     for (int j = 0; j< hmax; j++ )
     {
@@ -403,6 +405,7 @@ void MainWindow::screensample(){
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
             imtools->saveImg((cameracv->get_current_frm().get()),num2str.c_str());
+
             counter += 1;
         }
         ctrl->stage_set_speed(20000.0f);
@@ -438,4 +441,12 @@ void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 {
      ctrl->stage_set_speed((float)arg1);
+}
+
+void MainWindow::on_predict_sph_clicked()
+{
+    deeplearning dl;
+    auto cfrm = cameracv->get_current_frm();
+    dl.rundnn(*cfrm);
+
 }

@@ -83,7 +83,7 @@ public:
 //pipette_driver* pd(arduinogcode apic);
 class i_stagecontroll {
 public:
-    virtual void move_x()=0;
+    virtual void move_x()= 0;
 
 };
 

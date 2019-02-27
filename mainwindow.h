@@ -152,6 +152,8 @@ private slots:
 
      void on_actionLight_triggered();
 
+     void on_predict_sph_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

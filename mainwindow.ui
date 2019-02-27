@@ -1358,7 +1358,7 @@ Stage</string>
       <x>1730</x>
       <y>280</y>
       <width>171</width>
-      <height>161</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="title">
@@ -1398,6 +1398,19 @@ Stage</string>
      </property>
      <property name="text">
       <string>Start screening</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="predict_sph">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>170</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Predtict spheroid</string>
      </property>
     </widget>
    </widget>

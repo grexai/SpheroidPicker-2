@@ -87,10 +87,8 @@ INCLUDEPATH += $$PWD/'../../../Libraries\opencv-3.4.5\build\install\include'
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_core345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_core345
 
-
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgproc345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_imgproc345
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_highgui345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_highgui345
@@ -104,13 +102,8 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_ml345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_ml345
 
-
-
-
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/ -lopencv_dnn345
-
-
 
 #INCLUDEPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
 #DEPENDPATH += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/Release
