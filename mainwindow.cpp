@@ -447,6 +447,7 @@ void MainWindow::on_predict_sph_clicked()
 {
     deeplearning dl;
     auto cfrm = cameracv->get_current_frm();
+    dl.setup_network();
     dl.rundnn(*cfrm);
 
 }
