@@ -29,6 +29,8 @@ public:
 
     cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput);
 
+
+
 protected:
     cv::Mat* frame= nullptr;
     QSharedPointer<cv::Mat> dispfrm = nullptr;

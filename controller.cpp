@@ -249,7 +249,7 @@ bool controller::connect_tango_stage(){
         if(theHardwareModel())
         {
             iop::string name = "";
-            pRootUnit = theHardwareModel()->getUnit("");
+            pRootUnit = theHardwareModel()->getUnit(name);
             if(pRootUnit)
             {
                 pStageUnit = findUnit(pRootUnit, ahm::MICROSCOPE_STAGE);

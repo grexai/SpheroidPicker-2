@@ -153,7 +153,8 @@ void MainWindow::update_window()
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     calib_frame_view(displayfrm);
     delete qframe;
-    qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
+    //qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
+    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
@@ -386,11 +387,11 @@ void MainWindow::screensample(){
     int xpos=ctrl->stage_get_x_coords();
     int ypos=ctrl->stage_get_y_coords();
     std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-    int platesize= 300000; //    //100nm
-    float  img_w_5p5x = 27426; //  //100nm
-    float  img_h_5p5x = 19466; //  um
-    int wmax = platesize/img_w_5p5x; // um
-    int hmax = platesize/img_h_5p5x; // um
+    int platesize= 300000;     //    100nm
+    float  img_w_5p5x = 27426; //    100nm
+    float  img_h_5p5x = 19466; //    100nm
+    int wmax = static_cast<int>(platesize/img_w_5p5x); // um
+    int hmax = static_cast<int>(platesize/img_h_5p5x); // um
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
@@ -401,7 +402,7 @@ void MainWindow::screensample(){
         for (int  i = 0; i< wmax; i++)
         {
             QTextStream(stdout)<< "i" << i << endl;
-            ctrl->stage_move_to_x_sync(xpos+img_w_5p5x*i);
+            ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
@@ -464,7 +465,6 @@ void MainWindow::on_predict_sph_clicked()
     dl->dnn_prediction(*cfrm);
 }
 
-
 void MainWindow::pickup_sph()
 {
     QTextStream(stdout) << "pciking up" << endl;
@@ -474,6 +474,7 @@ void MainWindow::pickup_sph()
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     ctrl->pipette_home_z();
 }
+
 void MainWindow::on_pickup_sph_clicked()
 {
     std::thread t2(&MainWindow::pickup_sph,this);

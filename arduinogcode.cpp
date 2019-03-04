@@ -91,29 +91,32 @@ std::vector<float> arduinogcode::getcurrentpos(){
     QRegExp findecho("(echo:*)");
     if(findecho.isEmpty())
     {
-    for (int i=1;i<4;i++)
-    {
-         xRegExp.indexIn( resultStrings.at(i));
-         QStringList xList = xRegExp.capturedTexts();
-         try
-         {
-             coors.push_back( static_cast<float>(xList.begin()->toFloat()));
-         }
-         catch (...)
-         {
-             std::cout << "extractiing cooordinates error error " << std::endl;
+        for (int i=1;i<4;i++)
+        {
+            xRegExp.indexIn( resultStrings.at(i));
+            QStringList xList = xRegExp.capturedTexts();
+            try
+            {
+            coors.push_back( static_cast<float>(xList.begin()->toFloat()));
+            }
+            catch (...)
+            {
+            std::cout << "extractiing cooordinates error error " << std::endl;
             //error extracting coord
-         }
-    }
-    return coors;
+            }
+        }
+        return coors;
     }
     else if(!findecho.isEmpty())
     {
         return this->getcurrentpos();
-    }else
+    }
+    else
     {
         std::cerr << "invalid coordinates..." << std::endl;
+        return coors = {-1,-1,-1};
     }
+    return coors;
 }
 
 //Moves the machine to an XYZ coordinate with syncronized moving, coordinates sent
