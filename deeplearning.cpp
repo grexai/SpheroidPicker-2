@@ -7,7 +7,6 @@ deeplearning::deeplearning()
 
 }
 
-
 deeplearning::~deeplearning(){}
 
 // Draw the predicted bounding box, colorize and show the mask on the image
@@ -33,6 +32,7 @@ void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box
     box.y = max(box.y, labelSize.height);
     //rectangle(frame, Point(box.x, box.y - round(1.5*labelSize.height)), Point(box.x + round(1.5*labelSize.width), box.y + baseLine), Scalar(255, 255, 255), FILLED);
     //putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0,0,0),1);
+
 
     // Resize the mask, threshold, color and apply it on the image
     cv::resize(objectMask, objectMask, Size(box.width, box.height));
@@ -69,10 +69,10 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
         {
             // Extract the bounding box
             int classId = static_cast<int>(outDetections.at<float>(i, 1));
-            int left = static_cast<int>(frame.cols* 1.422222f * outDetections.at<float>(i, 3));
-            int top = static_cast<int>(frame.rows * outDetections.at<float>(i, 4));
-            int right = static_cast<int>(frame.cols*1.422222f * outDetections.at<float>(i, 5));
-            int bottom = static_cast<int>(frame.rows * outDetections.at<float>(i, 6));
+            int left = static_cast<int>(frame.cols * outDetections.at<float>(i, 3));
+            int top = static_cast<int>(frame.rows * 1.422222f* outDetections.at<float>(i, 4));
+            int right = static_cast<int>(frame.cols * outDetections.at<float>(i, 5));
+            int bottom = static_cast<int>(frame.rows*1.422222f * outDetections.at<float>(i, 6));
 
             left = max(0, min(left, frame.cols - 1));
             top = max(0, min(top, frame.rows - 1));
@@ -80,7 +80,11 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
             bottom = max(0, min(bottom, frame.rows - 1));
             Rect box = Rect(left, top, right - left + 1, bottom - top + 1);
             std::cout << left << " " << top << " " << right << " " << bottom << std::endl;
-
+            std::vector <float> outcoors;
+            outcoors.push_back(left);
+            outcoors.push_back(top);
+            objpos.push_back(outcoors);
+            cout <<"what"<< endl;
             // Extract the mask for the object
             Mat objectMask(outMasks.size[2], outMasks.size[3], CV_32F, outMasks.ptr<float>(i,classId));
             // Draw bounding box, colorize and show the mask on the image
@@ -91,7 +95,7 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
 }
 
 //resize the image for 512x512 keeping ratio
-//empty space 0
+//empty space = 0
 void deeplearning::resize(cv::Mat &input, cv::Mat &out)
 {
     using namespace cv;
@@ -116,7 +120,7 @@ void deeplearning::resize(cv::Mat &input, cv::Mat &out)
 }
 
 //Setup a DNN network
-void deeplearning::setup_network()
+void deeplearning::setup_dnn_network()
 {
     using namespace cv;
     using namespace std;
@@ -128,8 +132,6 @@ void deeplearning::setup_network()
     string line;
     while (getline(ifs, line)) classes.push_back(line);
 
-    std::vector<Scalar> colors;
-    colors.push_back(Scalar(50, 255, 100, 255.0));
     String modelWeights = "d:/dev/cpp/model.pb";
     String textGraph = "d:/dev/cpp/model.pbtxt";
     net = new cv::dnn::Net();
@@ -143,11 +145,11 @@ void deeplearning::setup_network()
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-void deeplearning::rundnn(cv::Mat& input){
+void deeplearning::dnn_prediction(cv::Mat& input)
+{
     using namespace cv;
     using namespace std;
     using namespace dnn;
-
 
     std::cerr << "Read START" << std::endl;
 
@@ -170,7 +172,7 @@ void deeplearning::rundnn(cv::Mat& input){
     blobFromImage(frameResized, blob, 1.0, cv::Size(frameResized.cols, frameResized.rows), cv::Scalar(), true, false);
 
     std::cerr << "BLOB OK" << std::endl;
-
+    colors.push_back(Scalar(255, 100, 45, 255.0));
     //Sets the input to the network
     net->setInput(blob, "image_tensor");
     net->enableFusion(1);
@@ -180,7 +182,6 @@ void deeplearning::rundnn(cv::Mat& input){
     outNames[1] = "detection_masks";
     std::vector<cv::Mat> outs;
 
-    //for (int i = 0; i < 3; ++i)
     {
         std::cerr << "Start..." << std::endl;
 
@@ -189,7 +190,7 @@ void deeplearning::rundnn(cv::Mat& input){
 
     try
     {
-            net.forward(outs, outNames);
+        net->forward(outs, outNames);
     } catch (std::exception& e)
     {
         std::cerr << e.what() << std::endl;
@@ -202,9 +203,8 @@ void deeplearning::rundnn(cv::Mat& input){
     std::cerr << "ok" << std::endl;
 
 
-        // Extract the bounding box and mask for each of the detected objects
-    postprocess(frameResized, outs);
-
+    // Extract the bounding box and mask for each of the detected objects
+    postprocess(frame, outs);
 
     auto end = std::chrono::system_clock::now();
 
@@ -214,16 +214,11 @@ void deeplearning::rundnn(cv::Mat& input){
         std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
     }
 
-    //Mat frameResult;
-    //resize(frameResized, frameResult, Size(frame.cols, frame.rows));
-    // Write the frame with the detection boxes
     Mat detectedFrame;
 
-    frameResized.convertTo(detectedFrame, CV_8U);
+    frame.convertTo(detectedFrame, CV_8U);
 
     imshow("detect object", detectedFrame);
-    //imshow("asdasd", frame);
-     waitKey(0);
-   // imwrite("result.jpg", detectedFrame);
-   // waitKey(0);
+
+    waitKey(1);
 }

@@ -15,7 +15,6 @@ public:
 
     ~imagetools(){}
 
-
     cv::Mat* getframe();
 
     void setframe(cv::Mat &input);
@@ -26,8 +25,6 @@ public:
 
     int2coors getSphCoors(cv::Mat &img);
 
-    bool iscameraopen=false;
-
     void saveImg(cv::Mat* outimg, std::string outname);
 
     cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput);
@@ -36,8 +33,7 @@ protected:
     cv::Mat* frame= nullptr;
     QSharedPointer<cv::Mat> dispfrm = nullptr;
     cv::Mat* temp = nullptr;
-    std::mutex mFrameBufferMutex;
-    std::mutex m_disp_frm_mutex;
+
 private:
 
 

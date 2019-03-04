@@ -21,16 +21,16 @@ public:
     void drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask);
     void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
     void resize(cv::Mat& input, cv::Mat& out);
-    void setup_network();
-    void rundnn(cv::Mat& input);
-
+    void setup_dnn_network();
+    void dnn_prediction(cv::Mat& input);
+    std::vector<std::vector<float>> objpos;
     std::vector<std::string> classes;
     std::vector<cv::Scalar> colors;
     // Initialize the parameters
 protected:
     cv::dnn::Net* net;
-    float confThreshold = 0.4; // Confidence threshold
-    float maskThreshold = 0.3; // Mask threshold
+    float confThreshold = 0.4f; // Confidence threshold
+    float maskThreshold = 0.3f; // Mask threshold
 };
 
 #endif // DEEPLEARNING_H

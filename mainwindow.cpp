@@ -162,7 +162,7 @@ void MainWindow::on_Campushbtn_clicked()
 {
 
     cameracv = new CameraCV(cameraIndex);
-    if ((Iscameraopen==true)){
+    if (Iscameraopen==true){
         ui->Campushbtn->setText("Camera on");
         cameracv->~CameraCV();
         Iscameraopen= false;
@@ -196,7 +196,7 @@ void MainWindow::on_Campushbtn_clicked()
 
 void MainWindow::on_exptime_button_clicked()
 {
-    cameracv->setexposuretime(ui->exptime_spin->value());
+    cameracv->setexposuretime(static_cast<float>(ui->exptime_spin->value()));
 }
 
 void MainWindow::on_width_button_clicked()
@@ -249,7 +249,7 @@ void MainWindow::on_p_home_z_clicked()
 
 void MainWindow::on_SetPressure_clicked()
 {
-    ctrl->request_pressure(ui->pressure_value->value());
+    ctrl->request_pressure(static_cast<float>(ui->pressure_value->value()));
 }
 
 void MainWindow::on_atm_button_clicked()
@@ -259,7 +259,7 @@ void MainWindow::on_atm_button_clicked()
 
 void MainWindow::on_pc_pulse_button_clicked()
 {
-    ctrl->vaccum_pulse(ui->pulse_value->value(),ui->pulse_time->value());
+    ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
 }
 
 void MainWindow::on_get_coors_pushButton_clicked()
@@ -375,6 +375,7 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 }
 
 void MainWindow::screensample(){
+    using namespace  cv;
     if (QDir().exists("Scandata")){
         QTextStream(stdout) << "this folder already folder exists"<< endl;
     }
@@ -404,8 +405,20 @@ void MainWindow::screensample(){
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
-            imtools->saveImg((cameracv->get_current_frm().get()),num2str.c_str());
+            cv::Mat *tmpimg = (cameracv->get_current_frm().get());
+            imtools->saveImg(tmpimg,num2str.c_str());
 
+            // mosaik creaton
+            for (int ii = i*1080; ii < tmpimg->rows; ++ii)
+                {
+                    for (int jj = j*1920; jj < tmpimg->cols; ++jj)
+                    {
+                        Mimage.at<Vec3b>(ii, jj)[0] = tmpimg->at<Vec3b>(ii, jj)[0];
+                        Mimage.at<Vec3b>(ii, jj)[1] = tmpimg->at<Vec3b>(ii, jj)[1];
+                        Mimage.at<Vec3b>(ii, jj)[2] = tmpimg->at<Vec3b>(ii, jj)[2];
+                    }
+                }
+            //till this
             counter += 1;
         }
         ctrl->stage_set_speed(20000.0f);
@@ -445,9 +458,30 @@ void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_predict_sph_clicked()
 {
-    deeplearning dl;
+    dl = new deeplearning;
     auto cfrm = cameracv->get_current_frm();
-    dl.setup_network();
-    dl.rundnn(*cfrm);
-
+    dl->setup_dnn_network();
+    dl->dnn_prediction(*cfrm);
 }
+
+
+void MainWindow::pickup_sph()
+{
+    QTextStream(stdout) << "pciking up" << endl;
+    ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    ctrl->pipette_home_z();
+}
+void MainWindow::on_pickup_sph_clicked()
+{
+    std::thread t2(&MainWindow::pickup_sph,this);
+    t2.detach();
+}
+
+
+
+
+
+

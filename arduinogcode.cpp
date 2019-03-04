@@ -6,6 +6,8 @@
 //  https://reprap.org/wiki/G-code //
 //*********************************//
 
+
+//setting up feedrate (speed)
 void arduinogcode::setfeedrate(int acceleration){
     QString msg = "G0F";
     msg= msg.append(QString::number(acceleration)).append(EOM);
@@ -53,32 +55,48 @@ void arduinogcode::moveToZSync(float z_value){
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
 
+// set the GCODE interpreter to ABSOLUTE POSIITING MODE
+// sends to desired coordinates
 void arduinogcode::setabsoluepositioning(){
     QString msg = "G90";
     apipc_sc.send(msg.append(EOM));
 
 }
 
+// set the GCODE interpreter to RELATIVE POSTIONING MODE
+// incrementing coordinates
 void arduinogcode::setrelativepositioning(){
     QString msg = "G91";
     apipc_sc.send(msg.append(EOM));
 }
 
+
+// extracting the coordinates from the answer of GCODE interpreter
+//                                            0,1,2
+// and returns with coordinate vector<float> (x,y,z)
+
 std::vector<float> arduinogcode::getcurrentpos(){
-//  apipc_sc.sp.clear();
     QByteArray answer;
     QString msg = "M114";
     answer=apipc_sc.sendAndReceive(msg,EOM);
     std::vector<float> coors;
-    //split strings by :
     QString s(answer);
+    //split strings by ":"
     QStringList resultStrings =  s.split(':');
     // get floating point number regularexpressions
     QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-    for (int i=1;i<4;i++){
+    // experiment to find echo...
+    // tries to get the coordinates
+    //recall the function if echo thrown, else error
+    QRegExp findecho("(echo:*)");
+    if(findecho.isEmpty())
+    {
+    for (int i=1;i<4;i++)
+    {
          xRegExp.indexIn( resultStrings.at(i));
          QStringList xList = xRegExp.capturedTexts();
-         try {
+         try
+         {
              coors.push_back( static_cast<float>(xList.begin()->toFloat()));
          }
          catch (...)
@@ -88,17 +106,31 @@ std::vector<float> arduinogcode::getcurrentpos(){
          }
     }
     return coors;
+    }
+    else if(!findecho.isEmpty())
+    {
+        return this->getcurrentpos();
+    }else
+    {
+        std::cerr << "invalid coordinates..." << std::endl;
+    }
 }
 
-void arduinogcode::MoveToXYZSync(std::vector<float> coords){
+//Moves the machine to an XYZ coordinate with syncronized moving, coordinates sent
+// one by one
+
+void arduinogcode::MoveToXYZSync(std::vector<float> coords)
+{
     setabsoluepositioning();
     moveToXSync(coords.at(0));  //X
     moveToZSync(coords.at(2));  //Z
     moveToYSync(coords.at(1));  //Y
 }
 
+// A function will set manually the machines position
 
-void arduinogcode::setPipetteposition(){
+void arduinogcode::setPipetteposition()
+{
 
 
 

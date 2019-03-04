@@ -14,7 +14,7 @@
 #include <comps.h>
 #include <controller.h>
 #include <cameracv.h>
-
+#include "deeplearning.h"
 namespace Ui {
 class MainWindow;
 }
@@ -154,6 +154,10 @@ private slots:
 
      void on_predict_sph_clicked();
 
+     void on_pickup_sph_clicked();
+
+     void pickup_sph();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -162,7 +166,7 @@ private:
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-
+    deeplearning* dl= nullptr;
 
     //TEST
 

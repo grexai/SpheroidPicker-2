@@ -139,6 +139,7 @@ void controller::pipette_movey_sync(const float y)
 
 void controller::pipette_movez_sync(const float z)
 {
+
     apipc->setrelativepositioning();
     apipc->moveToZSync(z);
 }

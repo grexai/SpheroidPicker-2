@@ -1358,7 +1358,7 @@ Stage</string>
       <x>1730</x>
       <y>280</y>
       <width>171</width>
-      <height>211</height>
+      <height>241</height>
      </rect>
     </property>
     <property name="title">
@@ -1411,6 +1411,19 @@ Stage</string>
      </property>
      <property name="text">
       <string>Predtict spheroid</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pickup_sph">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>200</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pick up selected</string>
      </property>
     </widget>
    </widget>
