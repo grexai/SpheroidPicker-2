@@ -5,16 +5,17 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QGraphicsPixmapItem>
-#include "imagetools.h"
+#include <QGraphicsSceneMouseEvent>
+#include <imagetools.h>
 #include <arduinopressurecontroller.h>
 #include <arduinogcode.h>
 #include <stagecontroller.h>
-#include <QGraphicsSceneMouseEvent>
 #include <calibratedialog.h>
 #include <comps.h>
 #include <controller.h>
 #include <cameracv.h>
-#include "deeplearning.h"
+#include <deeplearning.h>
+
 namespace Ui {
 class MainWindow;
 }

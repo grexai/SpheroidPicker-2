@@ -22,10 +22,19 @@ public:
     ~arduinogcode(){}
 
     bool isconnected = false;
+     //end of message
 
-    QString EOM= "\r\n"; //end of message
-    //sets acceleration in: mmperminute
-    void setfeedrate(int acceleration); //G0
+    QString EOM= "\r\n";
+
+    //G0 F<speed>
+    void setfeedrate(int speed);
+
+    //M201
+    void setacceleration(int acc);
+    //M205
+    void setjerk(int jerk);
+
+    //G0
     // move Linear or interpolated default movement type is linear else Interpolated movement
     void moveAsync(float x, float y, float z); // G0
 
@@ -43,8 +52,6 @@ public:
 
     // G91
     void setrelativepositioning();
-
-    // to define bool3
 
     bool getEndstopstatus(); //M119
 

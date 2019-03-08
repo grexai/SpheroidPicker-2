@@ -9,9 +9,9 @@ int main(int argc, char *argv[])
 
 //    setstyle();
 
-
     MainWindow w;
     w.show();
 
     return a.exec();
+
 }

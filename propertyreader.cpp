@@ -17,6 +17,7 @@ std::string s_param(std::map<std::string, std::string>& settings, std::string pa
     return settings[param];
 
 }
+
 template<typename Out>
 
 void split(const std::string &s, char delim, Out result) {

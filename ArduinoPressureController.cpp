@@ -9,6 +9,8 @@
 
 const int arduinopressurecontroller::UnknownError = INT_MAX;
 
+
+//creates a pressure constantly in the system
 void arduinopressurecontroller::requestPressure(const float pressure){
     using namespace std;
     QString cmd= QString::number(kSetRequestedPressure).append(",").QString::number(pressure);
@@ -50,6 +52,7 @@ void arduinopressurecontroller::checkAckOrSetError(
     }
 }
 
+// returns with the pipette pressure value
 float arduinopressurecontroller::getPipettePressure(){
     using namespace  std;
     float pressureValue = 0.0f;
@@ -95,10 +98,13 @@ float arduinopressurecontroller::getPipettePressure(){
 
 }
 
+//creates a vaacum pulse for the requested time, and sends it to the pipette
+
 void arduinopressurecontroller::breakIn(const float vacuumValue,const float delaySeconds){
     using namespace  std;
 
-    QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).append(",")
-           .append(to_string(vacuumValue).append(",").append(to_string(delaySeconds))));
-   QString ans= this->acp_sc.sendAndReceive(cmd,this->EOM);
+    QString cmd =  QString::fromStdString(to_string(static_cast<int>(kBreakIn)).
+        append(",").append(to_string(vacuumValue).append(",").
+                           append(to_string(delaySeconds))));
+    QString ans= this->acp_sc.sendAndReceive(cmd,this->EOM);
 };

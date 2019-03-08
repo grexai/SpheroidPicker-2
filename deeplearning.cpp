@@ -2,9 +2,7 @@
 #include "deeplearning.h"
 deeplearning::deeplearning()
 {
-
-
-
+    this->setup_dnn_network();
 }
 
 deeplearning::~deeplearning(){}
@@ -58,8 +56,8 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
     // N - number of detected boxes
     // C - number of classes (excluding background)
     // HxW - segmentation shape
-    const int numDetections = outDetections.size[2];
-    const int numClasses = outMasks.size[1];
+    const int numDetections = static_cast<int>(outDetections.size[2]);
+//    const int numClasses = outMasks.size[1];
 
     outDetections = outDetections.reshape(1, outDetections.total() / 7);
     for (int i = 0; i < numDetections; ++i)
@@ -102,7 +100,7 @@ void deeplearning::resize(cv::Mat &input, cv::Mat &out)
         float n = input.cols / 512;
         std::cout << "mod: "<< n << std::endl;
         Mat rf;
-        cv::resize(input,rf,Size(512,(input.rows/n)));
+        cv::resize(input,rf,Size(512,static_cast<int>(input.rows/n)));
         std::cout << "fr/n" << (input.rows / n) << std::endl;
         Mat resized;
         resized = cv::Mat::zeros(cv::Size(512, 512), CV_8UC3);
@@ -152,12 +150,6 @@ void deeplearning::dnn_prediction(cv::Mat& input)
     using namespace dnn;
 
     std::cerr << "Read START" << std::endl;
-
-    // Load the network
-
-
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
     // Read image
 
     cv::Mat frame = input;
@@ -183,10 +175,9 @@ void deeplearning::dnn_prediction(cv::Mat& input)
     std::vector<cv::Mat> outs;
 
     {
-        std::cerr << "Start..." << std::endl;
-
+    std::cerr << "Start..." << std::endl;
         // CHRONO START
-        auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::system_clock::now();
 
     try
     {
@@ -201,7 +192,6 @@ void deeplearning::dnn_prediction(cv::Mat& input)
     }
 
     std::cerr << "ok" << std::endl;
-
 
     // Extract the bounding box and mask for each of the detected objects
     postprocess(frame, outs);

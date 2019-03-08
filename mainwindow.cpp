@@ -2,9 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
 #include <QMouseEvent>
-#include <iostream>
+//#include <iostream>
 #include <QStyle>
-#include <deeplearning.h>
 
 void setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -299,7 +298,6 @@ void MainWindow::on_p_xp_button_clicked()
 void MainWindow::on_p_xm_button_clicked()
 {
     ctrl->pipette_movex_sync(-(ui->pip_step_spinbox->value()));
-
 }
 
 void MainWindow::on_p_yp_button_clicked()
@@ -395,36 +393,43 @@ void MainWindow::screensample(){
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
-    cv::Mat Mimage = cv::Mat::zeros(hmax*1080,wmax*1920,CV_8UC3);
+    cv::Mat* Mimage = new Mat();
+    *Mimage =  cv::Mat::zeros(hmax*2100,wmax*2000,CV_8UC3);
+    std::vector<std::vector<cv::Mat>> scanvector;
     std::string folder ="Scandata/screening";
-    for (int j = 0; j< hmax; j++ )
+    for (int j = 1; j <= hmax; ++j )
     {
-        for (int  i = 0; i< wmax; i++)
+        for (int  i = 1; i<= wmax; ++i)
         {
-            QTextStream(stdout)<< "i" << i << endl;
+           // QTextStream(stdout)<< "i" << i << endl;
             ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            std::cout<< "c" << counter << std::endl;
+          //  std::cout<< "c" << counter << std::endl;
             std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
-            cv::Mat *tmpimg = (cameracv->get_current_frm().get());
+            std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
+            std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
+            ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
+            cv::Mat *tmpimg = cameracv->get_current_frm().get();
             imtools->saveImg(tmpimg,num2str.c_str());
 
             // mosaik creaton
-            for (int ii = i*1080; ii < tmpimg->rows; ++ii)
+        //    scanvector.at(i).at(j) = *tmpimg;
+            for (int ii = 1; ii < tmpimg->cols;++ii)
                 {
-                    for (int jj = j*1920; jj < tmpimg->cols; ++jj)
+                    for (int jj = 1; jj < tmpimg->rows; ++jj)
                     {
-                        Mimage.at<Vec3b>(ii, jj)[0] = tmpimg->at<Vec3b>(ii, jj)[0];
-                        Mimage.at<Vec3b>(ii, jj)[1] = tmpimg->at<Vec3b>(ii, jj)[1];
-                        Mimage.at<Vec3b>(ii, jj)[2] = tmpimg->at<Vec3b>(ii, jj)[2];
+                        Mimage->at<Vec3b>(jj+(j*1080),ii+(i*1920))[0] = tmpimg->at<Vec3b>(jj, ii)[0];
+                        Mimage->at<Vec3b>(jj+(j*1080),ii+(i*1920))[1] = tmpimg->at<Vec3b>(jj, ii)[1];
+                        Mimage->at<Vec3b>(jj+(j*1080),ii+(i*1920))[2] = tmpimg->at<Vec3b>(jj, ii)[2];
                     }
                 }
             //till this
             counter += 1;
         }
         ctrl->stage_set_speed(20000.0f);
-        ctrl->stage_move_to_y_sync(ypos+img_h_5p5x*j);
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
         ctrl->stage_set_speed(7500.0f);
+        imtools->saveImg(Mimage,"mozaic");
     }
 }
 
@@ -442,7 +447,6 @@ void MainWindow::on_pushButton_5_clicked()
 void MainWindow::on_actionSpheroid_picker_triggered()
 {
     ctrl->connect_microscope_unit();
-
 }
 
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
@@ -454,14 +458,13 @@ void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 
 void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 {
-     ctrl->stage_set_speed((float)arg1);
+     ctrl->stage_set_speed(static_cast<float>(arg1));
 }
 
 void MainWindow::on_predict_sph_clicked()
 {
     dl = new deeplearning;
     auto cfrm = cameracv->get_current_frm();
-    dl->setup_dnn_network();
     dl->dnn_prediction(*cfrm);
 }
 

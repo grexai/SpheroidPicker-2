@@ -77,6 +77,7 @@ void CameraCV::getCameraframe(){
     }
 }
 
+//starts an endless loop on a new thread,
 void CameraCV::spawnCameraLoop()
 {
    // mActive= true;
@@ -93,8 +94,6 @@ cv::VideoCapture* CameraCV::getCamera(){
 void CameraCV::freeframe(){
     delete this->frame;
 }
-
-
 
 void CameraCV::setimagewidth(float& imwidth){
 

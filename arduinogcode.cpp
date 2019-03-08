@@ -7,13 +7,27 @@
 //*********************************//
 
 
-//setting up feedrate (speed)
-void arduinogcode::setfeedrate(int acceleration){
+// Sets the speed in the (in current units-per-second)
+void arduinogcode::setfeedrate(int speed){
     QString msg = "G0F";
-    msg= msg.append(QString::number(acceleration)).append(EOM);
+    msg= msg.append(QString::number(speed)).append(EOM);
     apipc_sc.send(msg);
 }
 
+//Set the max acceleration for all axes (in current units-per-second squared)
+void arduinogcode::setacceleration(int acc){
+    QString msg = "M201";
+    msg= msg.append(QString::number(acc)).append(EOM);
+    apipc_sc.send(msg);
+}
+//Unusable yet
+void arduinogcode::setjerk(int jerk){
+    QString msg = "M205";
+    msg= msg.append(QString::number(jerk)).append(EOM);
+    apipc_sc.send(msg);
+}
+
+// Sends one or more axis to the initial position
 void arduinogcode::goHome(bool x, bool y, bool z){
     QString msg = "G28";
     if (x){
@@ -29,8 +43,8 @@ void arduinogcode::goHome(bool x, bool y, bool z){
     apipc_sc.send(msg);
 }
 
+//Asynchronous movements
 void arduinogcode::moveAsync(float x, float y, float z){
-
     QString msg = "G1";
     msg.append("X").append(QString::number(x));
     msg.append("Y").append(QString::number(y));
@@ -39,6 +53,8 @@ void arduinogcode::moveAsync(float x, float y, float z){
     apipc_sc.send(msg);
 }
 
+
+//Synchronous movements
 void arduinogcode::moveToXSync(float x_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
@@ -70,15 +86,13 @@ void arduinogcode::setrelativepositioning(){
     apipc_sc.send(msg.append(EOM));
 }
 
-
 // extracting the coordinates from the answer of GCODE interpreter
 //                                            0,1,2
 // and returns with coordinate vector<float> (x,y,z)
 
 std::vector<float> arduinogcode::getcurrentpos(){
-    QByteArray answer;
     QString msg = "M114";
-    answer=apipc_sc.sendAndReceive(msg,EOM);
+    QByteArray answer=apipc_sc.sendAndReceive(msg,EOM);
     std::vector<float> coors;
     QString s(answer);
     //split strings by ":"
@@ -89,6 +103,7 @@ std::vector<float> arduinogcode::getcurrentpos(){
     // tries to get the coordinates
     //recall the function if echo thrown, else error
     QRegExp findecho("(echo:*)");
+
     if(findecho.isEmpty())
     {
         for (int i=1;i<4;i++)
@@ -101,22 +116,21 @@ std::vector<float> arduinogcode::getcurrentpos(){
             }
             catch (...)
             {
-            std::cout << "extractiing cooordinates error error " << std::endl;
-            //error extracting coord
+            std::cout << "extractiing cooordinates error" << std::endl;
             }
         }
         return coors;
     }
     else if(!findecho.isEmpty())
     {
+        std::cout << "extractiing cooordinates error retrial..." << std::endl;
         return this->getcurrentpos();
     }
     else
     {
-        std::cerr << "invalid coordinates..." << std::endl;
-        return coors = {-1,-1,-1};
+        throw  "invalid coordinates...";
     }
-    return coors;
+   // return coors;
 }
 
 //Moves the machine to an XYZ coordinate with syncronized moving, coordinates sent
@@ -130,12 +144,10 @@ void arduinogcode::MoveToXYZSync(std::vector<float> coords)
     moveToYSync(coords.at(1));  //Y
 }
 
-// A function will set manually the machines position
+// A function will override manually the machines position
 
 void arduinogcode::setPipetteposition()
 {
-
-
 
 }
 

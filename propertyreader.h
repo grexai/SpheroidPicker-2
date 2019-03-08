@@ -22,8 +22,6 @@ public:
     void apply_settings(std::map<std::string, std::string>& settings);
     void read_settings(std::string settings_file_path,
                        std::map<std::string, std::string>& settings);
-
-
     props cfg;
 };
 

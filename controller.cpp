@@ -211,8 +211,6 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
        | y1  y2  y3 |
 
     *************************************************/
-
-
     // pushing saved pipette positions to a Matrix
     cv::Mat pipette_mat;
     pipette_mat.push_back(*pos1);
@@ -270,36 +268,37 @@ bool controller::connect_tango_stage(){
             }
     }catch (ahm::Exception & ex) {
         // a hardware model exception occured:
-        std::cout << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << endl;
+        std::cout << "a hardware model exception occurred: error code: " << ex.errorClass() << ", error code: " << ex.errorCode() << ", text: " << ex.errorText() << std::endl;
         return false;
     }
+    return false;
 }
 
 void controller::stage_move_to_x_async(const int x)
 {
-    stage->XAxis().moveToAsync((iop::int32)x);
+    stage->XAxis().moveToAsync(static_cast<iop::int32>(x));
 }
 
 void controller::stage_move_to_y_async(const int y)
 {
-    stage->YAxis().moveToAsync(((iop::int32)y));
+    stage->YAxis().moveToAsync(static_cast<iop::int32>(y));
 }
 
 
 void controller::stage_move_to_x_sync(const int x)
 {
-    stage->XAxis().moveTo((iop::int32)x);
+    stage->XAxis().moveTo(static_cast<iop::int32>(x));
 }
 
 void controller::stage_move_to_y_sync(const int y)
 {
-    stage->YAxis().moveTo(((iop::int32)y));
+    stage->YAxis().moveTo(static_cast<iop::int32>(y));
 }
 
 void controller::stage_set_speed(const float speed)
 {
-    stage->XAxis().setCurrentSpeed((iop::int32)speed);
-    stage->YAxis().setCurrentSpeed((iop::int32)speed);
+    stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+    stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
 }
 
 int controller::stage_get_x_speed()

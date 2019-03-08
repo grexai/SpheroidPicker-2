@@ -1362,7 +1362,7 @@ Stage</string>
      </rect>
     </property>
     <property name="title">
-     <string>Imageing</string>
+     <string>Imaging</string>
     </property>
     <widget class="QPushButton" name="save_image_button">
      <property name="geometry">
@@ -1426,6 +1426,32 @@ Stage</string>
       <string>Pick up selected</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="pushButton_6">
+    <property name="geometry">
+     <rect>
+      <x>1730</x>
+      <y>540</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>View scan</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="current_scaningpos">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>600</y>
+      <width>151</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Scaning pos: </string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
