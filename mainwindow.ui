@@ -1453,6 +1453,19 @@ Stage</string>
      <string>Scaning pos: </string>
     </property>
    </widget>
+   <widget class="QProgressBar" name="scanning_progress">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>640</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>24</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
