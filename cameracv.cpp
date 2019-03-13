@@ -80,10 +80,14 @@ void CameraCV::getCameraframe(){
 //starts an endless loop on a new thread,
 void CameraCV::spawnCameraLoop()
 {
+    float w =1920;
+    float h = 1080;
+    QTextStream(stdout)<< "setting sizes";
+    this->setimagewidth(w);
+    this->setimageheight(h);
    // mActive= true;
     mBGThread = std::thread(&CameraCV::getCameraframe, this);
   //  mBGThread.detach();
-  //  std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //ez elinditja a hatter szalat
 
 }
 

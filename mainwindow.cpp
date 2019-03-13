@@ -46,8 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
     ctrl = new controller;
+    ui->scanning_progress->setValue(static_cast<int>(m_status));
     setdarkstyle();
-    std::cout << "AKOS EDITION v1.1" << std::endl;
+   // std::cout << "AKOS EDITION v1.1" << std::endl;
 }
 
 MainWindow::~MainWindow()
@@ -62,7 +63,7 @@ void MainWindow::update_currentpressure(){
     }else
     {
 */
-    ui->lcdNumber->display( QString::number(ctrl->get_pressure()));
+    ui->lcdNumber->display( QString::number(static_cast<int>(ctrl->get_pressure())));
    // ui->lcdNumber->display( "13");
     //}
 }
@@ -152,7 +153,6 @@ void MainWindow::update_window()
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     calib_frame_view(displayfrm);
     delete qframe;
-    //qframe = new QImage((const unsigned char*) displayfrm.data,displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
@@ -179,11 +179,7 @@ void MainWindow::on_Campushbtn_clicked()
               }
 
         ui->Campushbtn->setText("Camera off");
-        float w =1920;
-        float h = 1080;
-        QTextStream(stdout)<< "setting sizes";
-        cameracv->setimagewidth(w);
-        cameracv->setimageheight(h);
+
         setMouseTracking(true);
 
         ui->graphicsView->installEventFilter(this);
@@ -265,9 +261,9 @@ void MainWindow::on_pc_pulse_button_clicked()
 void MainWindow::on_get_coors_pushButton_clicked()
 {
     std::vector<float> randx = ctrl->pipette_get_coordinates();
-    ui->xc_label->setText("X: " + QString::number(randx.at(0),'f',2));
-    ui->yc_label->setText("Y: " + QString::number(randx.at(1),'f',2));
-    ui->zc_label->setText("Z: " + QString::number(randx.at(2),'f',2));
+    ui->xc_label->setText("X: " + QString::number(static_cast<double>(randx.at(0)),'f',2));
+    ui->yc_label->setText("Y: " + QString::number(static_cast<double>(randx.at(1)),'f',2));
+    ui->zc_label->setText("Z: " + QString::number(static_cast<double>(randx.at(2)),'f',2));
 }
 
 void MainWindow::on_s_xp_button_clicked()
@@ -384,57 +380,46 @@ void MainWindow::screensample(){
     //X 710798   Y-805545
     int xpos=ctrl->stage_get_x_coords();
     int ypos=ctrl->stage_get_y_coords();
-    std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-    int platesize= 300000;     //    100nm
+ //   std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
+    int platesize= 350000;     //    100nm
     float  img_w_5p5x = 27426; //    100nm
-    float  img_h_5p5x = 19466; //    100nm
+    float  img_h_5p5x = 15421;//19466; //    100nm
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
-    cv::Mat* Mimage = new Mat();
-    *Mimage =  cv::Mat::zeros((hmax*2000),(wmax*1100),CV_8UC3);
-    std::vector<std::vector<cv::Mat>> scanvector;
+
+
+
     std::string folder ="Scandata/s_";
-    for (int j = 1; j <= hmax; ++j )
+    for (int j = 0; j < hmax; ++j )
     {
-        for (int  i = 1; i<= wmax; ++i)
+        for (int  i = 0; i< wmax; ++i)
         {
-           // QTextStream(stdout)<< "i" << i << endl;
+            //QTextStream(stdout)<< "i" << i << endl;
             ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-          //  std::cout<< "c" << counter << std::endl;
-            std::string num2str= folder + "_W" + std::to_string(i)+ "_H" + std::to_string(j);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            //std::cout<< "c" << counter << std::endl;
+            int leading = 2 ;
+            std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
             std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
             std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
             ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
+            m_status = static_cast<int>((i*j)/(hmax*wmax))*100;
+            //
+            auto tmp = cameracv->get_current_frm();
+            imtools->saveImg(tmp.get(),num2str.c_str());
+            scanvector.push_back(*tmp.get());
 
-            // ui->scanning_progress->setValue((i*j)/(hmax*wmax));
-            cv::Mat* tmpimg = new cv::Mat();
-            tmpimg = cameracv->get_current_frm().get();
-            imtools->saveImg(tmpimg,num2str.c_str());
-
-            // mosaik creaton
-        //    scanvector.at(i).at(j) = *tmpimg;
-            for (int ii = 1; ii < tmpimg->cols;++ii)
-            {
-                    for (int jj = 1; jj < tmpimg->rows; ++jj)
-                    {
-                        Mimage->at<Vec3b>((jj+(j*1080)),(ii+(i*1920)))[0] = tmpimg->at<Vec3b>(jj, ii)[0];
-                        Mimage->at<Vec3b>((jj+(j*1080)),(ii+(i*1920)))[1] = tmpimg->at<Vec3b>(jj, ii)[1];
-                        Mimage->at<Vec3b>((jj+(j*1080)),(ii+(i*1920)))[2] = tmpimg->at<Vec3b>(jj, ii)[2];
-                    }
-            }
-            //till this
             counter += 1;
           //  delete tmpimg;
         }
-        ctrl->stage_set_speed(20000.0f);
+        ctrl->stage_set_speed(10000.0f);
         ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-        ctrl->stage_set_speed(7500.0f);
+        ctrl->stage_set_speed(7000.0f);
     }
-    imtools->saveImg(Mimage,"mozaic");
+
 }
 
 void MainWindow::on_start_screening_clicked()
@@ -489,3 +474,31 @@ void MainWindow::on_pickup_sph_clicked()
 }
 
 
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    using namespace  cv;
+    //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
+    int platesize = 350000;     //    100nm
+    float  img_w_5p5x = 27426; //    100nm
+    float  img_h_5p5x = 15421;//19466; //    100nm
+    int wmax = static_cast<int>(platesize / img_w_5p5x); // um
+    int hmax = static_cast<int>(platesize / img_h_5p5x); // um
+    cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
+    for (int i = 0; i < hmax; ++i) {
+        for (int j = 0; j < wmax; ++j) {
+
+            for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
+            {
+                for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
+                {
+                    Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
+                    Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
+                    Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
+                }
+            }
+        }
+    }
+    imtools->saveImg(Mimage,"mozaic");
+    scanvector.clear();
+}

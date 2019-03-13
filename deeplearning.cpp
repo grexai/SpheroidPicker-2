@@ -1,5 +1,6 @@
 
 #include "deeplearning.h"
+
 deeplearning::deeplearning()
 {
     this->setup_dnn_network();

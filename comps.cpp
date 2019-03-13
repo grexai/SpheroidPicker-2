@@ -22,15 +22,6 @@ cv::Mat geticenter(const cv::Mat& imagepoints){
     return icenter;
 }
 
-cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims){
-    int l = in_vec.size();
-    int h= coordims;
-    int w= l/coordims;
-    cv::Mat outputMatrix;
-
-    outputMatrix.reshape(w,h);
-    return outputMatrix;
-}
 
 cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints,centers &centers){
     std::cout<< "input cpp :"<< std::endl << cppoints << std::endl

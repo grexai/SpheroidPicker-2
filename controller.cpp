@@ -69,8 +69,6 @@ void controller::spawn_pressure_thread()
  //   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
-
-
 class pipette_driver: public arduinogcode{
 public:
     void movex(){
@@ -83,7 +81,9 @@ public:
 //pipette_driver* pd(arduinogcode apic);
 class i_stagecontroll {
 public:
-    virtual void move_x()= 0;
+    i_stagecontroll(){}
+    virtual ~i_stagecontroll(){}
+    virtual void move_x() = 0;
 
 };
 
@@ -101,8 +101,7 @@ public:
     }
 };
 
-
-i_stagecontroll* asd  = new TangoStage();
+//i_stagecontroll* asd  = new TangoStage();
 //asd->move_x
     //i_stagecontroll* asd  = new TangoStage();
     //asd->move_x();
@@ -284,7 +283,6 @@ void controller::stage_move_to_y_async(const int y)
     stage->YAxis().moveToAsync(static_cast<iop::int32>(y));
 }
 
-
 void controller::stage_move_to_x_sync(const int x)
 {
     stage->XAxis().moveTo(static_cast<iop::int32>(x));
@@ -337,7 +335,6 @@ std::vector<int>  controller::stage_get_coords()
     return coords;
 }
 
-
 void controller::stage_move_x_async(const int x)
 {
    int x0 = this->stage_get_x_coords();
@@ -378,8 +375,8 @@ void controller::stage_go_center()
     iop::int32 y0 = stage->YAxis().getMinPosition();
     iop::int32 y1 = stage->YAxis().getMaxPosition();
 
-    iop::int32 x = x0 + (iop::int32) ( (x1-x0)/2.0);
-    iop::int32 y = y0 + (iop::int32) ( (y1-y0)/2.0);
+    iop::int32 x = x0 + static_cast<iop::int32>( (x1-x0)/2.0);
+    iop::int32 y = y0 + static_cast<iop::int32>( (y1-y0)/2.0);
     stage->moveToAsync(x,y, false);
 }
 

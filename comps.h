@@ -18,7 +18,6 @@ cv::Mat getpcenter(const cv::Mat& cppoints);
 
 cv::Mat geticenter(const cv::Mat& imagepoints);
 
-cv::Mat coorsToMatrix(std::vector<float> in_vec, int coordims);
 
 cv::Mat calcTMatrix(cv::Mat& cppoints,cv::Mat& imagepoints, centers& centers);
 

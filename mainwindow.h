@@ -159,6 +159,8 @@ private slots:
 
      void pickup_sph();
 
+     void on_pushButton_6_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -168,9 +170,9 @@ private:
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
     deeplearning* dl= nullptr;
-
+     std::vector<cv::Mat> scanvector;
     //TEST
-
+    float m_status = 0;
     QTimer *timer1= nullptr ;
     QThread *thread1= nullptr;
 };
