@@ -102,10 +102,10 @@ std::vector<float> arduinogcode::getcurrentpos(){
     // experiment to find echo...
     // tries to get the coordinates
     //recall the function if echo thrown, else error
-    QRegExp findecho("(echo:*)");
+    QRegExp findecho("(echo:?)");
 
-    if(findecho.isEmpty())
-    {
+   // if(findecho.isEmpty())
+   // {
         for (int i=1;i<4;i++)
         {
             xRegExp.indexIn( resultStrings.at(i));
@@ -119,18 +119,18 @@ std::vector<float> arduinogcode::getcurrentpos(){
             std::cout << "extractiing cooordinates error" << std::endl;
             }
         }
-        return coors;
-    }
+      //  return coors;
+/*    }
     else if(!findecho.isEmpty())
-    {
-        std::cout << "extractiing cooordinates error retrial..." << std::endl;
+ //   {
+ //       std::cout << "extractiing cooordinates error retrial..." << std::endl;
         return this->getcurrentpos();
     }
     else
     {
         throw  "invalid coordinates...";
-    }
-   // return coors;
+    }*/
+   return coors;
 }
 
 //Moves the machine to an XYZ coordinate with syncronized moving, coordinates sent

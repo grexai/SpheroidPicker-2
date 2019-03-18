@@ -94,6 +94,53 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 }
 
+void imagetools::getobjectprops(cv::Mat* input){
+    using namespace cv;
+    using namespace std;
+    Mat canny_output;
+    RNG rng(12345);
+      vector<vector<Point> > contours;
+      vector<Vec4i> hierarchy;
+
+      /// Detect edges using canny
+      Canny( *input, canny_output, 0, 100, 3 );
+      /// Find contours
+      findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+      /// Get the moments
+      vector<Moments> mu(contours.size() );
+      for( int i = 0; i < contours.size(); i++ )
+         { mu[i] = moments( contours[i], false ); }
+
+      ///  Get the mass centers:
+      vector<Point2f> mc( contours.size() );
+      for( int i = 0; i < contours.size(); i++ )
+         { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+
+      /// Draw contours
+      Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+      for( int i = 0; i< contours.size(); i++ )
+         {
+           Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+           drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+           circle( drawing, mc[i], 4, color, -1, 8, 0 );
+         }
+
+      /// Show in a window
+      namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
+      imshow( "Contours", drawing );
+
+      /// Calculate the area with the moments 00 and compare with the result of the OpenCV function
+      printf("\t Info: Area and Contour Length \n");
+      for( int i = 0; i< contours.size(); i++ )
+         {
+           printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength( contours[i], true ) );
+           Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+           drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+           circle( drawing, mc[i], 4, color, -1, 8, 0 );
+         }
+}
+
 void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
 {
    cv::circle(img,point, 5, cv::Scalar(0,0,255), -1);
@@ -105,13 +152,9 @@ void imagetools::saveImg(cv::Mat* outimg, std::string outname)
     outname = outname + ".png";
     QTextStream(stdout) << QString::fromStdString(outname);
     std::vector<int> compression_params;
-  //  cv::Mat temp = currentFrame.get()->clone();
-    //CV_IMWRITE_PNG_COMPRESSION
     compression_params.push_back(16);
     compression_params.push_back(0);
     imwrite(outname, *outimg, compression_params);
 //    cout << "image saved as " << outname.str() << endl;
 
 }
-
-//void imagetools::
