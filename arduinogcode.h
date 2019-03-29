@@ -2,6 +2,8 @@
 #define PIPETTERCONTROLLER_H
 #include "serialcom.h"
 #include "types.h"
+#include <exception>
+#include <iostream>
 //#include <stagecontroller.h>
 class arduinogcode
 {
@@ -25,7 +27,7 @@ public:
      //end of message
 
     QString EOM= "\r\n";
-
+    int m_counter= 0;
     //G0 F<speed>
     void setfeedrate(int speed);
 
@@ -60,11 +62,19 @@ public:
     void MoveToXYZSync(std::vector<float> coords);
 
     void setPipetteposition();
-
+    class ardinogcodeexeption: public std::exception{
+    virtual  const char* what() const throw()
+        {
+            return "coordinate extraction error";
+        }
+    }ardinogcodeexeption;
 protected:
 
     serialcom apipc_sc;
 
 };
+
+
+
 
 #endif // PIPETTERCONTROLLER_H

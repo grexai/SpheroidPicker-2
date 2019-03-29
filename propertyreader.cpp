@@ -5,7 +5,7 @@ propertyreader::propertyreader()
     //get settings from file
 }
 float f_param(std::map<std::string, std::string>& settings, std::string param) {
-    return atof(settings[param].c_str());
+    return static_cast<float>(atof(settings[param].c_str()));
 }
 
 int i_param(std::map<std::string, std::string>& settings, std::string param) {
@@ -41,7 +41,7 @@ std::vector<std::string> split(const std::string & s, char delim)
 void propertyreader::read_settings(std::string settings_file_path,
                     std::map<std::string, std::string>& settings) {
         using namespace  std;
-    std::	cout << "Reading settings from file: " << settings_file_path << std::endl;
+    std::cout << "Reading settings from file: " << settings_file_path << std::endl;
             ifstream input(settings_file_path);
             if (!input) {
                     throw 20;
@@ -60,6 +60,9 @@ void propertyreader::read_settings(std::string settings_file_path,
 void propertyreader::apply_settings(std::map<std::string, std::string>& settings) {
     cfg.port_pipette=s_param(settings,"ports.pipette");
     cfg.port_pressurecontrooler=s_param(settings,"ports.pressurecontroller");
+    cfg.model_weights = s_param(settings,"dl.modellweights");
+    cfg.textGraph = s_param(settings,"dl.textgraph");
+    cfg.classesFile = s_param(settings,"dl.classes");
 }
 
 

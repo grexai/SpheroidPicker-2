@@ -31,3 +31,9 @@ void calibratedialog::on_buttonBox_accepted()
    Iscalibrating = false;
    this->~calibratedialog();
 }
+
+void calibratedialog::on_calibratedialog_destroyed()
+{
+   Iscalibrating = false;
+   this->~calibratedialog();
+}

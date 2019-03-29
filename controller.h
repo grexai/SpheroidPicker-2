@@ -8,16 +8,17 @@
 #include <comps.h>
 #include <QString>
 #include <QSerialPort>
-#include <propertyreader.h>
+
 #include <QThread>
 class controller
 {
 public:
-    controller(){
+    controller( )
+    {
 
     }
-    ~controller(){
-
+    ~controller()
+    {
 
     }
     void getTmatrix();
@@ -28,7 +29,7 @@ public:
 
     // pressurecontroller stuff
 
-    bool connect_pressure_controller();
+    bool connect_pressure_controller(std::string& port);
 
     void request_pressure(const float pressure);
 
@@ -44,7 +45,7 @@ public:
 
     void spawn_pressure_thread();
 
-    bool connect_pipette_controller();
+    bool connect_pipette_controller(std::string& port);
 
     void pipette_movex_sync(const float x);
 
@@ -116,11 +117,11 @@ public:
 
     void stage_run_iniciatlions();
 
-    bool connect_microscope_unit();
+    bool connect_microscope_unit(std::string &pa, std::string &pc);
 
     bool connect_screening_microscope();
 protected:
-    propertyreader* propreader=nullptr;
+    //propertyreader* propreader=nullptr;
     //serial ports
     QSerialPort QSP_apc;
     QSerialPort QSP_apipc;

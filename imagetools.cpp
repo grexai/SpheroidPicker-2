@@ -121,9 +121,12 @@ void imagetools::getobjectprops(cv::Mat* input){
       Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
       for( int i = 0; i< contours.size(); i++ )
          {
-           Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-           drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
-           circle( drawing, mc[i], 4, color, -1, 8, 0 );
+          double area = contourArea(contours[i]);
+          double arclength = arcLength(contours[i], true);
+          double circularity = 4 * CV_PI * area / (arclength * arclength);
+          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+          drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+          circle( drawing, mc[i], 4, color, -1, 8, 0 );
          }
 
       /// Show in a window

@@ -3,10 +3,11 @@
 
 // Pressure controller
 
-bool controller::connect_pressure_controller()
+bool controller::connect_pressure_controller(std::string& port)
 {
-    QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
-    apc = new arduinopressurecontroller(QSP_apc,port);
+    QString p1= QString::fromStdString(port);
+  //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
+    apc = new arduinopressurecontroller(QSP_apc,p1);
 
     if (apc->isconnected == true)
     {
@@ -107,10 +108,11 @@ public:
     //asd->move_x();
 
 // Pipette
-bool controller::connect_pipette_controller()
+bool controller::connect_pipette_controller(std::string& port)
 {
-    QString port = QString::fromStdString(propreader->cfg.port_pipette);
-    apipc = new arduinogcode(QSP_apipc,port);
+
+    QString p1 = QString::fromStdString(port);
+    apipc = new arduinogcode(QSP_apipc,p1);
     if (apipc->isconnected == true)
     {
        QTextStream(stdout)<< "Pipette connected!"<< endl;
@@ -466,14 +468,15 @@ void controller::stage_run_iniciatlions()
     std::cout << "current speed is " << stage->XAxis().toMicronsPerSecond(stage->XAxis().getCurrentSpeed()) << " microns/sec" << std::endl;
 }
 
-bool controller::connect_microscope_unit()
+bool controller::connect_microscope_unit(std::string &pa, std::string &pc)
 {
+    /*
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
-    propreader->apply_settings(settings);
-    this->connect_pipette_controller() ;
-    this->connect_pressure_controller();
+    propreader->apply_settings(settings);*/
+    this->connect_pipette_controller(pa) ;
+    this->connect_pressure_controller(pc);
     this->connect_tango_stage();
 //  this->spawn_pressure_thread();
     return true;

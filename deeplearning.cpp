@@ -3,7 +3,7 @@
 
 deeplearning::deeplearning()
 {
-    this->setup_dnn_network();
+
 }
 
 deeplearning::~deeplearning(){}
@@ -119,20 +119,20 @@ void deeplearning::resize(cv::Mat &input, cv::Mat &out)
 }
 
 //Setup a DNN network
-void deeplearning::setup_dnn_network()
+void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::string t_g)
 {
     using namespace cv;
     using namespace std;
     using namespace dnn;
 
     // Load names of classes
-    string classesFile = "d:/dev/cpp/mscoco_labels.names";
+    string classesFile = cf;          //"d:/dev/cpp/mscoco_labels.names";
     ifstream ifs(classesFile.c_str());
     string line;
     while (getline(ifs, line)) classes.push_back(line);
 
-    String modelWeights = "d:/dev/cpp/model.pb";
-    String textGraph = "d:/dev/cpp/model.pbtxt";
+    String modelWeights =model_w;    // "d:/dev/cpp/model.pb";
+    String textGraph = t_g;          //"d:/dev/cpp/model.pbtxt";
     net = new cv::dnn::Net();
     *net = readNetFromTensorflow(modelWeights, textGraph);
     std::cerr << "Read OK" << std::endl;
@@ -206,10 +206,9 @@ void deeplearning::dnn_prediction(cv::Mat& input)
     }
 
     Mat detectedFrame;
-
     frame.convertTo(detectedFrame, CV_8U);
-
-    imshow("detect object", detectedFrame);
-
+    cv::namedWindow("detected object", WINDOW_KEEPRATIO);
+    imshow("detected object", detectedFrame);
+    cv::resizeWindow("detected object", 1280, 720);
     waitKey(1);
 }

@@ -15,6 +15,8 @@
 #include <controller.h>
 #include <cameracv.h>
 #include <deeplearning.h>
+#include <propertyreader.h>
+
 
 namespace Ui {
 class MainWindow;
@@ -47,15 +49,16 @@ public:
     void porttest();
     cv::Mat TM;
 
-
 signals:
     // The signal of transmit the coordinates of the mouse position
-    void signalTargetCoordinate(QPointF point);
-
+   // void signalTargetCoordinate(QPointF point);
+    void prog_changed(int progress);
 public slots:
+    void set_progressbar( int value );
 
 
 protected:
+    int m_progvalue;
     controller* ctrl = nullptr;
     CameraCV* cameracv = nullptr;
     imagetools* imtools= nullptr;
@@ -78,6 +81,7 @@ private slots:
      void update_currentpressure();
 
      void MoveAction();
+     void keyPressEvent( QKeyEvent* e );
 
      void show_currentpressure();
 
@@ -161,6 +165,8 @@ private slots:
 
      void on_pushButton_6_clicked();
 
+     void on_analyse_scan_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -171,6 +177,7 @@ private:
     calibratedialog *calib= nullptr;
     deeplearning* dl= nullptr;
      std::vector<cv::Mat> scanvector;
+    propertyreader* propreader = nullptr;
     //TEST
     float m_status = 0;
     QTimer *timer1= nullptr ;

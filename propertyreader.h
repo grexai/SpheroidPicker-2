@@ -12,6 +12,9 @@
 typedef struct props{
     std::string port_pipette;
     std::string port_pressurecontrooler;
+    std::string model_weights;
+    std::string textGraph;
+    std::string classesFile;
 }props;
 class propertyreader
 {

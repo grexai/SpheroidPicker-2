@@ -48,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ctrl = new controller;
     ui->scanning_progress->setValue(static_cast<int>(m_status));
     setdarkstyle();
+
+
+   // qApp->installEventFilter(this);
    // std::cout << "AKOS EDITION v1.1" << std::endl;
 }
 
@@ -99,11 +102,31 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
             return true;
          }
     }
-}
 
+}
+void MainWindow::keyPressEvent( QKeyEvent* e )
+{
+    switch( e->key() )
+    {
+    case Qt::Key_Plus: on_p_zp_button_clicked(); break;
+    case Qt::Key_Minus: on_p_zm_btton_clicked();break;
+    case Qt::Key_2: on_p_xm_button_clicked();break;
+    case Qt::Key_8: on_p_xp_button_clicked();break;
+    case Qt::Key_4: on_p_ym_button_clicked();break;
+    case Qt::Key_6: on_p_yp_button_clicked();break;
+    case Qt::Key_W:on_s_yp_button_clicked(); break;
+    case Qt::Key_S: on_s_ym_button_clicked();break;
+    case Qt::Key_A:on_s_xm_button_clicked();break;
+    case Qt::Key_D:on_s_xp_button_clicked();break;
+    case Qt::Key_Space:on_pc_pulse_button_clicked();break;
+    case Qt::Key_Escape: on_actionExit_triggered();break;
+    default: ;
+    }
+    QMainWindow::keyPressEvent( e );
+}
 void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
-    if (calib->Iscalibrating == 1)
+    if (calib->Iscalibrating == true )
     {
         Point pmid = Point(disp.cols/2,100 );
 
@@ -160,7 +183,6 @@ void MainWindow::update_window()
 
 void MainWindow::on_Campushbtn_clicked()
 {
-
     cameracv = new CameraCV(cameraIndex);
     if (Iscameraopen==true){
         ui->Campushbtn->setText("Camera on");
@@ -288,11 +310,13 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
+     QTextStream(stdout)<< "+ presseeed" << endl;
     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
 {
+    QTextStream(stdout)<< "- presseeed" << endl;
     ctrl->pipette_movex_sync(-(ui->pip_step_spinbox->value()));
 }
 
@@ -314,6 +338,7 @@ void MainWindow::on_p_zp_button_clicked()
 
 void MainWindow::on_p_zm_btton_clicked()
 {
+    QTextStream(stdout)<< "2 presseeed" << endl;
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
 }
 
@@ -369,63 +394,90 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
     calib->show();
 }
 
-void MainWindow::screensample(){
+void MainWindow::screensample()
+{
     using namespace  cv;
-    if (QDir().exists("Scandata")){
+    int platesize= 350000;      //    100nm
+    float  img_w_5p5x = 27426;  //    100nm
+    float  img_h_5p5x = 15421;  //    100nm
+
+    std::string folder = "Scandata_";
+    std::string datetime = "_";
+    std::stringstream ss;
+    ss << (platesize/10000);
+    std::string plate_size_mm = ss.str();
+    folder.append(plate_size_mm).append("mm_");
+    datetime.append((QString::number(QDate::currentDate().year())).toStdString());
+    datetime.append((QString::number(QDate::currentDate().month())).toStdString());
+    datetime.append((QString::number(QDate::currentDate().day())).toStdString()+"-");
+    datetime.append((QString::number(QTime::currentTime().hour())).toStdString());
+    datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
+    folder.append(datetime+"/");
+    if (QDir().exists(folder.c_str())){
         QTextStream(stdout) << "this folder already folder exists"<< endl;
     }
     else{
-        QDir().mkdir("Scandata");
+        QTextStream(stdout)<< folder.c_str()<< "created" << endl;
+        QDir().mkdir(folder.c_str());
     }
-    //X 710798   Y-805545
+    QTextStream(stdout)<< "starting..";
     int xpos=ctrl->stage_get_x_coords();
     int ypos=ctrl->stage_get_y_coords();
- //   std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-    int platesize= 350000;     //    100nm
-    float  img_w_5p5x = 27426; //    100nm
-    float  img_h_5p5x = 15421;//19466; //    100nm
+ // std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
+
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
+    float p_v=0.0f;
 
+    folder.append("s_"+datetime);
 
-
-    std::string folder ="Scandata/s_";
     for (int j = 0; j < hmax; ++j )
     {
         for (int  i = 0; i< wmax; ++i)
         {
-            //QTextStream(stdout)<< "i" << i << endl;
             ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
+            p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
+            prog_changed(static_cast<int>(p_v));
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            //std::cout<< "c" << counter << std::endl;
             int leading = 2 ;
             std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
             std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
             std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
+
             ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
-            m_status = static_cast<int>((i*j)/(hmax*wmax))*100;
-            //
             auto tmp = cameracv->get_current_frm();
             imtools->saveImg(tmp.get(),num2str.c_str());
             scanvector.push_back(*tmp.get());
 
             counter += 1;
-          //  delete tmpimg;
+        //  delete tmpimg;
         }
         ctrl->stage_set_speed(10000.0f);
         ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
         ctrl->stage_set_speed(7000.0f);
     }
-
 }
 
 void MainWindow::on_start_screening_clicked()
 {
+    connect(this, SIGNAL(prog_changed(int)),
+            this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
+
     std::thread t1(&MainWindow::screensample,this);
+
     t1.detach();
+}
+
+void MainWindow::set_progressbar( int value ){
+    if ( value != m_progvalue ) {
+        m_progvalue = value;
+        ui->scanning_progress->setValue(m_progvalue );
+        QTextStream(stdout)<< m_progvalue;
+        emit prog_changed( m_progvalue );
+    }
 }
 
 void MainWindow::on_pushButton_5_clicked()
@@ -435,7 +487,13 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_actionSpheroid_picker_triggered()
 {
-    ctrl->connect_microscope_unit();
+    std::map<std::string, std::string> settings;
+    propreader = new propertyreader;
+    propreader->read_settings("config.txt",settings);
+    propreader->apply_settings(settings);
+    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+    dl = new deeplearning;
+    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
 }
 
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
@@ -461,7 +519,7 @@ void MainWindow::pickup_sph()
 {
     QTextStream(stdout) << "pciking up" << endl;
     ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     ctrl->pipette_home_z();
@@ -484,10 +542,10 @@ void MainWindow::on_pushButton_6_clicked()
     float  img_h_5p5x = 15421;//19466; //    100nm
     int wmax = static_cast<int>(platesize / img_w_5p5x); // um
     int hmax = static_cast<int>(platesize / img_h_5p5x); // um
-    cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    for (int i = 0; i < hmax; ++i) {
-        for (int j = 0; j < wmax; ++j) {
 
+    cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
+    for (int i = 1; i <= hmax; ++i) {
+        for (int j = 1; j <= wmax; ++j) {
             for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
@@ -499,6 +557,14 @@ void MainWindow::on_pushButton_6_clicked()
             }
         }
     }
+
     imtools->saveImg(Mimage,"mozaic");
-    scanvector.clear();
+    //scanvector.clear();
+}
+
+void MainWindow::on_analyse_scan_clicked()
+{
+    for (int i=0; i<scanvector.size();i++){
+        dl->dnn_prediction(scanvector.at(i));
+    }
 }

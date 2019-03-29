@@ -90,24 +90,32 @@ void arduinogcode::setrelativepositioning(){
 //                                            0,1,2
 // and returns with coordinate vector<float> (x,y,z)
 
-std::vector<float> arduinogcode::getcurrentpos(){
-    QString msg = "M114";
-    QByteArray answer=apipc_sc.sendAndReceive(msg,EOM);
+std::vector<float> arduinogcode::getcurrentpos()
+{
     std::vector<float> coors;
-    QString s(answer);
-    //split strings by ":"
-    QStringList resultStrings =  s.split(':');
-    // get floating point number regularexpressions
-    QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-    // experiment to find echo...
-    // tries to get the coordinates
-    //recall the function if echo thrown, else error
-    QRegExp findecho("(echo:?)");
+    try
+    {
+        QString msg = "M114";
+        QByteArray answer=apipc_sc.sendAndReceive(msg,EOM);
 
-   // if(findecho.isEmpty())
-   // {
-        for (int i=1;i<4;i++)
+        QString s(answer);
+        //split strings by ":"
+        QStringList resultStrings =  s.split(':');
+        // get floating point number regularexpressions
+        QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
+        // experiment to find echo...
+        // tries to get the coordinates
+        //recall the function if echo thrown, else error
+        QRegExp findecho("(echo)");
+      //  QString asd("echo: asdasdsad");
+        findecho.indexIn(answer);
+        QStringList test = findecho.capturedTexts();
+    // auto t21= ;
+        std::cout << "find " <<test.begin()->toStdString()<<   "asdsad"<<test.at(0).isEmpty()<< std::endl;
+        if(test.at(0).isEmpty()==true)
         {
+            for (int i=1;i<4;i++)
+            {
             xRegExp.indexIn( resultStrings.at(i));
             QStringList xList = xRegExp.capturedTexts();
             try
@@ -119,19 +127,27 @@ std::vector<float> arduinogcode::getcurrentpos(){
             std::cout << "extractiing cooordinates error" << std::endl;
             }
         }
-      //  return coors;
-/*    }
-    else if(!findecho.isEmpty())
- //   {
- //       std::cout << "extractiing cooordinates error retrial..." << std::endl;
+        return coors;
+    }
+    else if(test.at(0).isEmpty()==false && m_counter < 2 )
+    {
+        m_counter ++;
+        std::cout << "extractiing cooordinates error retrial..." << std::endl;
         return this->getcurrentpos();
     }
     else
     {
-        throw  "invalid coordinates...";
-    }*/
-   return coors;
+        throw ardinogcodeexeption;
+    }
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what() << '\n';
+        m_counter = 0;
+        return coors = {0,0,0};
+    }
 }
+
 
 //Moves the machine to an XYZ coordinate with syncronized moving, coordinates sent
 // one by one

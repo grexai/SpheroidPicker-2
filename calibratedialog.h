@@ -17,15 +17,18 @@ public:
    int clicks;
    bool Iscalibrating= false;
    std::vector<float>* calibpos;
+
 //   std::vector<float>* cpos1 = nullptr;
 //   std::vector<float>* cpos2 = nullptr;
 //   std::vector<float>* cpos3= nullptr;
 private slots:
     void on_pushButton_clicked();
 
-//    void on_buttonBox_destroyed();
+//  void on_buttonBox_destroyed();
 
     void on_buttonBox_accepted();
+
+    void on_calibratedialog_destroyed();
 
 private:
     Ui::calibratedialog *ui;
