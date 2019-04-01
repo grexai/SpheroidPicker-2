@@ -95,7 +95,6 @@ float arduinopressurecontroller::getPipettePressure(){
     }
     */
     return pressureValue;
-
 }
 
 //creates a vaacum pulse for the requested time, and sends it to the pipette

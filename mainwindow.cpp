@@ -421,13 +421,13 @@ void MainWindow::screensample()
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
-    int xpos=ctrl->stage_get_x_coords();
-    int ypos=ctrl->stage_get_y_coords();
+ //   int xpos=ctrl->stage_get_x_coords();
+//    int ypos=ctrl->stage_get_y_coords();
  // std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
 
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
-    ctrl->stage_set_speed(7500.0f);
+  //  ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     float p_v=0.0f;
@@ -438,7 +438,8 @@ void MainWindow::screensample()
     {
         for (int  i = 0; i< wmax; ++i)
         {
-            ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
+            if(m_s_t_acitive){
+    //        ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
             p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
             prog_changed(static_cast<int>(p_v));
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -453,22 +454,37 @@ void MainWindow::screensample()
             scanvector.push_back(*tmp.get());
 
             counter += 1;
+            }else{
+                break;
+            }
         //  delete tmpimg;
         }
-        ctrl->stage_set_speed(10000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-        ctrl->stage_set_speed(7000.0f);
+  //      ctrl->stage_set_speed(10000.0f);
+ //       ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+//        ctrl->stage_set_speed(7000.0f);
     }
 }
 
 void MainWindow::on_start_screening_clicked()
 {
-    connect(this, SIGNAL(prog_changed(int)),
+    if(!m_s_t_acitive)
+    {
+        m_s_t_acitive = true;
+        connect(this, SIGNAL(prog_changed(int)),
             this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
-
-    std::thread t1(&MainWindow::screensample,this);
-
-    t1.detach();
+        m_screening_thread = new std::thread(&MainWindow::screensample,this);
+    }
+    else
+    {
+        m_s_t_acitive= false;
+        std:: cout << "false" <<  std::endl;
+        if(m_screening_thread->joinable())
+        {
+            std:: cout << "joining " <<  std::endl;
+            m_screening_thread->join();
+            m_screening_thread->~thread();
+        }
+    }
 }
 
 void MainWindow::set_progressbar( int value ){
@@ -510,7 +526,6 @@ void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 
 void MainWindow::on_predict_sph_clicked()
 {
-    dl = new deeplearning;
     auto cfrm = cameracv->get_current_frm();
     dl->dnn_prediction(*cfrm);
 }
@@ -550,6 +565,7 @@ void MainWindow::on_pushButton_6_clicked()
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
                 {
+
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
@@ -565,6 +581,7 @@ void MainWindow::on_pushButton_6_clicked()
 void MainWindow::on_analyse_scan_clicked()
 {
     for (int i=0; i<scanvector.size();i++){
-        dl->dnn_prediction(scanvector.at(i));
+      scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
     }
+
 }

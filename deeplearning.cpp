@@ -6,7 +6,10 @@ deeplearning::deeplearning()
 
 }
 
-deeplearning::~deeplearning(){}
+deeplearning::~deeplearning()
+{
+
+}
 
 // Draw the predicted bounding box, colorize and show the mask on the image
 void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask)
@@ -131,9 +134,10 @@ void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::s
     string line;
     while (getline(ifs, line)) classes.push_back(line);
 
-    String modelWeights =model_w;    // "d:/dev/cpp/model.pb";
+    String modelWeights = model_w;    // "d:/dev/cpp/model.pb";
     String textGraph = t_g;          //"d:/dev/cpp/model.pbtxt";
     net = new cv::dnn::Net();
+    cout << model_w << endl;
     *net = readNetFromTensorflow(modelWeights, textGraph);
     std::cerr << "Read OK" << std::endl;
     net->setPreferableBackend(DNN_BACKEND_OPENCV);
@@ -144,7 +148,7 @@ void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::s
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-void deeplearning::dnn_prediction(cv::Mat& input)
+cv::Mat deeplearning::dnn_prediction(cv::Mat& input)
 {
     using namespace cv;
     using namespace std;
@@ -211,4 +215,5 @@ void deeplearning::dnn_prediction(cv::Mat& input)
     imshow("detected object", detectedFrame);
     cv::resizeWindow("detected object", 1280, 720);
     waitKey(1);
+    return detectedFrame;
 }

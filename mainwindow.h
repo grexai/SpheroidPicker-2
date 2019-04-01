@@ -178,6 +178,10 @@ private:
     deeplearning* dl= nullptr;
      std::vector<cv::Mat> scanvector;
     propertyreader* propreader = nullptr;
+
+    std::atomic_bool m_s_t_acitive=false;
+    std::thread* m_screening_thread= nullptr;
+
     //TEST
     float m_status = 0;
     QTimer *timer1= nullptr ;
