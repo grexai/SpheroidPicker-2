@@ -167,6 +167,8 @@ private slots:
 
      void on_analyse_scan_clicked();
 
+     std::string get_date_time_str();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;

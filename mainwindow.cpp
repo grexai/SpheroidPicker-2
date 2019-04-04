@@ -394,6 +394,18 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
     calib->show();
 }
 
+std::string MainWindow::get_date_time_str()
+{
+    std::string datetime;
+    datetime.append((QString::number(QDate::currentDate().year())).toStdString());
+    datetime.append((QString::number(QDate::currentDate().month())).toStdString());
+    datetime.append((QString::number(QDate::currentDate().day())).toStdString()+"-");
+    datetime.append((QString::number(QTime::currentTime().hour())).toStdString());
+    datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
+    return datetime;
+}
+
+
 void MainWindow::screensample()
 {
     using namespace  cv;
@@ -421,13 +433,11 @@ void MainWindow::screensample()
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
- //   int xpos=ctrl->stage_get_x_coords();
-//    int ypos=ctrl->stage_get_y_coords();
- // std::cout<< "ypos" << ypos<< "xpos" << xpos<< std::endl;
-
+    int xpos=ctrl->stage_get_x_coords();
+    int ypos=ctrl->stage_get_y_coords();
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
-  //  ctrl->stage_set_speed(7500.0f);
+    ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     float p_v=0.0f;
@@ -438,30 +448,29 @@ void MainWindow::screensample()
     {
         for (int  i = 0; i< wmax; ++i)
         {
-            if(m_s_t_acitive){
-    //        ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
-            p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
-            prog_changed(static_cast<int>(p_v));
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            int leading = 2 ;
-            std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
-            std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
-            std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
+            if(m_s_t_acitive)
+            {
+                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
+                p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
+                prog_changed(static_cast<int>(p_v));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                int leading = 2 ;
+                std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
+                std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
+                std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
 
-            ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
-            auto tmp = cameracv->get_current_frm();
-            imtools->saveImg(tmp.get(),num2str.c_str());
-            scanvector.push_back(*tmp.get());
-
-            counter += 1;
+                ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
+                auto tmp = cameracv->get_current_frm();
+                imtools->saveImg(tmp.get(),num2str.c_str());
+                scanvector.push_back(*tmp.get());
+                counter += 1;
             }else{
                 break;
             }
-        //  delete tmpimg;
         }
-  //      ctrl->stage_set_speed(10000.0f);
- //       ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-//        ctrl->stage_set_speed(7000.0f);
+        ctrl->stage_set_speed(10000.0f);
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+        ctrl->stage_set_speed(7000.0f);
     }
 }
 
@@ -545,6 +554,8 @@ void MainWindow::on_pickup_sph_clicked()
     std::thread t2(&MainWindow::pickup_sph,this);
     t2.detach();
 }
+
+
 
 
 

@@ -55,6 +55,7 @@ HEADERS += \
     arduinogcode.h \
     deeplearning.h \
     cameracv.h \
+    marcros.h
 
 FORMS += \
         mainwindow.ui \

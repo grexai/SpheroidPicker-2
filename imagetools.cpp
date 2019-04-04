@@ -153,7 +153,6 @@ void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
 void imagetools::saveImg(cv::Mat* outimg, std::string outname)
 {
     outname = outname + ".png";
-    QTextStream(stdout) << QString::fromStdString(outname);
     std::vector<int> compression_params;
     compression_params.push_back(16);
     compression_params.push_back(0);
