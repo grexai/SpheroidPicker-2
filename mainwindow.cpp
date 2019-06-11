@@ -396,7 +396,7 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 
 std::string MainWindow::get_date_time_str()
 {
-    std::string datetime;
+    std::string datetime= "";
     datetime.append((QString::number(QDate::currentDate().year())).toStdString());
     datetime.append((QString::number(QDate::currentDate().month())).toStdString());
     datetime.append((QString::number(QDate::currentDate().day())).toStdString()+"-");
@@ -404,7 +404,6 @@ std::string MainWindow::get_date_time_str()
     datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
     return datetime;
 }
-
 
 void MainWindow::screensample()
 {
@@ -454,7 +453,7 @@ void MainWindow::screensample()
                 p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
                 prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                int leading = 2 ;
+                int leading = 2;
                 std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
                 std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
                 std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
@@ -543,9 +542,9 @@ void MainWindow::pickup_sph()
 {
     QTextStream(stdout) << "pciking up" << endl;
     ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(7000));
     ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_home_z();
 }
 
@@ -570,8 +569,8 @@ void MainWindow::on_pushButton_6_clicked()
     int hmax = static_cast<int>(platesize / img_h_5p5x); // um
 
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    for (int i = 1; i <= hmax; ++i) {
-        for (int j = 1; j <= wmax; ++j) {
+    for (int i = 0; i < hmax; ++i) {
+        for (int j = 0; j < wmax; ++j) {
             for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)

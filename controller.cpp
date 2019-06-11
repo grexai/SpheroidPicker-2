@@ -8,7 +8,7 @@ bool controller::connect_pressure_controller(std::string& port)
     QString p1= QString::fromStdString(port);
   //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
     apc = new arduinopressurecontroller(QSP_apc,p1);
-
+    //arduinopressurecontroller sd(QSP_apc,p1);
     if (apc->isconnected == true)
     {
 
