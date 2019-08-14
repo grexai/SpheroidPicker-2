@@ -560,6 +560,19 @@ void MainWindow::on_pickup_sph_clicked()
 
 void MainWindow::on_pushButton_6_clicked()
 {
+
+}
+
+void MainWindow::on_analyse_scan_clicked()
+{
+    for (int i=0; i<scanvector.size();i++){
+      scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
+    }
+
+}
+
+void MainWindow::on_view_scan_clicked()
+{
     using namespace  cv;
     //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
     int platesize = 350000;     //    100nm
@@ -586,12 +599,4 @@ void MainWindow::on_pushButton_6_clicked()
 
     imtools->saveImg(Mimage,"mozaic");
     //scanvector.clear();
-}
-
-void MainWindow::on_analyse_scan_clicked()
-{
-    for (int i=0; i<scanvector.size();i++){
-      scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
-    }
-
 }

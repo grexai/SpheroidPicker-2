@@ -1427,19 +1427,6 @@ Stage</string>
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>540</y>
-      <width>171</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>View scan</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="current_scaningpos">
     <property name="geometry">
      <rect>
@@ -1477,6 +1464,19 @@ Stage</string>
     </property>
     <property name="text">
      <string>Analyse Scan</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="view_scan">
+    <property name="geometry">
+     <rect>
+      <x>1730</x>
+      <y>540</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
     </property>
    </widget>
   </widget>

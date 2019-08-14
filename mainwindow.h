@@ -169,6 +169,8 @@ private slots:
 
      std::string get_date_time_str();
 
+     void on_view_scan_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
