@@ -143,8 +143,6 @@ private slots:
 
      void on_start_screening_clicked();
 
-     void on_pushButton_5_clicked();
-
      void screensample();
 
      void on_actionCalibrate_Pipette_triggered();
@@ -162,8 +160,6 @@ private slots:
      void on_pickup_sph_clicked();
 
      void pickup_sph();
-
-     void on_pushButton_6_clicked();
 
      void on_analyse_scan_clicked();
 

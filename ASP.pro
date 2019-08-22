@@ -38,7 +38,8 @@ SOURCES += \
     propertyreader.cpp \
     arduinogcode.cpp \
     deeplearning.cpp \
-    cameracv.cpp
+    cameracv.cpp \
+    auto_methods.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,7 +56,8 @@ HEADERS += \
     arduinogcode.h \
     deeplearning.h \
     cameracv.h \
-    marcros.h
+    marcros.h \
+    auto_methods.h
 
 FORMS += \
         mainwindow.ui \

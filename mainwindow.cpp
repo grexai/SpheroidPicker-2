@@ -161,6 +161,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
                 cpos3 = new std::vector<float>;
                 *cpos3 = ctrl->pipette_get_coordinates();
                 QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
+                ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
             }
         }
     }
@@ -504,11 +505,6 @@ void MainWindow::set_progressbar( int value ){
     }
 }
 
-void MainWindow::on_pushButton_5_clicked()
-{
-    ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
-}
-
 void MainWindow::on_actionSpheroid_picker_triggered()
 {
     std::map<std::string, std::string> settings;
@@ -554,14 +550,6 @@ void MainWindow::on_pickup_sph_clicked()
     t2.detach();
 }
 
-
-
-
-
-void MainWindow::on_pushButton_6_clicked()
-{
-
-}
 
 void MainWindow::on_analyse_scan_clicked()
 {
