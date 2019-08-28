@@ -46,6 +46,10 @@ public:
 
     void moveToZSync(float z_value);
 
+    void extrude(float e_value);
+
+    void extrude_relative(float e_value);
+
     //G28
     void goHome(bool x, bool y, bool z);
 

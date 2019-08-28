@@ -21,7 +21,7 @@ void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box
     cv::rectangle(frame, Point(box.x, box.y), Point(box.x+box.width, box.y+box.height), Scalar(255, 178, 50), 3);
 
     //Get the label for the class name and its confidence
-    string label = format("%.2f", conf);
+    string label = format("%.2f", static_cast<double>(conf));
     if (!classes.empty())
     {
         CV_Assert(classId < (int)classes.size());

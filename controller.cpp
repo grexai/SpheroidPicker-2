@@ -145,6 +145,11 @@ void controller::pipette_movez_sync(const float z)
     apipc->moveToZSync(z);
 }
 
+void controller::pipette_extrude_relative(const float e)
+{
+    apipc->extrude_relative(e);
+}
+
 void controller::pipette_move(const std::vector<float> coords)
 {
     apipc->setabsoluepositioning();

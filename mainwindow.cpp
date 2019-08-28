@@ -409,7 +409,7 @@ std::string MainWindow::get_date_time_str()
 void MainWindow::screensample()
 {
     using namespace  cv;
-    int platesize= 350000;      //    100nm
+    int platesize= 350000;      //    100nm (means one step) --> for the stage
     float  img_w_5p5x = 27426;  //    100nm
     float  img_h_5p5x = 15421;  //    100nm
 
@@ -446,6 +446,9 @@ void MainWindow::screensample()
 
     for (int j = 0; j < hmax; ++j )
     {
+        ctrl->stage_set_speed(10000.0f);
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+        ctrl->stage_set_speed(7000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
@@ -468,9 +471,7 @@ void MainWindow::screensample()
                 break;
             }
         }
-        ctrl->stage_set_speed(10000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-        ctrl->stage_set_speed(7000.0f);
+
     }
 }
 
@@ -587,4 +588,14 @@ void MainWindow::on_view_scan_clicked()
 
     imtools->saveImg(Mimage,"mozaic");
     //scanvector.clear();
+}
+
+void MainWindow::on_p_ep_button_clicked()
+{
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+}
+
+void MainWindow::on_p_extruder_step_box_valueChanged(double arg1)
+{
+
 }

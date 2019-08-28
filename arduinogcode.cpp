@@ -60,15 +60,31 @@ void arduinogcode::moveToXSync(float x_value){
     apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
 }
 
-void arduinogcode::moveToYSync(float y_value){
+void arduinogcode::moveToYSync(float y_value)
+{
     QString msg= "G0";
     apipc_sc.send(msg.append("Y").append(QString::number(y_value,'f',2)).append(EOM));
 }
 
-void arduinogcode::moveToZSync(float z_value){
+void arduinogcode::moveToZSync(float z_value)
+{
     QString msg= "G0";
     //this->setabsoluepositioning;
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
+}
+
+void arduinogcode::extrude(float e_value)
+{
+    QString msg= "G0";
+    apipc_sc.send(msg.append("E").append(QString::number(e_value,'f',2)).append(EOM));
+}
+
+void arduinogcode::extrude_relative(float e_value)
+{
+    QString msg= "M82";
+    apipc_sc.send(msg);
+    this->extrude(e_value);
+
 }
 
 // set the GCODE interpreter to ABSOLUTE POSIITING MODE

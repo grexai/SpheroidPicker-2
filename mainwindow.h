@@ -167,6 +167,10 @@ private slots:
 
      void on_view_scan_clicked();
 
+     void on_p_ep_button_clicked();
+
+     void on_p_extruder_step_box_valueChanged(double arg1);
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
