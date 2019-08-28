@@ -2,7 +2,7 @@
 #define CALIBRATEDIALOG_H
 #include <types.h>
 #include <QDialog>
-
+#include <counter.h>
 namespace Ui {
 class calibratedialog;
 }
@@ -15,6 +15,7 @@ public:
     explicit calibratedialog(QWidget *parent = nullptr);
     ~calibratedialog();
    int clicks;
+   Counter a,b;
    bool Iscalibrating= false;
    std::vector<float>* calibpos;
 
@@ -29,6 +30,8 @@ private slots:
     void on_buttonBox_accepted();
 
     void on_calibratedialog_destroyed();
+
+
 
 private:
     Ui::calibratedialog *ui;

@@ -41,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
-    calib = new calibratedialog;
     imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
@@ -124,44 +123,50 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     }
     QMainWindow::keyPressEvent( e );
 }
+
 void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
-    if (calib->Iscalibrating == true )
+    if (Iscameraopen== true && calib!=nullptr )
     {
+        QTextStream(stdout ) << "point 1 saved:" <<calib->a.value()<< endl;
         Point pmid = Point(disp.cols/2,100 );
 
-        if (calib->clicks==0)
+        if (calib->a.value()==0)
         {
             imtools->addPointToImage(disp,pmid);
         }
-        if (calib->clicks==1){
+        if (calib->a.value()==1){
             imtools->addPointToImage(disp,Point(100,disp.rows-100));
             if(cpos1 == nullptr)
             {
-                cpos1 = new std::vector<float>;
-                *cpos1 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
+         //       cpos1 = new std::vector<float>;
+          //      *cpos1 = ctrl->pipette_get_coordinates();
+          //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
             }
 
         }
-        if (calib->clicks==2){
+        if (calib->a.value()==2){
             imtools->addPointToImage(disp,Point(disp.cols-100,disp.rows-100));
             if(cpos2== nullptr)
             {
-                cpos2 = new std::vector<float>;
-                *cpos2 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
+            //    cpos2 = new std::vector<float>;
+            //    *cpos2 = ctrl->pipette_get_coordinates();
+         //       QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
             }
 
         }
-        if (calib->clicks==3)
+        if (calib->a.value()==3)
         {
             if(cpos3 == nullptr)
             {
-                cpos3 = new std::vector<float>;
-                *cpos3 = ctrl->pipette_get_coordinates();
-                QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
-                ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
+            //    cpos3 = new std::vector<float>;
+           //     *cpos3 = ctrl->pipette_get_coordinates();
+           //     QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
+          //      ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
+
+           // calib->Iscalibrating = false;
+              //   calib->deleteLater();
+
             }
         }
     }
@@ -170,6 +175,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
 void MainWindow::update_window()
 {
     auto cfrm=  cameracv->get_current_frm();
+    QTextStream (stdout)<< "asd";
     if (cfrm == nullptr)
     {
         return;
@@ -391,6 +397,7 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
+    calib = new calibratedialog;
     calib->Iscalibrating= true;
     calib->show();
 }

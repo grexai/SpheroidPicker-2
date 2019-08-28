@@ -57,7 +57,8 @@ HEADERS += \
     deeplearning.h \
     cameracv.h \
     marcros.h \
-    auto_methods.h
+    auto_methods.h \
+    counter.h
 
 FORMS += \
         mainwindow.ui \
