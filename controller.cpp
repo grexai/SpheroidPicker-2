@@ -42,8 +42,10 @@ float controller::get_pressure()
     return apc->getPipettePressure();
 }
 
-void controller::req_pressure_loop(){
-    while (1){
+void controller::req_pressure_loop()
+{
+    while (1)
+    {
         QSharedPointer<float> temp(new float);
         *temp = this->get_pressure();
         std::unique_lock<std::mutex> pressurevaluelock(m_pressurevaluebuff);  //csak most lockoljuk a frame buffert az utolso pillanatban par microsecig, amig a swap megtortenik
@@ -147,6 +149,7 @@ void controller::pipette_movez_sync(const float z)
 
 void controller::pipette_extrude_relative(const float e)
 {
+
     apipc->extrude_relative(e);
 }
 
@@ -191,6 +194,8 @@ void controller::pipette_home_z()
 std::vector<float> controller::pipette_get_coordinates(){
    return apipc->getcurrentpos();
 }
+
+
 
 void controller::pipette_move_to_img_coordinates(std::vector<float> coords){
     cv::Mat pipc = calconimgpipettecoors(TM,coords,m_centers.img,m_centers.pipette);
@@ -244,6 +249,9 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
     QTextStream(stdout)<<"done" << endl;
 
 }
+
+
+
 
 // STAGE
 
@@ -402,8 +410,8 @@ void controller::stage_run_iniciatlions()
 
     std::cout << "current position: " << stage->XAxis().toMicrons(stage->XAxis().getCurrentPosition()) << ";" << stage->YAxis().toMicrons(stage->YAxis().getCurrentPosition()) << std::endl;
 
-    iop::int32 x = x0 + (iop::int32) ((x1 - x0) / 2.0);
-    iop::int32 y = y0 + (iop::int32) ((y1 - y0) / 2.0);
+    iop::int32 x = x0 + static_cast<iop::int32>(((x1 - x0) / 2.0) );
+    iop::int32 y = y0 + static_cast<iop::int32>( ((y1 - y0) / 2.0));
 
     std::cout << "moving to center " << x << "," << y << std::endl;
 

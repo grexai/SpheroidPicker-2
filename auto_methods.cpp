@@ -7,7 +7,7 @@ auto_methods::~auto_methods(){}
 
 
 void auto_methods::pickup_sph(float pulse_value,float pulse_time,std::vector<float> objpos){
-    //   QTextStream(stdout) << "pciking up" << endl;
+  //   QTextStream(stdout) << "pciking up" << endl;
        this->pipette_move_to_img_coordinates(objpos);
        std::this_thread::sleep_for(std::chrono::milliseconds(7000));
        this->vaccum_pulse(pulse_value,pulse_time);
@@ -67,9 +67,9 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
                 std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
                 std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
 
-            //    ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
-            //    auto tmp = cameracv->get_current_frm();
-             //   imtools->saveImg(tmp.get(),num2str.c_str());
+          //    ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
+          //    auto tmp = cameracv->get_current_frm();
+           //   imtools->saveImg(tmp.get(),num2str.c_str());
              //   scanvector.push_back(*tmp.get());
                 counter += 1;
             }else{

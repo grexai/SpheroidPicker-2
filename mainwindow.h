@@ -161,6 +161,10 @@ private slots:
 
      void pickup_sph();
 
+     void centerspheroid();
+
+     void xz_stage_pickup_sph();
+
      void on_analyse_scan_clicked();
 
      std::string get_date_time_str();
@@ -171,11 +175,14 @@ private slots:
 
      void on_p_extruder_step_box_valueChanged(double arg1);
 
+     void on_p_em_button_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
     QGraphicsScene* scene= nullptr;
     QGraphicsPixmapItem  qpxmi;
+    QGraphicsPixmapItem  im_view_pxmi;
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;

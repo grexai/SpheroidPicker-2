@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
+    ui->graphicsView_2->setScene(new QGraphicsScene(this));
+    ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
     imtools= new imagetools;
     timer = new QTimer(this);
     disp_pressure= new QTimer(this);
@@ -128,18 +130,15 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
     if (Iscameraopen== true && calib!=nullptr )
     {
-        QTextStream(stdout ) << "point 1 saved:" <<calib->a.value()<< endl;
-        Point pmid = Point(disp.cols/2,100 );
-
         if (calib->a.value()==0)
         {
-            imtools->addPointToImage(disp,pmid);
+            imtools->addPointToImage(disp,Point(disp.cols/2,100 ));
         }
         if (calib->a.value()==1){
             imtools->addPointToImage(disp,Point(100,disp.rows-100));
             if(cpos1 == nullptr)
             {
-         //       cpos1 = new std::vector<float>;
+          //      cpos1 = new std::vector<float>;
           //      *cpos1 = ctrl->pipette_get_coordinates();
           //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
             }
@@ -153,7 +152,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             //    *cpos2 = ctrl->pipette_get_coordinates();
          //       QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
             }
-
         }
         if (calib->a.value()==3)
         {
@@ -175,7 +173,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
 void MainWindow::update_window()
 {
     auto cfrm=  cameracv->get_current_frm();
-    QTextStream (stdout)<< "asd";
     if (cfrm == nullptr)
     {
         return;
@@ -317,7 +314,7 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
-     QTextStream(stdout)<< "+ presseeed" << endl;
+    QTextStream(stdout)<< "+ presseeed" << endl;
     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
 }
 
@@ -397,9 +394,12 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
-    calib = new calibratedialog;
-    calib->Iscalibrating= true;
-    calib->show();
+    if (Iscameraopen)
+    {
+        calib = new calibratedialog;
+        calib->Iscalibrating= true;
+        calib->show();
+    }
 }
 
 std::string MainWindow::get_date_time_str()
@@ -539,7 +539,14 @@ void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 void MainWindow::on_predict_sph_clicked()
 {
     auto cfrm = cameracv->get_current_frm();
-    dl->dnn_prediction(*cfrm);
+
+    cv::Mat image = dl->dnn_prediction(*cfrm);
+  //  imtools->convert_bgr_to_rgb(image);
+    qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    ///ui->live_image->stackUnder(ui->tab2);
+
 }
 
 void MainWindow::pickup_sph()
@@ -552,17 +559,42 @@ void MainWindow::pickup_sph()
     ctrl->pipette_home_z();
 }
 
+void MainWindow::centerspheroid()
+{
+    const float  img_w_5p5x = 27426; //    100nm
+    const float  img_h_5p5x = 15421;
+    const float x_conv =  img_w_5p5x/1920;
+    const float y_conv = img_h_5p5x/1080;
+    const float obj_pos_um_x = dl->objpos.at(0).at(0) *x_conv;
+    const float obj_pos_um_y = dl->objpos.at(0).at(1) *y_conv;
+    float center_x = ctrl->stage_get_x_coords()-obj_pos_um_x;
+    float center_y = ctrl->stage_get_x_coords()-obj_pos_um_y;
+    ctrl->stage_move_x_async(static_cast<int>(center_x));
+    ctrl->stage_move_x_async(static_cast<int>(center_y));
+}
+
+void MainWindow::xz_stage_pickup_sph(){
+  //  ctrl->pipette_movex_sync(-0.3); // center
+ //   ctrl->pipette_movez_sync(0.2);
+
+    ctrl->pipette_extrude_relative(-0.1);
+    ctrl->pipette_movex_sync(-0.3); // center
+    ctrl->pipette_movez_sync(0.2);
+}
+
+
 void MainWindow::on_pickup_sph_clicked()
 {
-    std::thread t2(&MainWindow::pickup_sph,this);
-    t2.detach();
+    this->centerspheroid();
+    //std::thread t2(&MainWindow::pickup_sph,this);
+    //t2.detach();
 }
 
 
 void MainWindow::on_analyse_scan_clicked()
 {
     for (int i=0; i<scanvector.size();i++){
-      scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
+        scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
     }
 
 }
@@ -571,7 +603,7 @@ void MainWindow::on_view_scan_clicked()
 {
     using namespace  cv;
     //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    int platesize = 350000;     //    100nm
+    int platesize = 350000;     //    100nm // *0.1um
     float  img_w_5p5x = 27426; //    100nm
     float  img_h_5p5x = 15421;//19466; //    100nm
     int wmax = static_cast<int>(platesize / img_w_5p5x); // um
@@ -584,7 +616,6 @@ void MainWindow::on_view_scan_clicked()
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
                 {
-
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
@@ -594,15 +625,25 @@ void MainWindow::on_view_scan_clicked()
     }
 
     imtools->saveImg(Mimage,"mozaic");
+    qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
+    qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView_2->fitInView(&qpxmi, Qt::KeepAspectRatio);
+    ui->tab2->activateWindow();
     //scanvector.clear();
 }
+
 
 void MainWindow::on_p_ep_button_clicked()
 {
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+}
+void MainWindow::on_p_em_button_clicked()
+{
+    ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
 }
 
 void MainWindow::on_p_extruder_step_box_valueChanged(double arg1)
 {
 
 }
+

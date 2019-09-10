@@ -81,8 +81,8 @@ void arduinogcode::extrude(float e_value)
 
 void arduinogcode::extrude_relative(float e_value)
 {
-    QString msg= "M82";
-    apipc_sc.send(msg);
+    QString msg= "M83";
+    apipc_sc.send(msg.append(EOM));
     this->extrude(e_value);
 
 }

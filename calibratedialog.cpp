@@ -23,20 +23,16 @@ calibratedialog::~calibratedialog()
 
 void calibratedialog::on_pushButton_clicked()
 {
-
-
-    //a.setValue(0);
+    QString txt = "Point ";
     a.setValue((a.value()+1));
-    ui->pushButton->setText(QString::number((a.value())+1))  ;          //QString txt = "Point ";;
+    txt.append(QString::number((a.value())+1)).append(" ready!");
+    ui->pushButton->setText(txt);  ;          //QString txt = "Point ";;
     QTextStream(stdout)<< "v  " << a.value();
     if(a.value()==3){
-        ui->helper_label->setText("calibration finished! \n Press OK to close this window ");
-       //                       );
+        ui->helper_label->setText("Calibration process finished!\nPress OK to close this window ");
         ui->pushButton->deleteLater();
     }
-    //clicks=clicks+1;
-    //txt.append(QString::number(clicks+1)).append("ready");
-    //ui->pushButton->setText(txt);
+
 }
 
 void calibratedialog::on_buttonBox_accepted()

@@ -211,9 +211,9 @@ cv::Mat deeplearning::dnn_prediction(cv::Mat& input)
 
     Mat detectedFrame;
     frame.convertTo(detectedFrame, CV_8U);
-    cv::namedWindow("detected object", WINDOW_KEEPRATIO);
-    imshow("detected object", detectedFrame);
-    cv::resizeWindow("detected object", 1280, 720);
+ //   cv::namedWindow("detected object", WINDOW_KEEPRATIO);
+ //   imshow("detected object", detectedFrame);
+ //   cv::resizeWindow("detected object", 1280, 720);
     waitKey(1);
     return detectedFrame;
 }

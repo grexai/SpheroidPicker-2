@@ -902,7 +902,7 @@ Stage</string>
       <string>Y-</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="pip_step_spinbox">
+    <widget class="QDoubleSpinBox" name="pip_step_spinbox">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -910,18 +910,6 @@ Stage</string>
        <width>61</width>
        <height>31</height>
       </rect>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>3000</number>
-     </property>
-     <property name="singleStep">
-      <number>5</number>
-     </property>
-     <property name="value">
-      <number>100</number>
      </property>
     </widget>
     <widget class="QPushButton" name="p_zm_btton">
@@ -1203,6 +1191,31 @@ Stage</string>
       </rect>
      </property>
     </widget>
+    <zorder>get_coors_pushButton</zorder>
+    <zorder>p_xm_button</zorder>
+    <zorder>pip_step_spinbox</zorder>
+    <zorder>p_zm_btton</zorder>
+    <zorder>p_xp_button</zorder>
+    <zorder>p_zp_button</zorder>
+    <zorder>p_yp_button</zorder>
+    <zorder>Home_pip</zorder>
+    <zorder>xc_label</zorder>
+    <zorder>zc_label</zorder>
+    <zorder>yc_label</zorder>
+    <zorder>p_home_x</zorder>
+    <zorder>p_home_y</zorder>
+    <zorder>p_home_z</zorder>
+    <zorder>p_pos_text</zorder>
+    <zorder>p_xmax</zorder>
+    <zorder>p_ymax</zorder>
+    <zorder>p_zmax</zorder>
+    <zorder>p_set_speed_spinbox</zorder>
+    <zorder>label_3</zorder>
+    <zorder>label_4</zorder>
+    <zorder>p_ep_button</zorder>
+    <zorder>p_em_button</zorder>
+    <zorder>p_extruder_step_box</zorder>
+    <zorder>p_ym_button</zorder>
    </widget>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
@@ -1358,7 +1371,7 @@ Stage</string>
       <x>1730</x>
       <y>280</y>
       <width>171</width>
-      <height>241</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="title">
@@ -1476,7 +1489,7 @@ Stage</string>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>View scan</string>
     </property>
    </widget>
    <widget class="QTabWidget" name="tabWidget">
@@ -1492,7 +1505,7 @@ Stage</string>
      <enum>QTabWidget::South</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="live_image">
      <attribute name="title">
@@ -1518,8 +1531,8 @@ Stage</string>
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>1291</width>
-        <height>711</height>
+        <width>1280</width>
+        <height>720</height>
        </rect>
       </property>
      </widget>
