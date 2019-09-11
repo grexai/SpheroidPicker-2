@@ -259,28 +259,7 @@ void MainWindow::on_actionLight_triggered()
     setdefault();
 }
 
-void MainWindow::closeEvent (QCloseEvent *event)
-{
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
-                                                                tr("Are you sure?\n"),
-                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
-        event->ignore();
 
-    } else {
-        event->accept();
-        this->close();
-        this->parentWidget()->show();
-    }
-}
-
-void MainWindow::on_actionExit_triggered()
-{
-    this->close();
-    this->parentWidget()->show();
-    //QCoreApplication::exit(0);
-}
 
 void MainWindow::on_Home_pip_clicked()
 {
@@ -684,3 +663,30 @@ void MainWindow::on_p_extruder_step_box_valueChanged(double arg1)
 
 }
 
+
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+
+    } else {
+        event->accept();
+        this->close();
+        this->parentWidget()->show();
+    }
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    this->close();
+}
+
+void MainWindow::on_actionHW_selector_triggered()
+{
+    this->parentWidget()->show();
+    this->deleteLater();
+}

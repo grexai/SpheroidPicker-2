@@ -1556,6 +1556,7 @@ Stage</string>
      <string>File</string>
     </property>
     <addaction name="separator"/>
+    <addaction name="actionHW_selector"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuTheme">
@@ -1613,6 +1614,11 @@ Stage</string>
   <action name="actionLight">
    <property name="text">
     <string>Light</string>
+   </property>
+  </action>
+  <action name="actionHW_selector">
+   <property name="text">
+    <string>HW selector</string>
    </property>
   </action>
  </widget>

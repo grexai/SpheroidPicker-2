@@ -86,9 +86,6 @@ private slots:
      void show_currentpressure();
 
      void on_actionDark_Mode_triggered();
-     void closeEvent (QCloseEvent *event);
-
-     void on_actionExit_triggered();
 
      void on_Home_pip_clicked();
 
@@ -177,6 +174,12 @@ private slots:
      void on_p_extruder_step_box_valueChanged(double arg1);
 
      void on_p_em_button_clicked();
+
+     void closeEvent (QCloseEvent *event);
+
+     void on_actionExit_triggered();
+
+     void on_actionHW_selector_triggered();
 
 private:
     QTimer *timer= nullptr;
