@@ -911,6 +911,9 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
     </widget>
     <widget class="QPushButton" name="p_zm_btton">
      <property name="geometry">
@@ -1126,7 +1129,7 @@ Stage</string>
       <number>100</number>
      </property>
      <property name="value">
-      <number>3000</number>
+      <number>500</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -1505,7 +1508,7 @@ Stage</string>
      <enum>QTabWidget::South</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="live_image">
      <attribute name="title">
@@ -1567,19 +1570,11 @@ Stage</string>
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionOpen_console"/>
     <addaction name="actionCalibrate_Pipette"/>
-   </widget>
-   <widget class="QMenu" name="menuConnect">
-    <property name="title">
-     <string>Connect</string>
-    </property>
-    <addaction name="actionSpheroid_picker"/>
    </widget>
    <addaction name="menuFIle"/>
    <addaction name="menuTheme"/>
    <addaction name="menuDebug_tools"/>
-   <addaction name="menuConnect"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

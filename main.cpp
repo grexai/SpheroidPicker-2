@@ -1,4 +1,5 @@
-#include "mainwindow.h"
+//#include "mainwindow.h"
+#include "hardwareselector.h"
 #include <QApplication>
 #include <QStyleOptionFrameV2>
 
@@ -9,7 +10,7 @@ int main(int argc, char *argv[])
 
 //    setstyle();
 
-    MainWindow w;
+    hardwareselector w;
     w.show();
 
     return a.exec();

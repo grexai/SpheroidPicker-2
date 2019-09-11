@@ -63,6 +63,8 @@ public:
 
     void pipette_home();
 
+    void pipette_xz_home();
+
     void pipette_home_x();
 
     void pipette_home_y();

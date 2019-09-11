@@ -41,8 +41,6 @@ void MTPrinter::print(const std::string& str, bool nl) {
     if (nl) std::cout << std::endl;
 }
 
-
-
 void Base::addLogText(iop::string szText) {
     if (m_pLogging) {
         m_pLogging->addText(szText);

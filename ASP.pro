@@ -39,7 +39,8 @@ SOURCES += \
     arduinogcode.cpp \
     deeplearning.cpp \
     cameracv.cpp \
-    auto_methods.cpp
+    auto_methods.cpp \
+    hardwareselector.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -58,11 +59,13 @@ HEADERS += \
     cameracv.h \
     marcros.h \
     auto_methods.h \
-    counter.h
+    counter.h \
+    hardwareselector.h
 
 FORMS += \
         mainwindow.ui \
-    calibratedialog.ui
+    calibratedialog.ui \
+    hardwareselector.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

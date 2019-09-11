@@ -5,7 +5,43 @@
 //#include <iostream>
 #include <QStyle>
 
-void setdarkstyle(){
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->graphicsView->setScene(new QGraphicsScene(this));
+    ui->graphicsView->scene()->addItem(&qpxmi);
+    ui->graphicsView_2->setScene(new QGraphicsScene(this));
+    ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
+    imtools = new imagetools;
+    timer = new QTimer(this);
+    disp_pressure= new QTimer(this);
+    ctrl = new controller;
+    ui->scanning_progress->setValue(static_cast<int>(m_status));
+    std::map<std::string, std::string> settings;
+    propreader = new propertyreader;
+    propreader->read_settings("config.txt",settings);
+    propreader->apply_settings(settings);
+    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+    dl = new deeplearning;
+    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+    //this->
+    ui->p_home_y->hide();
+    ui->p_ymax->hide();
+    ui->p_ym_button->hide();
+    ui->p_yp_button->hide();
+    ui->P_C_box->hide();
+
+/*
+    setdarkstyle();*/
+
+
+   // qApp->installEventFilter(this);
+   // std::cout << "AKOS EDITION v1.1" << std::endl;
+}
+
+void MainWindow::setdarkstyle(){
     qApp->setStyle(QStyleFactory::create("Fusion"));
     QPalette darkPalette;
     darkPalette.setColor(QPalette::Window, QColor(53,53,53));
@@ -33,27 +69,6 @@ void MainWindow::setdefault()
    qApp->setStyleSheet("");
 }
 
-
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    ui->graphicsView->setScene(new QGraphicsScene(this));
-    ui->graphicsView->scene()->addItem(&qpxmi);
-    ui->graphicsView_2->setScene(new QGraphicsScene(this));
-    ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-    imtools= new imagetools;
-    timer = new QTimer(this);
-    disp_pressure= new QTimer(this);
-    ctrl = new controller;
-    ui->scanning_progress->setValue(static_cast<int>(m_status));
-    setdarkstyle();
-
-
-   // qApp->installEventFilter(this);
-   // std::cout << "AKOS EDITION v1.1" << std::endl;
-}
 
 MainWindow::~MainWindow()
 {
@@ -221,6 +236,7 @@ void MainWindow::on_exptime_button_clicked()
     cameracv->setexposuretime(static_cast<float>(ui->exptime_spin->value()));
 }
 
+
 void MainWindow::on_width_button_clicked()
 {
     float w =  ui->width_spin->value();
@@ -243,14 +259,32 @@ void MainWindow::on_actionLight_triggered()
     setdefault();
 }
 
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+
+    } else {
+        event->accept();
+        this->close();
+        this->parentWidget()->show();
+    }
+}
+
 void MainWindow::on_actionExit_triggered()
 {
-    QCoreApplication::exit(0);
+    this->close();
+    this->parentWidget()->show();
+    //QCoreApplication::exit(0);
 }
 
 void MainWindow::on_Home_pip_clicked()
 {
-    ctrl->pipette_home();
+    ctrl->pipette_xz_home();
 }
 
 void MainWindow::on_p_home_x_clicked()
@@ -440,10 +474,10 @@ void MainWindow::screensample()
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
-    int xpos=ctrl->stage_get_x_coords();
-    int ypos=ctrl->stage_get_y_coords();
-    int wmax = static_cast<int>(platesize/img_w_5p5x); // um
-    int hmax = static_cast<int>(platesize/img_h_5p5x); // um
+    const int xpos=ctrl->stage_get_x_coords();
+    const int ypos=ctrl->stage_get_y_coords();
+    const int wmax = static_cast<int>(platesize/img_w_5p5x); // um
+    const int hmax = static_cast<int>(platesize/img_h_5p5x); // um
     ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
@@ -530,7 +564,6 @@ void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
      ctrl->pipette_set_speed(arg1);
 }
 
-
 void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 {
      ctrl->stage_set_speed(static_cast<float>(arg1));
@@ -565,12 +598,17 @@ void MainWindow::centerspheroid()
     const float  img_h_5p5x = 15421;
     const float x_conv =  img_w_5p5x/1920;
     const float y_conv = img_h_5p5x/1080;
-    const float obj_pos_um_x = dl->objpos.at(0).at(0) *x_conv;
-    const float obj_pos_um_y = dl->objpos.at(0).at(1) *y_conv;
-    float center_x = ctrl->stage_get_x_coords()-obj_pos_um_x;
-    float center_y = ctrl->stage_get_x_coords()-obj_pos_um_y;
-    ctrl->stage_move_x_async(static_cast<int>(center_x));
-    ctrl->stage_move_x_async(static_cast<int>(center_y));
+    QTextStream(stdout) << x_conv <<"xc : yc " << y_conv << endl;
+    QTextStream(stdout) << "dla0a0:  "<< dl->objpos.at(0).at(0) << endl;
+    QTextStream(stdout) << "dla0a1:  " <<  dl->objpos.at(0).at(1) << endl;
+    float obj_pos_um_x = ((dl->objpos.at(0).at(0))) *x_conv;
+    float obj_pos_um_y =( dl->objpos.at(0).at(1)) *y_conv;
+    QTextStream(stdout) << "xcp: "<< obj_pos_um_x << endl;
+    QTextStream(stdout) << "ycp: " <<  obj_pos_um_y << endl;
+    float center_x = ctrl->stage_get_x_coords()-(obj_pos_um_x*0.5f);
+    float center_y = ctrl->stage_get_y_coords()+(obj_pos_um_y*0.5f);
+    ctrl->stage_move_to_x_sync(static_cast<int>(center_x));
+    ctrl->stage_move_to_y_sync(static_cast<int>(center_y));
 }
 
 void MainWindow::xz_stage_pickup_sph(){
@@ -582,14 +620,12 @@ void MainWindow::xz_stage_pickup_sph(){
     ctrl->pipette_movez_sync(0.2);
 }
 
-
 void MainWindow::on_pickup_sph_clicked()
 {
     this->centerspheroid();
     //std::thread t2(&MainWindow::pickup_sph,this);
     //t2.detach();
 }
-
 
 void MainWindow::on_analyse_scan_clicked()
 {
@@ -610,7 +646,8 @@ void MainWindow::on_view_scan_clicked()
     int hmax = static_cast<int>(platesize / img_h_5p5x); // um
 
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    for (int i = 0; i < hmax; ++i) {
+    for (int i = 0; i < hmax; ++i)
+    {
         for (int j = 0; j < wmax; ++j) {
             for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
             {
@@ -626,17 +663,17 @@ void MainWindow::on_view_scan_clicked()
 
     imtools->saveImg(Mimage,"mozaic");
     qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
-    qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
-    ui->graphicsView_2->fitInView(&qpxmi, Qt::KeepAspectRatio);
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tab2->activateWindow();
     //scanvector.clear();
 }
-
 
 void MainWindow::on_p_ep_button_clicked()
 {
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
 }
+
 void MainWindow::on_p_em_button_clicked()
 {
     ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));

@@ -36,7 +36,7 @@ public:
     int cameraIndex=0;
 
     explicit MainWindow(QWidget *parent = nullptr);
-
+    void setdarkstyle();
     ~MainWindow();
     void setdefault();
     void displayImage();
@@ -86,6 +86,7 @@ private slots:
      void show_currentpressure();
 
      void on_actionDark_Mode_triggered();
+     void closeEvent (QCloseEvent *event);
 
      void on_actionExit_triggered();
 

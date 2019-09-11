@@ -176,6 +176,11 @@ void controller::pipette_home(){
     apipc->goHome(false,false,false);
 }
 
+void controller::pipette_xz_home()
+{
+    apipc->goHome(true,false,true);
+}
+
 void controller::pipette_home_x()
 {
     apipc->goHome(true,false,false);
