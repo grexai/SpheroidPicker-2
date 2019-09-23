@@ -4,35 +4,50 @@
 #include <QMouseEvent>
 //#include <iostream>
 #include <QStyle>
+#include <QProgressDialog>
+#include <QLabel>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QProgressDialog progress("Getting User Interface ready", NULL, 0, 0);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+    progress.setValue(20);
+
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-    imtools = new imagetools;
-    timer = new QTimer(this);
-    disp_pressure= new QTimer(this);
-    ctrl = new controller;
-    ui->scanning_progress->setValue(static_cast<int>(m_status));
-    std::map<std::string, std::string> settings;
-    propreader = new propertyreader;
-    propreader->read_settings("config.txt",settings);
-    propreader->apply_settings(settings);
-    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-    dl = new deeplearning;
-    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
-    //this->
     ui->p_home_y->hide();
     ui->p_ymax->hide();
     ui->p_ym_button->hide();
     ui->p_yp_button->hide();
     ui->P_C_box->hide();
 
+    progress.setValue(20);
+    imtools = new imagetools;
+    timer = new QTimer(this);
+    disp_pressure= new QTimer(this);
+    ctrl = new controller;
+    ui->scanning_progress->setValue(static_cast<int>(m_status));
+    progress.setLabelText("configuring hardware");
+    std::map<std::string, std::string> settings;
+    propreader = new propertyreader;
+    progress.setValue(50);
+    propreader->read_settings("config.txt",settings);
+    propreader->apply_settings(settings);
+    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+    progress.setLabelText("Loading neural network graph");
+    progress.setValue(75);
+    dl = new deeplearning;
+    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+    progress.setLabelText("Loading neural network graph");
+    progress.setValue(100);
+    progress.setAutoClose(true);
 /*
     setdarkstyle();*/
 
@@ -165,7 +180,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             {
             //    cpos2 = new std::vector<float>;
             //    *cpos2 = ctrl->pipette_get_coordinates();
-         //       QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
+            //     QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
             }
         }
         if (calib->a.value()==3)
@@ -258,8 +273,6 @@ void MainWindow::on_actionLight_triggered()
 {
     setdefault();
 }
-
-
 
 void MainWindow::on_Home_pip_clicked()
 {
@@ -382,26 +395,41 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
 }
 
-void MainWindow::MoveAction(){
+void MainWindow::move_action(){
 
     QTextStream(stdout) << "move action" << endl;
     std::vector<float> mouse ;
     mouse.push_back(point_mouse->x()*1.5f);
     mouse.push_back(point_mouse->y()*1.5f);
+
     ctrl->pipette_move_to_img_coordinates(mouse);
 }
 
+void MainWindow::center_this_point_action()
+{
+    std::vector<float> mouse ;
+    ctrl->stage_set_speed(5000.0f);
+
+    mouse.push_back(point_mouse->x()*1.5f);
+    mouse.push_back(point_mouse->y()*1.5f);
+    this->center_spheroid(mouse);
+    ctrl->stage_set_speed(15000.0f);
+}
+
+
 void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
-    QTextStream(stdout) << "isthis"<< endl;
     QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
-    QAction action1("Move Here", ui->graphicsView->viewport());
-    connect(&action1, SIGNAL(triggered()), this, SLOT(MoveAction()));
-    QAction action2("Pick up", ui->graphicsView->viewport());
-    QAction action3("Deploy", ui->graphicsView->viewport());
+    QAction action1("Move Pipette Here", ui->graphicsView->viewport());
+    connect(&action1, SIGNAL(triggered()), this, SLOT(move_action()));
+    QAction action2("Center this postion", ui->graphicsView->viewport());
+    connect(&action2, SIGNAL(triggered()), this, SLOT(center_this_point_action()));
+    QAction action3("Pick up", ui->graphicsView->viewport());
+    QAction action4("Deploy", ui->graphicsView->viewport());
     contextMenu.addAction(&action1);
     contextMenu.addAction(&action2);
     contextMenu.addAction(&action3);
+    contextMenu.addAction(&action4);
     contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
 }
 
@@ -429,14 +457,16 @@ std::string MainWindow::get_date_time_str()
 void MainWindow::screensample()
 {
     using namespace  cv;
-    int platesize= 350000;      //    100nm (means one step) --> for the stage
+    ui->pip_c_box->setDisabled(true);
+    ui->S_c_box->setDisabled(true); //  int platesize= 350000; //    100nm (means one step) --> for the stage
+    const float platesize= ui->set_plate_size_spinbox->value()*10000;
     float  img_w_5p5x = 27426;  //    100nm
     float  img_h_5p5x = 15421;  //    100nm
-
+    int object_counter = 0;
     std::string folder = "Scandata_";
     std::string datetime = "_";
     std::stringstream ss;
-    ss << (platesize/10000);
+    ss << (ui->set_plate_size_spinbox->value());
     std::string plate_size_mm = ss.str();
     folder.append(plate_size_mm).append("mm_");
     datetime.append((QString::number(QDate::currentDate().year())).toStdString());
@@ -457,35 +487,49 @@ void MainWindow::screensample()
     const int ypos=ctrl->stage_get_y_coords();
     const int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     const int hmax = static_cast<int>(platesize/img_h_5p5x); // um
-    ctrl->stage_set_speed(7500.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
-    int counter = 1;
+    int counter = 0;
     float p_v=0.0f;
 
-    folder.append("s_"+datetime);
+ //   QProgressDialog* scan_progress("Getting User Interface ready", NULL, 0, 0);
+   // scan_progress.setWindowModality(Qt::WindowModal);
+   // scan_progress.setMinimumDuration(0);
+   // scan_progress.setValue(20);
 
+
+    folder.append("s_"+datetime);
+    if (global_obj_im_coordinates != nullptr) {delete global_obj_im_coordinates;}
+    global_obj_im_coordinates = new std::vector<std::vector<float>>;
     for (int j = 0; j < hmax; ++j )
     {
-        ctrl->stage_set_speed(10000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
         ctrl->stage_set_speed(7000.0f);
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+        ctrl->stage_set_speed(5000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
             {
                 ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
-                p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
+                p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
+                QTextStream(stdout)<<"progvalue"<< p_v<< endl;
                 prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 int leading = 2;
                 std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
                 std::string posy = std::to_string(j)+ "/" + std::to_string(hmax);
                 std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
-
                 ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
                 auto tmp = cameracv->get_current_frm();
-                imtools->saveImg(tmp.get(),num2str.c_str());
                 scanvector.push_back(*tmp.get());
+                imtools->saveImg(tmp.get(),num2str.c_str());
+                std::vector<std::vector<float>>im_objects  = dl->dnn_prediction(scanvector.at(counter),scanvector.at(counter));
+                for (int k =0; k<im_objects.size();++k)
+                {
+                   global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
+                   QTextStream (stdout) <<object_counter << endl;
+                   object_counter++;
+                   ui->objcounter->setText(QString::number(object_counter));
+                }
                 counter += 1;
             }else{
                 break;
@@ -493,6 +537,17 @@ void MainWindow::screensample()
         }
 
     }
+    prog_changed(100);
+    m_s_t_acitive=false;
+    ctrl->stage_set_speed(20000.0f);
+    ui->found_objects->clear();
+    for (int i=1 ;i<=global_obj_im_coordinates->size();++i )
+    {
+        ui->found_objects->addItem(QString::number(i));
+    }
+    ui->pip_c_box->setEnabled(true);
+    ui->S_c_box->setEnabled(true);
+    QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
 }
 
 void MainWindow::on_start_screening_clicked()
@@ -507,13 +562,16 @@ void MainWindow::on_start_screening_clicked()
     else
     {
         m_s_t_acitive= false;
-        std:: cout << "false" <<  std::endl;
+        ui->pip_c_box->setEnabled(true);
+        ui->S_c_box->setEnabled(true);
         if(m_screening_thread->joinable())
         {
-            std:: cout << "joining " <<  std::endl;
             m_screening_thread->join();
             m_screening_thread->~thread();
+            scanvector.clear();
+            global_obj_im_coordinates->clear();
         }
+        QMessageBox::warning(this,"Scanning canceled","Scanning of the plate is canceled,pipette and stage controller unlocked");
     }
 }
 
@@ -521,6 +579,7 @@ void MainWindow::set_progressbar( int value ){
     if ( value != m_progvalue ) {
         m_progvalue = value;
         ui->scanning_progress->setValue(m_progvalue );
+    //    scan_progress
         QTextStream(stdout)<< m_progvalue;
         emit prog_changed( m_progvalue );
     }
@@ -551,43 +610,54 @@ void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
 void MainWindow::on_predict_sph_clicked()
 {
     auto cfrm = cameracv->get_current_frm();
-
-    cv::Mat image = dl->dnn_prediction(*cfrm);
+    cv::Mat image;
+    std::vector<std::vector<float>> im_obj = dl->dnn_prediction(*cfrm,image);
   //  imtools->convert_bgr_to_rgb(image);
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
-    ///ui->live_image->stackUnder(ui->tab2);
+    ui->tabWidget->setCurrentWidget(ui->tab2);
 
 }
 
 void MainWindow::pickup_sph()
 {
     QTextStream(stdout) << "pciking up" << endl;
-    ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
+    //ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
     std::this_thread::sleep_for(std::chrono::milliseconds(7000));
     ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_home_z();
 }
 
-void MainWindow::centerspheroid()
+std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_coors)
 {
+    std:: vector<float> center_coordinates;
     const float  img_w_5p5x = 27426; //    100nm
     const float  img_h_5p5x = 15421;
     const float x_conv =  img_w_5p5x/1920;
     const float y_conv = img_h_5p5x/1080;
     QTextStream(stdout) << x_conv <<"xc : yc " << y_conv << endl;
-    QTextStream(stdout) << "dla0a0:  "<< dl->objpos.at(0).at(0) << endl;
-    QTextStream(stdout) << "dla0a1:  " <<  dl->objpos.at(0).at(1) << endl;
-    float obj_pos_um_x = ((dl->objpos.at(0).at(0))) *x_conv;
-    float obj_pos_um_y =( dl->objpos.at(0).at(1)) *y_conv;
-    QTextStream(stdout) << "xcp: "<< obj_pos_um_x << endl;
-    QTextStream(stdout) << "ycp: " <<  obj_pos_um_y << endl;
-    float center_x = ctrl->stage_get_x_coords()-(obj_pos_um_x*0.5f);
-    float center_y = ctrl->stage_get_y_coords()+(obj_pos_um_y*0.5f);
-    ctrl->stage_move_to_x_sync(static_cast<int>(center_x));
-    ctrl->stage_move_to_y_sync(static_cast<int>(center_y));
+    QTextStream(stdout) << "dla0a0:  "<< sph_coors.at(0) << endl;
+    QTextStream(stdout) << "dla0a1:  " <<  sph_coors.at(1) << endl;
+    float mid_obj_pxl_x =  960 - sph_coors.at(0);
+    float mid_obj_pxl_y =  540 - sph_coors.at(1);
+    float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
+    float obj_pos_um_y = (  mid_obj_pxl_y *y_conv);
+    center_coordinates.push_back( ctrl->stage_get_x_coords()-(obj_pos_um_x));
+    center_coordinates.push_back(  ctrl->stage_get_y_coords()-(obj_pos_um_y));
+    return center_coordinates;
+}
+
+
+
+void MainWindow::center_spheroid(std::vector<float> coors)
+{
+    ctrl->stage_set_speed(5000.0f);
+    std:: vector<float> c_coords = this->get_centered_coordinates(coors);
+    ctrl->stage_move_to_x_sync(static_cast<int>(c_coords.at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
+    ctrl->stage_set_speed(15000.0f);
 }
 
 void MainWindow::xz_stage_pickup_sph(){
@@ -601,24 +671,23 @@ void MainWindow::xz_stage_pickup_sph(){
 
 void MainWindow::on_pickup_sph_clicked()
 {
-    this->centerspheroid();
+    //this->center_spheroid(dl->objpos.at(ui->n_obj->value()));
+  //  this->center_spheroid();
+    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->n_obj->value()).at(0) <<":" <<global_obj_im_coordinates->at(ui->n_obj->value()).at(1)<< endl;
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->n_obj->value()).at(1)));
     //std::thread t2(&MainWindow::pickup_sph,this);
     //t2.detach();
 }
 
-void MainWindow::on_analyse_scan_clicked()
-{
-    for (int i=0; i<scanvector.size();i++){
-        scanvector.at(i)= dl->dnn_prediction(scanvector.at(i));
-    }
-
-}
 
 void MainWindow::on_view_scan_clicked()
 {
     using namespace  cv;
     //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    int platesize = 350000;     //    100nm // *0.1um
+   // int platesize = 350000; //    100nm // *0.1um
+
+    const float platesize = ui->set_plate_size_spinbox->value()*10000;
     float  img_w_5p5x = 27426; //    100nm
     float  img_h_5p5x = 15421;//19466; //    100nm
     int wmax = static_cast<int>(platesize / img_w_5p5x); // um
@@ -627,7 +696,9 @@ void MainWindow::on_view_scan_clicked()
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
     for (int i = 0; i < hmax; ++i)
     {
-        for (int j = 0; j < wmax; ++j) {
+        for (int j = 0; j < wmax; ++j)
+        {
+
             for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
@@ -637,15 +708,17 @@ void MainWindow::on_view_scan_clicked()
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
                 }
             }
+
+
         }
     }
-
     imtools->saveImg(Mimage,"mozaic");
     qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
-    ui->tab2->activateWindow();
-    //scanvector.clear();
+    ui->tabWidget->setCurrentWidget(ui->tab2);
+    scanvector.clear();
+    prog_changed(0);
 }
 
 void MainWindow::on_p_ep_button_clicked()
@@ -656,11 +729,6 @@ void MainWindow::on_p_ep_button_clicked()
 void MainWindow::on_p_em_button_clicked()
 {
     ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
-}
-
-void MainWindow::on_p_extruder_step_box_valueChanged(double arg1)
-{
-
 }
 
 
@@ -675,14 +743,15 @@ void MainWindow::closeEvent (QCloseEvent *event)
 
     } else {
         event->accept();
-        this->close();
+        QCoreApplication::quit();
+        //this->close();
         this->parentWidget()->show();
     }
 }
 
 void MainWindow::on_actionExit_triggered()
 {
-    this->close();
+    QCoreApplication::quit();
 }
 
 void MainWindow::on_actionHW_selector_triggered()

@@ -19,11 +19,12 @@ public:
     deeplearning();
     ~deeplearning();
     void drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask);
-    void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
+    std::vector<std::vector<float>> postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
     void resize(cv::Mat& input, cv::Mat& out);
     void setup_dnn_network(std::string cf, std::string model_w, std::string t_g);
-    cv::Mat dnn_prediction(cv::Mat& input);
-    std::vector<std::vector<float>> objpos;
+    std::vector<std::vector<float>> dnn_prediction(cv::Mat& input);
+    std::vector<std::vector<float>> dnn_prediction(cv::Mat& input,cv::Mat& output);
+  //  std::vector<std::vector<float>> objpos;
     std::vector<std::string> classes;
     std::vector<cv::Scalar> colors;
     // Initialize the parameters

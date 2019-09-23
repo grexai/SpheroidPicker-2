@@ -17,7 +17,6 @@
 #include <deeplearning.h>
 #include <propertyreader.h>
 
-
 namespace Ui {
 class MainWindow;
 }
@@ -42,10 +41,7 @@ public:
     void displayImage();
 
     void SpawnThreadAndLaunch();
-
  //   void MainWindow::mouseMoveEvent(QMouseEvent *event);
-
-
     void porttest();
     cv::Mat TM;
 
@@ -80,7 +76,10 @@ private slots:
 
      void update_currentpressure();
 
-     void MoveAction();
+     void move_action();
+
+     void center_this_point_action();
+
      void keyPressEvent( QKeyEvent* e );
 
      void show_currentpressure();
@@ -159,19 +158,17 @@ private slots:
 
      void pickup_sph();
 
-     void centerspheroid();
+     std::vector<float> get_centered_coordinates(std::vector<float> sph_coors);
+
+     void center_spheroid(std::vector<float> coors);
 
      void xz_stage_pickup_sph();
-
-     void on_analyse_scan_clicked();
 
      std::string get_date_time_str();
 
      void on_view_scan_clicked();
 
      void on_p_ep_button_clicked();
-
-     void on_p_extruder_step_box_valueChanged(double arg1);
 
      void on_p_em_button_clicked();
 
@@ -191,7 +188,8 @@ private:
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
     deeplearning* dl= nullptr;
-     std::vector<cv::Mat> scanvector;
+    std::vector<cv::Mat> scanvector;
+    std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     propertyreader* propreader = nullptr;
 
     std::atomic_bool m_s_t_acitive=false;

@@ -11,7 +11,7 @@ hardwareselector::hardwareselector(QWidget *parent) :
 
 }
 
-
+#include <QSplashScreen>
 
 hardwareselector::~hardwareselector()
 {
@@ -20,10 +20,17 @@ hardwareselector::~hardwareselector()
 
 void hardwareselector::on_pushButton_clicked()
 {
-    main = new MainWindow(this);
-    main->show();
-   // main->show();
     this->hide();
+    main = new MainWindow(this);
+ //   QPixmap pixmap("D:/dev/cpp/VS2015/gpuphasefield/2d-segmentation/test-images/black.png");
+ //   QSplashScreen splash(pixmap);
+  //  splash.show();
+  //  QTimer::singleShot(5000,&splash,SLOT(show()));
+
+    main->show();
+
+   // main->show();
+
 
     //main->ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
 }

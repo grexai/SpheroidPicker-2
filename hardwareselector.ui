@@ -37,7 +37,7 @@
    </property>
    <item>
     <property name="text">
-     <string>Leica Stage</string>
+     <string>Leica Tango Stage</string>
     </property>
    </item>
   </widget>
@@ -52,12 +52,12 @@
    </property>
    <item>
     <property name="text">
-     <string>3 Axis pipette manipulator</string>
+     <string>2 Axis XZ pipette manipulator</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>2 Axis XZ pipette manipulator</string>
+     <string>3 Axis pipette manipulator</string>
     </property>
    </item>
   </widget>
@@ -72,12 +72,12 @@
    </property>
    <item>
     <property name="text">
-     <string>Pressure Controller</string>
+     <string>Syringe connected to pipette manipulator</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>Syringe connected to pipette manipulator</string>
+     <string>Pressure Controller</string>
     </property>
    </item>
   </widget>
@@ -92,7 +92,7 @@
    </property>
    <item>
     <property name="text">
-     <string>Leica Stereo Microscope S</string>
+     <string>Leica Stereo Microscope S9i</string>
     </property>
    </item>
   </widget>

@@ -45,7 +45,7 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
     int ypos=this->stage_get_y_coords();
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
-    this->stage_set_speed(7500.0f);
+    this->stage_set_speed(7000.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     float p_v=0.0f;
@@ -60,7 +60,7 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
             {
                 this->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
                 p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
-           //     prog_changed(static_cast<int>(p_v));
+                //Qt fill combobox prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 int leading = 2;
                 std::string num2str= folder + "_H" + std::to_string(j*0.000001).substr(8-leading)+ "_W" + std::to_string(i*0.000001).substr(8-leading);
@@ -76,10 +76,10 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
                 break;
             }
         }
-        this->stage_set_speed(10000.0f);
+        this->stage_set_speed(70000.0f);
         this->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-        this->stage_set_speed(7000.0f);
+        this->stage_set_speed(5000.0f);
 
 
-}
+    }
 }

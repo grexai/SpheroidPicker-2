@@ -45,13 +45,13 @@ void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box
 }
 
 // For each frame, extract the bounding box and mask for each detected object
-void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
+std::vector<std::vector<float>> deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
 {
     using namespace cv;
     using namespace std;
     std::cout << "Outs: " << outs.size() << std::endl;
-
-    if (outs.size() < 2) return;
+    std::vector<std::vector<float>> objpos;
+    if (outs.size() >= 2){ //return 1;
 
     Mat outDetections = outs[0];
     Mat outMasks = outs[1];
@@ -62,7 +62,7 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
     // HxW - segmentation shape
     const int numDetections = static_cast<int>(outDetections.size[2]);
 //    const int numClasses = outMasks.size[1];
-
+  //    std::vector<std::vector<float>> objpos;
     outDetections = outDetections.reshape(1, outDetections.total() / 7);
     for (int i = 0; i < numDetections; ++i)
     {
@@ -86,14 +86,15 @@ void deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
             outcoors.push_back(left);
             outcoors.push_back(top);
             objpos.push_back(outcoors);
-            cout <<"what"<< endl;
+            cout <<"image object size"<< objpos.size()<<  endl;
             // Extract the mask for the object
             Mat objectMask(outMasks.size[2], outMasks.size[3], CV_32F, outMasks.ptr<float>(i,classId));
-            // Draw bounding box, colorize and show the mask on the image
+             // Draw bounding box, colorize and show the mask on the image
             drawBox(frame, classId, score, box, objectMask);
-
+            }
         }
     }
+    return objpos;
 }
 
 //resize the image for 512x512 keeping ratio
@@ -148,12 +149,13 @@ void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::s
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-cv::Mat deeplearning::dnn_prediction(cv::Mat& input)
+
+std::vector<std::vector<float>> deeplearning::dnn_prediction(cv::Mat& input,cv::Mat& output)
 {
     using namespace cv;
     using namespace std;
     using namespace dnn;
-
+     std::vector<std::vector<float>> objpos;
     std::cerr << "Read START" << std::endl;
     // Read image
 
@@ -199,7 +201,7 @@ cv::Mat deeplearning::dnn_prediction(cv::Mat& input)
     std::cerr << "ok" << std::endl;
 
     // Extract the bounding box and mask for each of the detected objects
-    postprocess(frame, outs);
+   objpos = postprocess(frame, outs);
 
     auto end = std::chrono::system_clock::now();
 
@@ -209,11 +211,84 @@ cv::Mat deeplearning::dnn_prediction(cv::Mat& input)
         std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
     }
 
-    Mat detectedFrame;
-    frame.convertTo(detectedFrame, CV_8U);
+  //  Mat detectedFrame;
+    frame.convertTo(output, CV_8U);
  //   cv::namedWindow("detected object", WINDOW_KEEPRATIO);
  //   imshow("detected object", detectedFrame);
  //   cv::resizeWindow("detected object", 1280, 720);
     waitKey(1);
-    return detectedFrame;
+    return objpos;
+}
+
+
+
+std::vector<std::vector<float>> deeplearning::dnn_prediction(cv::Mat& input)
+{
+    using namespace cv;
+    using namespace std;
+    using namespace dnn;
+     std::vector<std::vector<float>> objpos;
+    std::cerr << "Read START" << std::endl;
+    // Read image
+
+    cv::Mat frame = input;
+    frame.convertTo(frame, CV_8UC3);
+    Mat frameResized;
+    // resize to 512*512 keeping the ratio
+    this->resize(frame,frameResized);
+ //   resize(frame, frameResized, Size(1024, 1024));
+
+    // Create a 4D blob from a frame.
+    cv::Mat blob;
+    blobFromImage(frameResized, blob, 1.0, cv::Size(frameResized.cols, frameResized.rows), cv::Scalar(), true, false);
+
+    std::cerr << "BLOB OK" << std::endl;
+    colors.push_back(Scalar(255, 100, 45, 255.0));
+    //Sets the input to the network
+    net->setInput(blob, "image_tensor");
+    net->enableFusion(1);
+    // Runs the forward pass to get output from the output layers
+    std::vector<String> outNames(2);
+    outNames[0] = "detection_out_final";
+    outNames[1] = "detection_masks";
+    std::vector<cv::Mat> outs;
+
+    {
+    std::cerr << "Start..." << std::endl;
+        // CHRONO START
+    auto start = std::chrono::system_clock::now();
+
+    try
+    {
+        net->forward(outs, outNames);
+    } catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cerr << "ex" << std::endl;
+    }
+
+    std::cerr << "ok" << std::endl;
+
+    // Extract the bounding box and mask for each of the detected objects
+    objpos = postprocess(frame, outs);
+
+    auto end = std::chrono::system_clock::now();
+
+        std::chrono::duration<double> elapsed_seconds = end - start;
+
+        // CHRONO END
+        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+    }
+
+   // Mat detectedFrame;
+//    frame.convertTo(detectedFrame, CV_8U);
+ //   cv::namedWindow("detected object", WINDOW_KEEPRATIO);
+ //   imshow("detected object", detectedFrame);
+ //   cv::resizeWindow("detected object", 1280, 720);
+    waitKey(1);
+    return objpos;
+    //return detectedFrame;
 }
