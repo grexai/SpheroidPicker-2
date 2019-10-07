@@ -11,7 +11,6 @@ bool controller::connect_pressure_controller(std::string& port)
     //arduinopressurecontroller sd(QSP_apc,p1);
     if (apc->isconnected == true)
     {
-
        QTextStream(stdout)<< "Pressure controller connected"<< endl;
        return true;
     }
@@ -317,6 +316,7 @@ void controller::stage_set_speed(const float speed)
 {
     stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
     stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+
 }
 
 int controller::stage_get_x_speed()
@@ -503,6 +503,11 @@ bool controller::connect_microscope_unit(std::string &pa, std::string &pc)
 //  this->spawn_pressure_thread();
     return true;
 }
+
+
+
+
+
 
 bool controller::connect_screening_microscope(){
     return false;

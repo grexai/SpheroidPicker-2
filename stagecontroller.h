@@ -126,6 +126,8 @@ public:
     // BasicControlValueVelocity - current speed
     bool setCurrentSpeed(iop::int32 speed) ;// set current native speed
 
+    bool setCurrentAcceleration(iop::int32 accel);
+
     iop::int32 getCurrentSpeed();// retrieve current native speed
 
     iop::int32 getMinSpeed() ; // min native speed
@@ -166,6 +168,7 @@ private:
     ahm::DirectedControlValueAsync *m_pDirectedControlValueAsync;
     ahm::DirectedControlValueAsyncVelocity *m_pDirectedControlValueAsyncVelocity;
     ahm::BasicControlValueVelocity *m_pBasicControlValueVelocity;
+    ahm::BasicControlValueAcceleration *m_pm_pBasicControlValueAcceleration;
     ahm::BasicControlState *m_pBasicControlState;
     ahm::EventSource *m_pEventSource;
 };

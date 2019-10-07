@@ -187,9 +187,25 @@ void Axis::printWhatIsSupported() {
             try {
                 m_pBasicControlValueVelocity->setControlValue(speed);
                 return true;
+
             }
             catch (ahm::Exception & ex) {
                 std::cout << "exception while setting speed" << speed << ": " << ex.errorText() << std::endl;
+            }
+        }
+        return false;
+    }
+
+    bool Axis::setCurrentAcceleration(iop::int32 accel)
+    {
+        if (m_pBasicControlValueVelocity) {
+            try {
+                m_pm_pBasicControlValueAcceleration->setControlValue(accel);
+                return true;
+
+            }
+            catch (ahm::Exception & ex) {
+                std::cout << "exception while setting speed" << accel << ": " << ex.errorText() << std::endl;
             }
         }
         return false;
