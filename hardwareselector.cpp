@@ -26,6 +26,7 @@ void hardwareselector::on_pushButton_clicked()
     main->show();
 
     main->set_h4(ui->comboBox_3->currentIndex());
+    main->set_pip_man(ui->pip_manip_combobox->currentIndex());
    // main->show();
 
 

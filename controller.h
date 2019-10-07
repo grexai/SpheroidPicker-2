@@ -96,6 +96,8 @@ public:
 
     void stage_set_speed(const float speed);
 
+    void stage_set_acceleration(const float accel);
+
     int stage_get_x_speed();
 
     int stage_get_y_speed();
@@ -103,6 +105,8 @@ public:
     int stage_get_acceleration();
 
     std::vector<int> stage_get_speed();
+
+
 
     int stage_get_x_coords();
 

@@ -316,6 +316,12 @@ void controller::stage_set_speed(const float speed)
 {
     stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
     stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+}
+
+void controller::stage_set_acceleration(const float accel)
+{
+    stage->XAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
+    stage->YAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
 
 }
 
@@ -328,9 +334,10 @@ int controller::stage_get_y_speed()
 {
     return int(stage->YAxis().getCurrentSpeed());
 }
+
 int controller::stage_get_acceleration()
 {
-   return 1;
+   return int(stage->YAxis().getCurrentAcceleration());
 }
 
 std::vector<int> controller::stage_get_speed()
