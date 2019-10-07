@@ -6,10 +6,9 @@
 #include <stagecontroller.h>
 #include <calibratedialog.h>
 #include <comps.h>
-#include <QString>
-#include <QSerialPort>
-
-#include <QThread>
+//#include <QString>
+//#include <QSerialPort>
+//#include <QThread>
 class controller
 {
 public:
@@ -100,6 +99,8 @@ public:
     int stage_get_x_speed();
 
     int stage_get_y_speed();
+
+    int stage_get_acceleration();
 
     std::vector<int> stage_get_speed();
 

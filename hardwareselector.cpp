@@ -28,7 +28,7 @@ void hardwareselector::on_pushButton_clicked()
   //  QTimer::singleShot(5000,&splash,SLOT(show()));
 
     main->show();
-
+    main->set_h4(ui->comboBox_3->currentIndex());
    // main->show();
 
 

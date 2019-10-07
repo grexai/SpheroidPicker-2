@@ -1,14 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include <QThread>
+//#include <QThread>
 #include <QTimer>
 #include <QMainWindow>
-#include <QMessageBox>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
+
 #include <imagetools.h>
-#include <arduinopressurecontroller.h>
-#include <arduinogcode.h>
 #include <stagecontroller.h>
 #include <calibratedialog.h>
 #include <comps.h>
@@ -51,6 +49,7 @@ signals:
     void prog_changed(int progress);
 public slots:
     void set_progressbar( int value );
+    void set_h4(int value);
 
 
 protected:

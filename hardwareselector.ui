@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>ASP- Hardware configurator</string>
   </property>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>430</y>
-     <width>221</width>
+     <width>231</width>
      <height>21</height>
     </rect>
    </property>
@@ -31,7 +31,7 @@
     <rect>
      <x>30</x>
      <y>210</y>
-     <width>221</width>
+     <width>231</width>
      <height>22</height>
     </rect>
    </property>
@@ -46,7 +46,7 @@
     <rect>
      <x>30</x>
      <y>280</y>
-     <width>221</width>
+     <width>231</width>
      <height>22</height>
     </rect>
    </property>
@@ -66,7 +66,7 @@
     <rect>
      <x>30</x>
      <y>350</y>
-     <width>221</width>
+     <width>231</width>
      <height>22</height>
     </rect>
    </property>
@@ -86,7 +86,7 @@
     <rect>
      <x>30</x>
      <y>130</y>
-     <width>221</width>
+     <width>231</width>
      <height>22</height>
     </rect>
    </property>
@@ -102,11 +102,11 @@
      <x>20</x>
      <y>20</y>
      <width>251</width>
-     <height>31</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>Automatic Spheroid Picker Hardware selector</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Automatic Spheroid Picker&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Hardware Configurator&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">

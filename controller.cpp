@@ -328,6 +328,10 @@ int controller::stage_get_y_speed()
 {
     return int(stage->YAxis().getCurrentSpeed());
 }
+int controller::stage_get_acceleration()
+{
+   return 1;
+}
 
 std::vector<int> controller::stage_get_speed()
 {
