@@ -126,13 +126,19 @@ public:
     // BasicControlValueVelocity - current speed
     bool setCurrentSpeed(iop::int32 speed) ;// set current native speed
 
-    bool setCurrentAcceleration(iop::int32 accel);
+
 
     iop::int32 getCurrentSpeed();// retrieve current native speed
 
     iop::int32 getMinSpeed() ; // min native speed
 
     iop::int32 getMaxSpeed() ; // min position in micro steps
+
+    bool setCurrentAcceleration(iop::int32 accel);
+
+    iop::int32 getCurrentAcceleration();
+
+
 
     // what is supported
     bool isAsyncSupported() const ;
