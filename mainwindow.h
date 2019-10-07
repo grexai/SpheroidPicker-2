@@ -50,7 +50,7 @@ signals:
 public slots:
     void set_progressbar( int value );
     void set_h4(int value);
-
+    void set_pip_man(int value);
 
 protected:
     int m_progvalue;

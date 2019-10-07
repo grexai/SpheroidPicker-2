@@ -23,10 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->scene()->addItem(&qpxmi);
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-    ui->p_home_y->hide();
-    ui->p_ymax->hide();
-    ui->p_ym_button->hide();
-    ui->p_yp_button->hide();
+
    // ui->P_C_box->hide();
 
     progress.setValue(20);
@@ -617,8 +614,24 @@ void MainWindow::set_h4(int value)
        ui->P_C_box->show();
        ui->syringe_box->hide();
     }
+}
 
-
+void MainWindow::set_pip_man(int value)
+{
+    if(value == 0)
+    {
+        ui->p_home_y->hide();
+        ui->p_ymax->hide();
+        ui->p_ym_button->hide();
+        ui->p_yp_button->hide();
+    }
+    if (value == 1)
+    {
+        ui->p_home_y->show();
+        ui->p_ymax->show();
+        ui->p_ym_button->show();
+        ui->p_yp_button->show();
+    }
 }
 
 void MainWindow::on_actionSpheroid_picker_triggered()

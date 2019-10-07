@@ -174,7 +174,7 @@ private:
     ahm::DirectedControlValueAsync *m_pDirectedControlValueAsync;
     ahm::DirectedControlValueAsyncVelocity *m_pDirectedControlValueAsyncVelocity;
     ahm::BasicControlValueVelocity *m_pBasicControlValueVelocity;
-    ahm::BasicControlValueAcceleration *m_pm_pBasicControlValueAcceleration;
+    ahm::BasicControlValueAcceleration *m_pBasicControlValueAcceleration;
     ahm::BasicControlState *m_pBasicControlState;
     ahm::EventSource *m_pEventSource;
 };
