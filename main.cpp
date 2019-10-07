@@ -2,7 +2,7 @@
 #include "hardwareselector.h"
 #include <QApplication>
 #include <QStyleOptionFrameV2>
-
+#include <QSplashScreen>
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +11,13 @@ int main(int argc, char *argv[])
 //    setstyle();
 
     hardwareselector w;
-    w.show();
+    QPixmap pixmap("E:/BIOMAGtransparentsml.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+    QTimer::singleShot(1200,&splash,SLOT(close()));
+    QTimer::singleShot(1100,&w,SLOT(show()));
+  //  w.show();
+
 
     return a.exec();
 
