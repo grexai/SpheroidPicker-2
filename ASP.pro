@@ -145,3 +145,5 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 #else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_ml345.a
 #else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/opencv_video345.lib
 #else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_video345.lib
+
+DISTFILES +=

@@ -26,7 +26,7 @@
     <string>Select hardware</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="stage_combobox">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -81,7 +81,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="comboBox_4">
+  <widget class="QComboBox" name="microscope_combobox">
    <property name="geometry">
     <rect>
      <x>30</x>

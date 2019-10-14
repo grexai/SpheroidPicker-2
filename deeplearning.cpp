@@ -131,6 +131,7 @@ void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::s
 
     // Load names of classes
     string classesFile = cf;          //"d:/dev/cpp/mscoco_labels.names";
+ //   std::cout <<
     ifstream ifs(classesFile.c_str());
     string line;
     while (getline(ifs, line)) classes.push_back(line);

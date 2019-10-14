@@ -43,7 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setValue(75);
     dl = new deeplearning;
     dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
-    progress.setLabelText("Loading neural network graph");
+    QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
+    QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
+    QTextStream(stdout) << propreader->cfg.textGraph.c_str() << endl;
+    progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
 /*
@@ -77,8 +80,11 @@ void MainWindow::setdarkstyle(){
 
 void MainWindow::setdefault()
 {
-   qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+  qApp->setStyle(QStyleFactory::create("WindowsDefault"));
    qApp->setPalette(this->style()->standardPalette());
+   qApp->style()->standardPalette();
+ //  qApp->setStyle(this->style()->standardIcon());
+ //  qApp->setStyle(this->style()->standardPixmap());
    qApp->setStyleSheet("");
 }
 
@@ -151,7 +157,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
     }
-    QMainWindow::keyPressEvent( e );
+    QMainWindow::keyPressEvent(e);
 }
 
 void MainWindow::calib_frame_view(cv::Mat& disp){
@@ -412,6 +418,8 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     std::vector<int> coords = ctrl->stage_get_coords();
     ui->s_xpos_label->setText("X: " + QString::number(coords.at(0),'f',2));
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
+   // ctrl->stage_set_acceleration(ui->s_accel_spinbox->value());
+    QTextStream(stdout) << ctrl->stage_get_x_acceleration();
 }
 
 void MainWindow::move_action(){
@@ -549,7 +557,7 @@ void MainWindow::screensample()
     m_s_t_acitive=false;
     ctrl->stage_set_speed(20000.0f);
     ui->found_objects->clear();
-    for (int i=1 ;i<=global_obj_im_coordinates->size();++i )
+    for (int i=0 ;i<global_obj_im_coordinates->size();++i )
     {
         ui->found_objects->addItem(QString::number(i));
     }
@@ -557,6 +565,7 @@ void MainWindow::screensample()
     ui->S_c_box->setEnabled(true);
     ui->syringe_box->setEnabled(true);
     ui->start_screening->setText("Start Screening");
+    scan_finished();
    /* if(m_screening_thread->joinable())
     {
         m_screening_thread->join();
@@ -566,6 +575,7 @@ void MainWindow::screensample()
 
 void MainWindow::on_start_screening_clicked()
 {
+    connect(this, SIGNAL(scan_finised),this,SLOT(scan_stopped));
     if(!m_s_t_acitive)
     {
         m_s_t_acitive = true;
@@ -616,6 +626,13 @@ void MainWindow::set_h4(int value)
     }
 }
 
+void MainWindow::scan_stopped()
+{
+ //   emit scan_finished();
+
+    QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
+}
+
 void MainWindow::set_pip_man(int value)
 {
     if(value == 0)
@@ -639,10 +656,12 @@ void MainWindow::on_actionSpheroid_picker_triggered()
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
+
     propreader->apply_settings(settings);
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
     dl = new deeplearning;
     dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+
 }
 
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
@@ -651,12 +670,10 @@ void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
      ctrl->pipette_set_speed(arg1);
 }
 
-void MainWindow::on_s_speed_spinbox_valueChanged(double arg1)
+void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
 {
-     ctrl->stage_set_speed(static_cast<float>(arg1));
+     ctrl->stage_set_speed(static_cast<int>(arg1));
 }
-
-
 
 void MainWindow::pickup_sph()
 {
@@ -687,8 +704,6 @@ std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_c
     return center_coordinates;
 }
 
-
-
 void MainWindow::center_spheroid(std::vector<float> coors)
 {
     ctrl->stage_set_speed(5000.0f);
@@ -711,6 +726,7 @@ void MainWindow::on_pickup_sph_clicked()
 {
     //this->center_spheroid(dl->objpos.at(ui->n_obj->value()));
   //  this->center_spheroid();
+    ctrl->stage_set_speed(3000);
     QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
@@ -796,4 +812,9 @@ void MainWindow::on_actionHW_selector_triggered()
 {
     this->parentWidget()->show();
     this->deleteLater();
+}
+
+void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
+{
+    ctrl->stage_set_acceleration(arg1);
 }

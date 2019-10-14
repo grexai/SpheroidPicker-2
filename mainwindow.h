@@ -47,11 +47,12 @@ signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
     void prog_changed(int progress);
+    void scan_finished();
 public slots:
+    void scan_stopped();
     void set_progressbar( int value );
     void set_h4(int value);
     void set_pip_man(int value);
-
 protected:
     int m_progvalue;
     controller* ctrl = nullptr;
@@ -147,7 +148,7 @@ private slots:
 
      void on_p_set_speed_spinbox_valueChanged(int arg1);
 
-     void on_s_speed_spinbox_valueChanged(double arg1);
+     void on_s_speed_spinbox_valueChanged(int arg1);
 
      void on_actionLight_triggered();
 
@@ -176,6 +177,8 @@ private slots:
      void on_actionExit_triggered();
 
      void on_actionHW_selector_triggered();
+
+     void on_s_accel_spinbox_valueChanged(int arg1);
 
 private:
     QTimer *timer= nullptr;

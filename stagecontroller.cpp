@@ -237,7 +237,7 @@ void Axis::printWhatIsSupported() {
     // BasicControlValueAcceleration - current acceleration
     bool Axis::setCurrentAcceleration(iop::int32 accel)
     {
-        if (m_pBasicControlValueVelocity) {
+        if (m_pBasicControlValueAcceleration) {
             try {
                 m_pBasicControlValueAcceleration->setControlValue(accel);
                 return true;
@@ -250,8 +250,10 @@ void Axis::printWhatIsSupported() {
     }
 
     iop::int32 Axis::getCurrentAcceleration() { // retrieve current native acceleation
+        std::cout<< m_pBasicControlValueAcceleration;
         if (m_pBasicControlValueAcceleration) {
             try {
+                std::cout<< m_pBasicControlValueAcceleration;
                 return m_pBasicControlValueAcceleration->getControlValue();
             }
             catch (ahm::Exception & ex) {

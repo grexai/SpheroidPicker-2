@@ -88,6 +88,7 @@ public:
         m_pHaltControlValue = find_itf<ahm::HaltControlValue>(m_pAxisUnit, ahm::IID_HALT_CONTROL_VALUE);
         m_pDirectedControlValueAsync = find_itf<ahm::DirectedControlValueAsync>(m_pAxisUnit, ahm::IID_DIRECTED_CONTROL_VALUE_ASYNC);
         m_pBasicControlValueVelocity = find_itf<ahm::BasicControlValueVelocity>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_VELOCITY);
+        m_pBasicControlValueAcceleration = find_itf<ahm::BasicControlValueAcceleration>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_ACCELERATION);
         m_pDirectedControlValueAsyncVelocity = find_itf<ahm::DirectedControlValueAsyncVelocity>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_ASYNC);
         m_pBasicControlState = find_itf<ahm::BasicControlState>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_STATE);
         m_pEventSource = find_itf<ahm::EventSource>(m_pAxisUnit, ahm::IID_EVENT_SOURCE);

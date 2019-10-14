@@ -11,13 +11,12 @@ int main(int argc, char *argv[])
 //    setstyle();
 
     hardwareselector w;
-    QPixmap pixmap("E:/BIOMAGtransparentsml.png");
-    pixmap.scaled(400,150,Qt::KeepAspectRatio,Qt::FastTransformation);
+    QPixmap pixmap("../BIOMAGwhite-01.png");
     QSplashScreen splash(pixmap);
 
     splash.show();
-    QTimer::singleShot(1200,&splash,SLOT(close()));
-    QTimer::singleShot(1100,&w,SLOT(show()));
+    QTimer::singleShot(1100,&splash,SLOT(close()));
+    QTimer::singleShot(1130,&w,SLOT(show()));
   //  w.show();
 
 

@@ -94,18 +94,21 @@ public:
 
     void stage_move_to_y_sync( int y);
 
-    void stage_set_speed(const float speed);
+    void stage_set_speed(const int speed);
 
-    void stage_set_acceleration(const float accel);
+    void stage_set_acceleration(const int accel);
 
     int stage_get_x_speed();
 
     int stage_get_y_speed();
 
-    int stage_get_acceleration();
-
     std::vector<int> stage_get_speed();
 
+    int stage_get_x_acceleration();
+
+    int stage_get_y_acceleration();
+
+    std::vector<int> stage_get_acceleration();
 
 
     int stage_get_x_coords();

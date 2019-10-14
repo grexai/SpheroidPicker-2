@@ -312,17 +312,16 @@ void controller::stage_move_to_y_sync(const int y)
     stage->YAxis().moveTo(static_cast<iop::int32>(y));
 }
 
-void controller::stage_set_speed(const float speed)
+void controller::stage_set_speed(const int speed)
 {
     stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
     stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
 }
 
-void controller::stage_set_acceleration(const float accel)
+void controller::stage_set_acceleration(const int accel)
 {
     stage->XAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
     stage->YAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
-
 }
 
 int controller::stage_get_x_speed()
@@ -335,11 +334,6 @@ int controller::stage_get_y_speed()
     return int(stage->YAxis().getCurrentSpeed());
 }
 
-int controller::stage_get_acceleration()
-{
-   return int(stage->YAxis().getCurrentAcceleration());
-}
-
 std::vector<int> controller::stage_get_speed()
 {
     std::vector<int> speedvec;
@@ -347,6 +341,27 @@ std::vector<int> controller::stage_get_speed()
     speedvec.push_back(this->stage_get_y_speed());
     return speedvec;
 }
+
+int controller::stage_get_x_acceleration()
+{
+   return int(stage->XAxis().getCurrentAcceleration());
+}
+
+int controller::stage_get_y_acceleration()
+{
+   return int(stage->YAxis().getCurrentAcceleration());
+}
+
+std::vector<int> controller::stage_get_acceleration()
+{
+    std::vector<int> accelvec;
+    accelvec.push_back(this->stage_get_x_acceleration());
+    accelvec.push_back(this->stage_get_y_acceleration());
+    return accelvec;
+}
+
+
+
 
 int controller::stage_get_x_coords()
 {

@@ -769,7 +769,7 @@ Stage</string>
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="s_speed_spinbox">
+    <widget class="QSpinBox" name="s_speed_spinbox">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -779,10 +779,7 @@ Stage</string>
       </rect>
      </property>
      <property name="maximum">
-      <double>100000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>500.000000000000000</double>
+      <number>100000</number>
      </property>
     </widget>
     <widget class="QLabel" name="label">
@@ -863,7 +860,7 @@ Stage</string>
       <string>Acceletaion</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="s_accel_spinbox">
+    <widget class="QSpinBox" name="s_accel_spinbox">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -871,6 +868,9 @@ Stage</string>
        <width>62</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
      </property>
     </widget>
    </widget>
@@ -1140,7 +1140,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>60</y>
+       <y>70</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -1162,7 +1162,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>40</y>
        <width>51</width>
        <height>21</height>
       </rect>
@@ -1175,7 +1175,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>70</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1188,7 +1188,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>61</width>
        <height>16</height>
       </rect>
@@ -1201,7 +1201,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>100</y>
+       <y>110</y>
        <width>62</width>
        <height>31</height>
       </rect>
@@ -1658,6 +1658,7 @@ Stage</string>
     <addaction name="separator"/>
     <addaction name="actionHW_selector"/>
     <addaction name="actionExit"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuTheme">
     <property name="title">
@@ -1718,7 +1719,7 @@ Stage</string>
   </action>
   <action name="actionHW_selector">
    <property name="text">
-    <string>HW selector</string>
+    <string>Hardware selector</string>
    </property>
   </action>
  </widget>
