@@ -46,6 +46,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.textGraph.c_str() << endl;
+
+    /// basic setup
+//    ctrl->stage_set_speed(5000.0f);
+ //   std::vector<int> s = ctrl->stage_get_speed();
+//    ui->s_speed_spinbox->setValue(s.at(0));
+    connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
     progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
@@ -145,14 +151,17 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     {
     case Qt::Key_Plus: on_p_zp_button_clicked(); break;
     case Qt::Key_Minus: on_p_zm_btton_clicked();break;
-    case Qt::Key_2: on_p_xm_button_clicked();break;
-    case Qt::Key_8: on_p_xp_button_clicked();break;
-    case Qt::Key_4: on_p_ym_button_clicked();break;
-    case Qt::Key_6: on_p_yp_button_clicked();break;
+    case Qt::Key_4: on_p_xm_button_clicked();break;
+    case Qt::Key_6: on_p_xp_button_clicked();break;
+    case Qt::Key_2: on_p_ym_button_clicked();break;
+    case Qt::Key_8: on_p_yp_button_clicked();break;
     case Qt::Key_W:on_s_yp_button_clicked(); break;
     case Qt::Key_S: on_s_ym_button_clicked();break;
     case Qt::Key_A:on_s_xm_button_clicked();break;
     case Qt::Key_D:on_s_xp_button_clicked();break;
+    case Qt::Key_1:on_p_em_button_clicked();break;
+    case Qt::Key_3:on_p_ep_button_clicked();break;
+    case Qt::Key_Control:  break;
     case Qt::Key_Space:on_pc_pulse_button_clicked();break;
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
@@ -223,8 +232,14 @@ void MainWindow::on_predict_sph_clicked()
 {
     auto cfrm = cameracv->get_current_frm();
     cv::Mat image;
-    if (global_obj_im_coordinates != nullptr) {delete global_obj_im_coordinates;}
-    global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    if (global_obj_im_coordinates != nullptr)
+    {
+        delete global_obj_im_coordinates;
+        global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    }else {
+        global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    }
+    //global_obj_im_coordinates = new std::vector<std::vector<float>>;
     std::vector<std::vector<float>> im_obj = dl->dnn_prediction(*cfrm,image);
     global_obj_im_coordinates->push_back(im_obj.at(0));
  //   cv::Mat rgb = imtools->convert_bgr_to_rgb(image);
@@ -233,8 +248,7 @@ void MainWindow::on_predict_sph_clicked()
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
     ui->found_objects->clear();
-
-    for (int i=1 ;i<=im_obj.size();++i )
+    for (int i=0 ;i<=im_obj.size();++i)
     {
         ui->found_objects->addItem(QString::number(i));
     }
@@ -575,7 +589,7 @@ void MainWindow::screensample()
 
 void MainWindow::on_start_screening_clicked()
 {
-    connect(this, SIGNAL(scan_finised),this,SLOT(scan_stopped));
+
     if(!m_s_t_acitive)
     {
         m_s_t_acitive = true;
@@ -628,8 +642,6 @@ void MainWindow::set_h4(int value)
 
 void MainWindow::scan_stopped()
 {
- //   emit scan_finished();
-
     QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
 }
 
@@ -713,25 +725,50 @@ void MainWindow::center_spheroid(std::vector<float> coors)
     ctrl->stage_set_speed(15000.0f);
 }
 
-void MainWindow::xz_stage_pickup_sph(){
-  //  ctrl->pipette_movex_sync(-0.3); // center
- //   ctrl->pipette_movez_sync(0.2);
 
-   // ctrl->pipette_extrude_relative(-0.1);
-   // ctrl->pipette_movex_sync(-0.3); // center
-   // ctrl->pipette_movez_sync(0.2);
-}
-
-void MainWindow::on_pickup_sph_clicked()
+void MainWindow::move_to_petri_B()
 {
-    //this->center_spheroid(dl->objpos.at(ui->n_obj->value()));
-  //  this->center_spheroid();
+    //MOVE to the petri "B 35mm petri if the Petri A is centered MID (stage 0,0)
+
+    ctrl->stage_move_x_async(-366407);
+    ctrl->stage_move_to_y_sync(0);
+
+}
+void MainWindow::xz_stage_pickup_sph(){
+    //set pick speeds
     ctrl->stage_set_speed(3000);
+    ctrl->pipette_set_speed(200);
+    //slowly center the selected sph
     QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
-    //std::thread t2(&MainWindow::pickup_sph,this);
-    //t2.detach();
+    //
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //move to the middle of image
+    ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
+    //move Z down to the petri
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ctrl->pipette_home_z();
+    ctrl->pipette_movex_sync(-2.6f);
+    move_to_petri_B();
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->p_extruder_step_box->value()+0.3));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_home_z();
+
+}
+
+
+
+
+
+void MainWindow::on_pickup_sph_clicked()
+{
+    std::thread t2(&MainWindow::xz_stage_pickup_sph,this);
+    t2.detach();
 }
 
 
@@ -817,4 +854,10 @@ void MainWindow::on_actionHW_selector_triggered()
 void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
 {
     ctrl->stage_set_acceleration(arg1);
+}
+
+void MainWindow::on_save_m_p_button_clicked()
+{
+    std::vector<float> pos = ctrl->pipette_get_coordinates();
+    this->mid_s_x_p = pos.at(0);
 }

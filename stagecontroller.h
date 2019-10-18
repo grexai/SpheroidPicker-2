@@ -94,6 +94,7 @@ public:
         m_pEventSource = find_itf<ahm::EventSource>(m_pAxisUnit, ahm::IID_EVENT_SOURCE);
         m_pMicronsConverter = m_pBasicControlValue != 0 && m_pBasicControlValue->metricsConverters() != 0 ? m_pBasicControlValue->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS) : 0;
         m_pMicronsPerSecondConverter = m_pBasicControlValueVelocity != 0 && m_pBasicControlValueVelocity->metricsConverters() != 0 ? m_pBasicControlValueVelocity->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS_PER_SECOND) : 0;
+        m_pMicronsPerSecondSquaredConverter = m_pBasicControlValueAcceleration != 0 && m_pBasicControlValueAcceleration->metricsConverters() != 0 ? m_pBasicControlValueVelocity->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS_PER_SECOND_SQUARED) : 0;
     }
 
     void printWhatIsSupported();
@@ -171,7 +172,7 @@ private:
     ahm::BasicControlValue *m_pBasicControlValue;
     ahm::BasicControlValueAsync *m_pBasicControlValueAsync;
     ahm::HaltControlValue *m_pHaltControlValue;
-    ahm::MetricsConverter *m_pMicronsConverter, *m_pMicronsPerSecondConverter;
+    ahm::MetricsConverter *m_pMicronsConverter, *m_pMicronsPerSecondConverter, *m_pMicronsPerSecondSquaredConverter;
     ahm::DirectedControlValueAsync *m_pDirectedControlValueAsync;
     ahm::DirectedControlValueAsyncVelocity *m_pDirectedControlValueAsyncVelocity;
     ahm::BasicControlValueVelocity *m_pBasicControlValueVelocity;
@@ -208,6 +209,7 @@ public:
         iop::int32 pos;
         DWORD time;
     };
+
     typedef std::vector<Record> Records;
 
     virtual void onEvent(ahm::Unit* pSender, ahm::Event* pEvent);

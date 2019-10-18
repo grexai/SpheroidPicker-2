@@ -4,18 +4,19 @@ propertyreader::propertyreader()
 {
     //get settings from file
 }
-float f_param(std::map<std::string, std::string>& settings, std::string param) {
+float f_param(std::map<std::string, std::string>& settings, std::string param)
+{
     return static_cast<float>(atof(settings[param].c_str()));
 }
 
-int i_param(std::map<std::string, std::string>& settings, std::string param) {
+int i_param(std::map<std::string, std::string>& settings, std::string param)
+{
     return atoi(settings[param].c_str());
 }
 
-std::string s_param(std::map<std::string, std::string>& settings, std::string param) {
-
+std::string s_param(std::map<std::string, std::string>& settings, std::string param)
+{
     return settings[param];
-
 }
 
 template<typename Out>

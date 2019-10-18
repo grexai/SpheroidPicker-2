@@ -162,6 +162,8 @@ private slots:
 
      void center_spheroid(std::vector<float> coors);
 
+     void move_to_petri_B();
+
      void xz_stage_pickup_sph();
 
      std::string get_date_time_str();
@@ -179,6 +181,8 @@ private slots:
      void on_actionHW_selector_triggered();
 
      void on_s_accel_spinbox_valueChanged(int arg1);
+
+     void on_save_m_p_button_clicked();
 
 private:
     QTimer *timer= nullptr;
@@ -201,6 +205,7 @@ private:
     float m_status = 0;
     QTimer *timer1= nullptr ;
     QThread *thread1= nullptr;
+    float mid_s_x_p=0.0f;
 };
 
 #endif // MAINWINDOW_H

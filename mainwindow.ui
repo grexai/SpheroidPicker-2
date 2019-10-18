@@ -668,7 +668,7 @@
     <widget class="QPushButton" name="s_xp_button">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>110</x>
        <y>200</y>
        <width>41</width>
        <height>41</height>
@@ -753,7 +753,7 @@ Stage</string>
     <widget class="QPushButton" name="s_xm_button">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>10</x>
        <y>200</y>
        <width>41</width>
        <height>41</height>
@@ -889,7 +889,7 @@ Stage</string>
     <widget class="QPushButton" name="get_coors_pushButton">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>110</x>
        <y>320</y>
        <width>80</width>
        <height>21</height>
@@ -1207,6 +1207,48 @@ Stage</string>
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="save_m_p_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>290</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>setX midpoint</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="set_z_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>300</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>999.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>50.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>300</y>
+       <width>61</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>auto z height</string>
+     </property>
+    </widget>
     <zorder>get_coors_pushButton</zorder>
     <zorder>p_xm_button</zorder>
     <zorder>pip_step_spinbox</zorder>
@@ -1231,6 +1273,9 @@ Stage</string>
     <zorder>p_ym_button</zorder>
     <zorder>label_4</zorder>
     <zorder>doubleSpinBox</zorder>
+    <zorder>save_m_p_button</zorder>
+    <zorder>set_z_spinbox</zorder>
+    <zorder>label_6</zorder>
    </widget>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
@@ -1557,9 +1602,9 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>450</y>
+      <y>440</y>
       <width>391</width>
-      <height>91</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="title">
@@ -1569,7 +1614,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>30</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -1582,7 +1627,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>50</y>
+       <y>30</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -1595,7 +1640,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>50</y>
+       <y>30</y>
        <width>121</width>
        <height>31</height>
       </rect>

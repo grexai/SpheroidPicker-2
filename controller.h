@@ -48,9 +48,13 @@ public:
 
     void pipette_movex_sync(const float x);
 
+    void pipette_move_to_x_sync(const float x);
+
     void pipette_movey_sync(const float y);
 
     void pipette_movez_sync(const float z);
+
+    void pipette_move_to_z_sync(const float z);
 
     void pipette_extrude_relative(const float e);
 

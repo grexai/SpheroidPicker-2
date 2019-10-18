@@ -132,6 +132,14 @@ void controller::pipette_movex_sync(const float x)
     apipc->moveToXSync(x);
 }
 
+void controller::pipette_move_to_x_sync(const float x)
+{
+    if(apipc == nullptr){return;}
+    apipc->setabsoluepositioning();
+    apipc->moveToXSync(x);
+}
+
+
 void controller::pipette_movey_sync(const float y)
 {
     if(apipc == nullptr){return;}
@@ -143,6 +151,12 @@ void controller::pipette_movez_sync(const float z)
 {
 
     apipc->setrelativepositioning();
+    apipc->moveToZSync(z);
+}
+
+void controller::pipette_move_to_z_sync(const float z)
+{
+    apipc->setabsoluepositioning();
     apipc->moveToZSync(z);
 }
 
@@ -412,6 +426,7 @@ int controller::stage_get_y_max_pos()
 {
    return int(stage->YAxis().getMaxPosition());
 }
+
 
 void controller::stage_go_center()
 {
