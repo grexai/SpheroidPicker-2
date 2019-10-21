@@ -1,18 +1,18 @@
 
 #include "deeplearning.h"
 
-deeplearning::deeplearning()
+invecption_v2::invecption_v2()
 {
 
 }
 
-deeplearning::~deeplearning()
+invecption_v2::~invecption_v2()
 {
 
 }
 
 // Draw the predicted bounding box, colorize and show the mask on the image
-void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask)
+void invecption_v2::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask)
 {
     using namespace cv;
     using namespace dnn;
@@ -45,7 +45,7 @@ void deeplearning::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box
 }
 
 // For each frame, extract the bounding box and mask for each detected object
-std::vector<std::vector<float>> deeplearning::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
+std::vector<std::vector<float>> invecption_v2::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
 {
     using namespace cv;
     using namespace std;
@@ -99,7 +99,7 @@ std::vector<std::vector<float>> deeplearning::postprocess(cv::Mat& frame, const 
 
 //resize the image for 512x512 keeping ratio
 //empty space = 0
-void deeplearning::resize(cv::Mat &input, cv::Mat &out)
+void invecption_v2::resize(cv::Mat &input, cv::Mat &out)
 {
     using namespace cv;
         float n = input.cols / 512;
@@ -123,7 +123,7 @@ void deeplearning::resize(cv::Mat &input, cv::Mat &out)
 }
 
 //Setup a DNN network
-void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::string t_g)
+void invecption_v2::setup_dnn_network(std::string cf, std::string model_w, std::string t_g)
 {
     using namespace cv;
     using namespace std;
@@ -150,8 +150,7 @@ void deeplearning::setup_dnn_network(std::string cf, std::string model_w, std::s
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-
-std::vector<std::vector<float>> deeplearning::dnn_prediction(cv::Mat& input,cv::Mat& output)
+std::vector<std::vector<float>> invecption_v2::dnn_prediction(cv::Mat& input,cv::Mat& output)
 {
     using namespace cv;
     using namespace std;
@@ -221,9 +220,7 @@ std::vector<std::vector<float>> deeplearning::dnn_prediction(cv::Mat& input,cv::
     return objpos;
 }
 
-
-
-std::vector<std::vector<float>> deeplearning::dnn_prediction(cv::Mat& input)
+std::vector<std::vector<float>> invecption_v2::dnn_prediction(cv::Mat& input)
 {
     using namespace cv;
     using namespace std;

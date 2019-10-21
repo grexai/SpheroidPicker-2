@@ -147,3 +147,11 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 #else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../Libraries/opencv-3.4.5/build/lib/debug/opencv_video345.lib
 
 DISTFILES +=
+
+win32: LIBS += -L$$PWD/../../../Libraries/tf-gpu131/lib/ -llib64tf131
+
+INCLUDEPATH += $$PWD/../../../Libraries/tf-gpu131/include
+DEPENDPATH += $$PWD/../../../Libraries/tf-gpu131/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-gpu131/lib/lib64tf131.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-gpu131/lib/liblib64tf131.a

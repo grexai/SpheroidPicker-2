@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
     progress.setLabelText("Loading neural network graph");
     progress.setValue(75);
-    dl = new deeplearning;
+    dl = new invecption_v2();
     dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
@@ -235,11 +235,8 @@ void MainWindow::on_predict_sph_clicked()
     if (global_obj_im_coordinates != nullptr)
     {
         delete global_obj_im_coordinates;
-        global_obj_im_coordinates = new std::vector<std::vector<float>>;
-    }else {
-        global_obj_im_coordinates = new std::vector<std::vector<float>>;
     }
-    //global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    global_obj_im_coordinates = new std::vector<std::vector<float>>;
     std::vector<std::vector<float>> im_obj = dl->dnn_prediction(*cfrm,image);
     global_obj_im_coordinates->push_back(im_obj.at(0));
  //   cv::Mat rgb = imtools->convert_bgr_to_rgb(image);
@@ -248,10 +245,10 @@ void MainWindow::on_predict_sph_clicked()
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
     ui->found_objects->clear();
-    for (int i=0 ;i<=im_obj.size();++i)
-    {
-        ui->found_objects->addItem(QString::number(i));
-    }
+    //for (int i=0 ;i<=im_obj.size();++i)
+    //{
+     //   ui->found_objects->addItem(QString::number(i));
+//    /}
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -671,8 +668,8 @@ void MainWindow::on_actionSpheroid_picker_triggered()
 
     propreader->apply_settings(settings);
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-    dl = new deeplearning;
-    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+  //  dl = new deeplearning;
+  //  dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
 
 }
 
@@ -729,11 +726,17 @@ void MainWindow::center_spheroid(std::vector<float> coors)
 void MainWindow::move_to_petri_B()
 {
     //MOVE to the petri "B 35mm petri if the Petri A is centered MID (stage 0,0)
+   // ctrl->stage_move_to_x_sync(-366407);
+   // ctrl->stage_move_to_y_sync(0);
 
-    ctrl->stage_move_x_async(-366407);
+    ctrl->stage_move_to_x_sync(-366407);
     ctrl->stage_move_to_y_sync(0);
-
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_home_z();
 }
+
 void MainWindow::xz_stage_pickup_sph(){
     //set pick speeds
     ctrl->stage_set_speed(3000);
@@ -744,31 +747,25 @@ void MainWindow::xz_stage_pickup_sph(){
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
     //
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //move to the middle of image
+    //move to the middle of image with the pipette
     ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
     //move Z down to the petri
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // PICK UP WITH SYRINGE
     ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ctrl->pipette_home_z();
     ctrl->pipette_movex_sync(-2.6f);
-    move_to_petri_B();
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->p_extruder_step_box->value()+0.3));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
-    ctrl->pipette_home_z();
-
+    //MOVE to the petri "B 35mm petri if the Petri A is centered MID (stage 0,0)
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  //  delete this->m_picking_thread;
 }
-
-
-
-
 
 void MainWindow::on_pickup_sph_clicked()
 {
-    std::thread t2(&MainWindow::xz_stage_pickup_sph,this);
-    t2.detach();
+   m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
+    //  t2.detach();
 }
 
 
@@ -777,7 +774,7 @@ void MainWindow::on_view_scan_clicked()
     using namespace  cv;
     //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
    // int platesize = 350000; //    100nm // *0.1um
-
+    if (scanvector.size()>0){
     const float platesize = ui->set_plate_size_spinbox->value()*10000;
     float  img_w_5p5x = 27426; //    100nm
     float  img_h_5p5x = 15421;//19466; //    100nm
@@ -810,6 +807,7 @@ void MainWindow::on_view_scan_clicked()
     ui->tabWidget->setCurrentWidget(ui->tab2);
     scanvector.clear();
     prog_changed(0);
+    }
 }
 
 void MainWindow::on_p_ep_button_clicked()
@@ -860,4 +858,20 @@ void MainWindow::on_save_m_p_button_clicked()
 {
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
+}
+
+void MainWindow::on_found_objects_currentIndexChanged(int index)
+{
+    ctrl->stage_set_speed(3000);
+    ctrl->pipette_set_speed(200);
+    //slowly center the selected sph
+    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
+}
+
+void MainWindow::on_petri_b_clicked()
+{
+    std::thread t2(&MainWindow::move_to_petri_B,this);
+    t2.detach();
 }

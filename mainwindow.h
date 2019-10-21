@@ -184,6 +184,10 @@ private slots:
 
      void on_save_m_p_button_clicked();
 
+     void on_found_objects_currentIndexChanged(int index);
+
+     void on_petri_b_clicked();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -193,13 +197,14 @@ private:
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-    deeplearning* dl= nullptr;
+    i_deeplearning* dl= nullptr;
     std::vector<cv::Mat> scanvector;
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     propertyreader* propreader = nullptr;
 
     std::atomic_bool m_s_t_acitive=false;
     std::thread* m_screening_thread= nullptr;
+    std::thread* m_picking_thread= nullptr;
 
     //TEST
     float m_status = 0;
