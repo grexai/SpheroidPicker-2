@@ -241,10 +241,15 @@ void MainWindow::on_predict_sph_clicked()
         delete global_obj_im_coordinates;
     }
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
+
+    ui->found_objects->clear();
+
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
     for (int idx = 0; idx <= im_obj.size(); ++idx)
     {
         global_obj_im_coordinates->push_back(im_obj.at(idx));
+         //commented just for not to crash when test without stage
+        // ui->found_objects->addItem(QString::number(idx));
     }
     //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
@@ -252,12 +257,6 @@ void MainWindow::on_predict_sph_clicked()
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
-    ui->found_objects->clear();
-    for (int i=0 ;i<=im_obj.size();++i)
-    {
-        //just for not to crash when test without stage
- //       ui->found_objects->addItem(QString::number(i));
-    }
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -726,7 +725,8 @@ void MainWindow::center_spheroid(std::vector<float> coors)
 
 void MainWindow::move_to_petri_B()
 {
-    //MOVE to the petri "B" 35mm petri if the Petri "A" is centered MID (stage 0,0)
+    //MOVE to the petri "B" 35mm petri
+    //if the Petri "A" is centered MID (stage 0,0)
 
     ctrl->stage_move_to_x_sync(-366407);
     ctrl->stage_move_to_y_sync(0);
@@ -737,7 +737,7 @@ void MainWindow::move_to_petri_B()
 }
 
 void MainWindow::xz_stage_pickup_sph(){
-    //set pick speeds
+    //set Pickup speeds
     ctrl->stage_set_speed(3000);
     ctrl->pipette_set_speed(200);
     //slowly center the selected sph
@@ -748,17 +748,17 @@ void MainWindow::xz_stage_pickup_sph(){
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //move to the middle of image with the pipette
     ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
-    //move Z down to the petri
+    //move Z axis down to the petri (auto Z height)
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     // PICK UP WITH SYRINGE
     ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ctrl->pipette_home_z();
+    // MOVE x axis out of image
     ctrl->pipette_movex_sync(-2.6f);
-    //MOVE to the petri "B 35mm petri if the Petri A is centered MID (stage 0,0)
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  //  delete this->m_picking_thread;
+    //TODO
+    // this point CHECK if the spheroid picked up!
 }
 
 void MainWindow::on_pickup_sph_clicked()
@@ -770,11 +770,11 @@ void MainWindow::on_pickup_sph_clicked()
 
 void MainWindow::on_view_scan_clicked()
 {
+    // CREATING the mosaic of analyzed images
     using namespace  cv;
-    //cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
    // int platesize = 350000; //    100nm // *0.1um
     if (scanvector.size()>0){
-    const float platesize = ui->set_plate_size_spinbox->value()*10000;
+    const float platesize = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
     float  img_w_5p5x = 27426; //    100nm
     float  img_h_5p5x = 15421;//19466; //    100nm
     int wmax = static_cast<int>(platesize / img_w_5p5x); // um
@@ -832,8 +832,6 @@ void MainWindow::closeEvent (QCloseEvent *event)
     } else {
         event->accept();
         QCoreApplication::quit();
-        //this->close();
-        this->parentWidget()->show();
     }
 }
 
@@ -855,12 +853,17 @@ void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
 
 void MainWindow::on_save_m_p_button_clicked()
 {
+    // XZ CALIBRATION STEP 2, user should move X to the middle of
+    // IMAGE and click this button
+    // this button saves X positon of the pipette.
+    // auto pick up will send back to this pos (should be mid)
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
 }
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
+    //set Picking speeds
     ctrl->stage_set_speed(3000);
     ctrl->pipette_set_speed(200);
     //slowly center the selected sph
