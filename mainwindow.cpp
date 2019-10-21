@@ -169,6 +169,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     QMainWindow::keyPressEvent(e);
 }
 
+// OLD calibration for 3axis pipette
 void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
     if (Iscameraopen== true && calib!=nullptr )
@@ -213,6 +214,8 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
     }
 }
 
+
+
 void MainWindow::update_window()
 {
     auto cfrm=  cameracv->get_current_frm();
@@ -228,6 +231,7 @@ void MainWindow::update_window()
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
 
+
 void MainWindow::on_predict_sph_clicked()
 {
     auto cfrm = cameracv->get_current_frm();
@@ -239,17 +243,17 @@ void MainWindow::on_predict_sph_clicked()
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
     global_obj_im_coordinates->push_back(im_obj.at(0));
- //   cv::Mat rgb = imtools->convert_bgr_to_rgb(image);
+    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
     ui->found_objects->clear();
-    //for (int i=0 ;i<=im_obj.size();++i)
-    //{
-     //   ui->found_objects->addItem(QString::number(i));
-//    /}
+    for (int i=0 ;i<=im_obj.size();++i)
+    {
+ //       ui->found_objects->addItem(QString::number(i));
+    }
 }
 
 void MainWindow::on_Campushbtn_clicked()

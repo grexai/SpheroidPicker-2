@@ -78,7 +78,7 @@ public:
     }
 
 };
-
+/*
 // INTERFACE TEST
 //pipette_driver* pd(arduinogcode apic);
 class i_stagecontroll {
@@ -103,11 +103,11 @@ public:
     }
 };
 
-//i_stagecontroll* asd  = new TangoStage();
-//asd->move_x
-    //i_stagecontroll* asd  = new TangoStage();
-    //asd->move_x();
-
+i_stagecontroll* asd  = new TangoStage();
+asd->move_x
+   i_stagecontroll* asd  = new TangoStage();
+   asd->move_x();
+*/
 // Pipette
 bool controller::connect_pipette_controller(std::string& port)
 {

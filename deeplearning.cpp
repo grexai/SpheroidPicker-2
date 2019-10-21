@@ -1,4 +1,3 @@
-
 #include "deeplearning.h"
 
 invecption_v2::invecption_v2()

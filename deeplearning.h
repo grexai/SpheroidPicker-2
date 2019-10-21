@@ -35,22 +35,15 @@
 #include <tensorflow/c/c_api.h>
 
 
-
 class i_deeplearning
 {
 public:
     i_deeplearning(){}
     virtual ~i_deeplearning(){}
     virtual void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) = 0;
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input) ;
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output)= 0;
-    // Initialize the parameters
-protected:
-    cv::dnn::Net* net;
-    float confThreshold = 0.4f; // Confidence threshold
-    float maskThreshold = 0.3f; // Mask threshold
-};
 
+};
 
 class invecption_v2 : public virtual i_deeplearning
 {
@@ -73,11 +66,8 @@ protected:
     float maskThreshold = 0.3f; // Mask threshold
 };
 
-
-class keras_mrcnn :public i_deeplearning
+class keras_mrcnn :public virtual i_deeplearning
 {
-
-
 
     class TF_Session_Wrapper
     {
@@ -111,6 +101,7 @@ class keras_mrcnn :public i_deeplearning
     private:
         TF_Session* mSession = nullptr;
     };
+
     static void DontDeleteTensor(void*, size_t, void*)
     {
     }
@@ -255,6 +246,7 @@ public:
     }
 
     void inferencing(cv::Mat image, TF_Session* session, TF_Status* status, cv::Mat moldedInput, int IMAGE_SIZE, TF_Graph* graph, std::vector <float> anchors,const char* outFileName) {
+
         static constexpr int NUM_CLASSES = 2;
         static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
         float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
@@ -510,8 +502,6 @@ public:
 
     }
 
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
-
     TF_Session_Wrapper create_session(TF_Graph* graph) {
         TF_SessionOptions_Ptr options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
         TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
@@ -520,6 +510,64 @@ public:
         return session;
 
     }
+
+    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override{
+
+     //   inferencing(input,session.Get(),status.get(), moldedInput, IMAGE_SIZE, graph.get(), anchors, outFileName);
+        std::vector<std::vector<float>> obj;
+        return obj;
+    }
+
+    TF_Graph_Ptr graph;
+    TF_Session_Wrapper session;
+    TF_Status_Ptr status;
+    TF_SessionOptions_Ptr options;
+ //  virtual void setup_dnn_network(const char* imName, const char* modelPB, const char* modelPath, const char* outFileName) override ;
+    virtual void setup_dnn_network(const char* imName, const char* modelPB, const char* modelPath, const char* outFileName){
+        graph = read_graph(modelPB);
+
+        std::cout << "Successfully imported graph" << std::endl;
+
+        std::cout << "reading input image" << std::endl;
+        cv::Mat image = cv::imread(imName, cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+        if (image.empty()) throw std::runtime_error("unable to open the image");
+
+        image.convertTo(image, CV_8UC3);
+        cv::resize(image, image, cv::Size(1024, 608));
+        const int maxDim = (std::max)(image.cols, image.rows);
+
+
+        const int IMAGE_SIZE = select_anchor(image);
+
+        std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
+
+        //matterport's mrcnn only works for image sizes that are multiples of 64
+        if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
+
+        cv::Mat moldedInput = mold_image(image, IMAGE_SIZE, maxDim);
+
+
+        static constexpr int NUM_CLASSES = 2;
+        static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
+        float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
+            static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //original image shape (irrelevant)
+            static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //molded image shape
+            0.0f, 0.0f, static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE),  //window (y1, x1, y2, x2)
+            1.0f,                                                                        //scale factor: was 1.0f
+            0.0f, 1.0f };                                                                 //classes (NUM_CLASSES)
+
+                                                                                          //Reading graph
+
+                                                                                    //TODO the binary
+        std::ifstream anchor_file;
+        //Creating session
+    //  TF_SessionOptions_Ptr options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
+    //  TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
+        std::unique_ptr<TF_Status_Ptr> status = std::make_unique<TF_Status_Ptr>(TF_NewStatus(), TF_DeleteStatus);
+        std::unique_ptr<TF_SessionOptions_Ptr> options = std::make_unique<TF_SessionOptions_Ptr>(TF_NewSessionOptions(), TF_DeleteSessionOptions);
+        session = (TF_NewSession(graph.get(), options->get(), status->get()));
+        if (TF_GetCode(status->get()) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(status->get()));
+        }
 };
 
 

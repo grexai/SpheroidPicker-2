@@ -20,6 +20,7 @@ void arduinogcode::setacceleration(int acc){
     msg= msg.append(QString::number(acc)).append(EOM);
     apipc_sc.send(msg);
 }
+
 //Unusable yet
 void arduinogcode::setjerk(int jerk){
     QString msg = "M205";
