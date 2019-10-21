@@ -161,7 +161,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     case Qt::Key_D:on_s_xp_button_clicked();break;
     case Qt::Key_1:on_p_em_button_clicked();break;
     case Qt::Key_3:on_p_ep_button_clicked();break;
-    case Qt::Key_Control:  break;
+    case Qt::Key_L: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); QTextStream(stdout)<< ui->tabWidget->currentIndex();break;
     case Qt::Key_Space:on_pc_pulse_button_clicked();break;
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
@@ -244,6 +244,7 @@ void MainWindow::on_predict_sph_clicked()
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
+
     ui->found_objects->clear();
     //for (int i=0 ;i<=im_obj.size();++i)
     //{

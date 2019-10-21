@@ -1565,7 +1565,7 @@ Stage</string>
      <enum>QTabWidget::South</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="live_image">
      <attribute name="title">
