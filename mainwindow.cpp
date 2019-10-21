@@ -237,7 +237,7 @@ void MainWindow::on_predict_sph_clicked()
         delete global_obj_im_coordinates;
     }
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
-    std::vector<std::vector<float>> im_obj = dl->dnn_prediction(*cfrm,image);
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
     global_obj_im_coordinates->push_back(im_obj.at(0));
  //   cv::Mat rgb = imtools->convert_bgr_to_rgb(image);
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
@@ -550,7 +550,7 @@ void MainWindow::screensample()
                 auto tmp = cameracv->get_current_frm();
                 scanvector.push_back(*tmp.get());
                 imtools->saveImg(tmp.get(),num2str.c_str());
-                std::vector<std::vector<float>>im_objects = dl->dnn_prediction(scanvector.at(counter),scanvector.at(counter));
+                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter));
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
@@ -725,9 +725,7 @@ void MainWindow::center_spheroid(std::vector<float> coors)
 
 void MainWindow::move_to_petri_B()
 {
-    //MOVE to the petri "B 35mm petri if the Petri A is centered MID (stage 0,0)
-   // ctrl->stage_move_to_x_sync(-366407);
-   // ctrl->stage_move_to_y_sync(0);
+    //MOVE to the petri "B" 35mm petri if the Petri "A" is centered MID (stage 0,0)
 
     ctrl->stage_move_to_x_sync(-366407);
     ctrl->stage_move_to_y_sync(0);

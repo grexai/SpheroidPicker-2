@@ -44,7 +44,7 @@ void invecption_v2::drawBox(cv::Mat& frame, int classId, float conf, cv::Rect bo
     coloredRoi.copyTo(frame(box), mask);
 }
 
-// For each frame, extract the bounding box and mask for each detected object
+// For each frame, extract the boundi ng box and mask for each detected object
 std::vector<std::vector<float>> invecption_v2::postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs)
 {
     using namespace cv;
@@ -150,7 +150,7 @@ void invecption_v2::setup_dnn_network(std::string cf, std::string model_w, std::
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-std::vector<std::vector<float>> invecption_v2::dnn_prediction(cv::Mat& input,cv::Mat& output)
+std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output)
 {
     using namespace cv;
     using namespace std;
@@ -220,7 +220,7 @@ std::vector<std::vector<float>> invecption_v2::dnn_prediction(cv::Mat& input,cv:
     return objpos;
 }
 
-std::vector<std::vector<float>> invecption_v2::dnn_prediction(cv::Mat& input)
+std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
 {
     using namespace cv;
     using namespace std;
