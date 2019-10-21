@@ -242,7 +242,10 @@ void MainWindow::on_predict_sph_clicked()
     }
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
-    global_obj_im_coordinates->push_back(im_obj.at(0));
+    for (int idx = 0; idx <= im_obj.size(); ++idx)
+    {
+        global_obj_im_coordinates->push_back(im_obj.at(idx));
+    }
     //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
@@ -252,6 +255,7 @@ void MainWindow::on_predict_sph_clicked()
     ui->found_objects->clear();
     for (int i=0 ;i<=im_obj.size();++i)
     {
+        //just for not to crash when test without stage
  //       ui->found_objects->addItem(QString::number(i));
     }
 }
@@ -291,7 +295,6 @@ void MainWindow::on_exptime_button_clicked()
 {
     cameracv->setexposuretime(static_cast<float>(ui->exptime_spin->value()));
 }
-
 
 void MainWindow::on_width_button_clicked()
 {
@@ -333,7 +336,6 @@ void MainWindow::on_p_home_y_clicked()
 void MainWindow::on_p_home_z_clicked()
 {
     ctrl->pipette_home_z();
-
 }
 
 void MainWindow::on_SetPressure_clicked()
@@ -381,13 +383,11 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
-    QTextStream(stdout)<< "+ presseeed" << endl;
     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
 {
-    QTextStream(stdout)<< "- presseeed" << endl;
     ctrl->pipette_movex_sync(-(ui->pip_step_spinbox->value()));
 }
 
@@ -409,7 +409,6 @@ void MainWindow::on_p_zp_button_clicked()
 
 void MainWindow::on_p_zm_btton_clicked()
 {
-    QTextStream(stdout)<< "2 presseeed" << endl;
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
 }
 
@@ -434,8 +433,6 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     std::vector<int> coords = ctrl->stage_get_coords();
     ui->s_xpos_label->setText("X: " + QString::number(coords.at(0),'f',2));
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
-   // ctrl->stage_set_acceleration(ui->s_accel_spinbox->value());
-    QTextStream(stdout) << ctrl->stage_get_x_acceleration();
 }
 
 void MainWindow::move_action(){
@@ -726,7 +723,6 @@ void MainWindow::center_spheroid(std::vector<float> coors)
     ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
     ctrl->stage_set_speed(15000.0f);
 }
-
 
 void MainWindow::move_to_petri_B()
 {
