@@ -135,11 +135,11 @@ public:
     TF_POINTER(SessionOptions)
     TF_POINTER(Tensor)
 
-    TF_Graph_Ptr m_graph;
-    TF_Session_Wrapper *m_session;
-  //  TF_Session* m_s;
-    TF_Status_Ptr m_status;
-    TF_SessionOptions_Ptr m_options;
+    TF_Graph *m_graph;
+   // TF_Session_Wrapper *m_session;
+   TF_Session* m_session;
+    TF_Status *m_status;
+    TF_SessionOptions *m_options;
 
     //image constants...
     const std::vector<int> ANCHOR_SIZES = { 128, 256, 512, 768, 1024, 1536, 2048 };
@@ -149,7 +149,7 @@ public:
     //constants for this graph type
     static constexpr float DETECTION_CONFIDENCE = 0.9f;
     static constexpr float MASK_CONFIDENCE = 0.9f;
-    int IMAGE_SIZE=0;
+    int IMAGE_SIZE=1920;
 
 
 
@@ -175,22 +175,27 @@ public:
         return buf;
     }
 
-    TF_Graph_Ptr  read_graph(const char* modelPB) {
+    void  read_graph(const char* modelPB) {
 
-        TF_Graph_Ptr m_graph(TF_NewGraph(), TF_DeleteGraph);
+        m_graph = TF_NewGraph() ;
                  //Reading graph
+
+
         TF_Buffer_Ptr graphDef = ReadFile(modelPB);
 
         TF_Status_Ptr importStatus(TF_NewStatus(), TF_DeleteStatus);
+
         TF_ImportGraphDefOptions_Ptr importOptions(TF_NewImportGraphDefOptions(), TF_DeleteImportGraphDefOptions);
-        TF_GraphImportGraphDef(m_graph.get(), graphDef.get(), importOptions.get(), importStatus.get());
+
+        TF_GraphImportGraphDef(m_graph, graphDef.get(), importOptions.get(), importStatus.get());
+
         importOptions.reset();
         if (TF_GetCode(importStatus.get()) != TF_OK) throw std::runtime_error(std::string("Cannot import graph: ") + TF_Message(importStatus.get()));
 
         importStatus.reset();
         graphDef.reset();
 
-        return m_graph;
+        //return m_graph;
     }
 
     std::vector <float> load_anchor(const char* modelPath,const int IMAGE_SIZE) {
@@ -296,7 +301,7 @@ public:
         std::vector<TF_Tensor*> inputTensors;
 
         //image tensor ezt
-        TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph.get(), "input_image");
+        TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph, "input_image");
         if (inputOpImage == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutImage = { inputOpImage, 0 };
@@ -307,7 +312,7 @@ public:
         inputTensors.push_back(inputTensorImage.get());
 
         //meta tensor
-        TF_Operation* inputOpMeta = TF_GraphOperationByName(m_graph.get(), "input_image_meta");
+        TF_Operation* inputOpMeta = TF_GraphOperationByName(m_graph, "input_image_meta");
         if (inputOpMeta == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutMeta = { inputOpMeta, 0 };
@@ -318,7 +323,7 @@ public:
         inputTensors.push_back(inputTensorMeta.get());
 
         //anchor tensor
-        TF_Operation* inputOpAnchor = TF_GraphOperationByName(m_graph.get(), "input_anchors");
+        TF_Operation* inputOpAnchor = TF_GraphOperationByName(m_graph, "input_anchors");
         if (inputOpAnchor == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutAnchor = { inputOpAnchor, 0 };
@@ -333,14 +338,14 @@ public:
         std::vector<TF_Output> outputs;
         std::vector<TF_Tensor*> outputTensorPtrs;
 
-        TF_Operation* outputOpDetection = TF_GraphOperationByName(m_graph.get(), "mrcnn_detection/Reshape_1");
+        TF_Operation* outputOpDetection = TF_GraphOperationByName(m_graph, "mrcnn_detection/Reshape_1");
         if (outputOpDetection == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output outputOutDetection = { outputOpDetection, 0 };
         outputs.push_back(outputOutDetection);
         outputTensorPtrs.push_back(nullptr);
 
-        TF_Operation* outputOpMask = TF_GraphOperationByName(m_graph.get(), "mrcnn_mask/Reshape_1");
+        TF_Operation* outputOpMask = TF_GraphOperationByName(m_graph, "mrcnn_mask/Reshape_1");
         if (outputOpMask == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output outputOutMask = { outputOpMask, 0 };
@@ -354,17 +359,17 @@ public:
      //   auto start = std::chrono::system_clock::now();
          //   TF_Session* x = m_session->Get();
         //Inferencing
-        TF_SessionRun(m_session->Get(), nullptr,
+        TF_SessionRun(m_session, nullptr,
             inputs.data(), inputTensors.data(), inputs.size(),
             outputs.data(), outputTensorPtrs.data(), outputs.size(),
-            nullptr, 0, nullptr, m_status.get());
+            nullptr, 0, nullptr, m_status);
 
         std::cout << "wrapping" << std::endl;
         //Wrapping all raw pointers
         for (TF_Tensor* outputTensor : outputTensorPtrs) outputTensors.emplace_back(TF_Tensor_Ptr(outputTensor, TF_DeleteTensor));
         outputTensorPtrs.clear();
 
-        if (TF_GetCode(m_status.get()) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status.get()));
+        if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status));
 
         static constexpr int BATCH_DIM = 0;
         static constexpr int DETECTIONS_DIM = 1;
@@ -539,13 +544,14 @@ public:
     void create_session() {
      //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
     //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-        m_options =  TF_SessionOptions_Ptr(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-        m_status =  TF_Status_Ptr(TF_NewStatus(), TF_DeleteStatus);
-        *m_session = TF_Session_Wrapper(TF_NewSession(m_graph.get(), m_options.get(), m_status.get()));
+        m_options = TF_NewSessionOptions();
+        m_status =  TF_NewStatus();
+
+        m_session = TF_NewSession(m_graph, m_options, m_status);
         // m_session();
-//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options.get(), m_status.get()));
-       // m_s= TF_NewSession(m_graph.get(), m_options.get(), m_status.get());
-        if (TF_GetCode(m_status.get()) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status.get()));
+//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options, m_status));
+       // m_s= TF_NewSession(m_graph, m_options, m_status);
+        if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 
 
       //  return m_session;

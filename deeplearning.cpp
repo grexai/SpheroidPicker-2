@@ -291,7 +291,7 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
 }
 
 void keras_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath){
-    m_graph = read_graph(modelPB);
+    read_graph(modelPB);
 
     std::cout << "Successfully imported graph" << std::endl;
 
