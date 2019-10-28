@@ -73,6 +73,7 @@ private slots:
      void calib_frame_view(cv::Mat& disp);
 
      void update_window();
+     void predict_sph();
 
      void update_currentpressure();
 
@@ -188,6 +189,10 @@ private slots:
 
      void on_petri_b_clicked();
 
+     void on_pick_and_put_clicked();
+
+     void pick_and_put();
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -202,10 +207,12 @@ private:
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     propertyreader* propreader = nullptr;
 
-    std::atomic_bool m_s_t_acitive=false;
+    std::atomic_bool m_s_t_acitive;
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
-
+    std::thread* m_predict_thread = nullptr;
+    std::thread* m_move_petri_b_thread = nullptr;
+    std::thread* m_put_and_pick_thread = nullptr;
     //TEST
     float m_status = 0;
     QTimer *timer1= nullptr ;

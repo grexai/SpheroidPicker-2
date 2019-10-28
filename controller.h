@@ -86,6 +86,8 @@ public:
 
     void center_stage();
 
+    void stage_autocalibrate();
+
     void stage_move_x_async(int x);
 
     void stage_move_y_async(int y);

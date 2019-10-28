@@ -14,50 +14,71 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     QProgressDialog progress("Getting User Interface ready", nullptr, 0, 0);
+    progress.setRange(0,100);
     progress.setWindowModality(Qt::WindowModal);
     progress.setMinimumDuration(0);
-    progress.setValue(20);
+    progress.setValue(0);
+
+
 
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-
    // ui->P_C_box->hide();
 
-    progress.setValue(20);
+    progress.setValue(10);
     imtools = new imagetools;
     timer = new QTimer(this);
+    timer->setSingleShot(false); // always restarts
     disp_pressure= new QTimer(this);
     ctrl = new controller;
+    m_s_t_acitive= false;
+
     ui->scanning_progress->setValue(static_cast<int>(m_status));
+    progress.setValue(25);
     progress.setLabelText("configuring hardware");
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
-    progress.setValue(50);
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-    progress.setLabelText("Loading neural network graph");
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                                tr("Do yo want to run stage inicialization?\n"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes) {
+            progress.setValue(50);
+            ctrl->stage_set_speed(30000.0f);
+            progress.setLabelText("Stage inicialization");
+            ctrl->stage_autocalibrate();
+            /// basic setup
+            ctrl->stage_set_speed(5000.0f);
+            std::vector<int> s = ctrl->stage_get_speed();
+            ui->s_speed_spinbox->setValue(s.at(0));
+    } else {
+
+    }
     progress.setValue(75);
+    progress.setLabelText("Loading neural network graph");
     dl = new invecption_v2();
     dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.textGraph.c_str() << endl;
 
-    /// basic setup
-//    ctrl->stage_set_speed(5000.0f);
- //   std::vector<int> s = ctrl->stage_get_speed();
-//    ui->s_speed_spinbox->setValue(s.at(0));
+
+    // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
+
+
     progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
+  //  timer->start(16);
 /*
     setdarkstyle();*/
-
 
    // qApp->installEventFilter(this);
    // std::cout << "AKOS EDITION v1.1" << std::endl;
@@ -232,8 +253,13 @@ void MainWindow::update_window()
 }
 
 
+void MainWindow::predict_sph(){
+
+}
+
 void MainWindow::on_predict_sph_clicked()
 {
+   // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
     auto cfrm = cameracv->get_current_frm();
     cv::Mat image;
     if (global_obj_im_coordinates != nullptr)
@@ -245,13 +271,13 @@ void MainWindow::on_predict_sph_clicked()
     ui->found_objects->clear();
 
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
-    for (int idx = 0; idx <= im_obj.size(); ++idx)
+    for (int idx = 0; idx < im_obj.size(); ++idx)
     {
-        global_obj_im_coordinates->push_back(im_obj.at(idx));
-         //commented just for not to crash when test without stage
-        // ui->found_objects->addItem(QString::number(idx));
+        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
+        ui->found_objects->addItem(QString::number(idx));
     }
     //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
+    delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
@@ -264,7 +290,8 @@ void MainWindow::on_Campushbtn_clicked()
     cameracv = new CameraCV(cameraIndex);
     if (Iscameraopen==true){
         ui->Campushbtn->setText("Camera on");
-        cameracv->~CameraCV();
+        delete cameracv;
+        cameracv= nullptr;
         Iscameraopen= false;
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
@@ -354,10 +381,10 @@ void MainWindow::on_pc_pulse_button_clicked()
 
 void MainWindow::on_get_coors_pushButton_clicked()
 {
-    std::vector<float> randx = ctrl->pipette_get_coordinates();
-    ui->xc_label->setText("X: " + QString::number(static_cast<double>(randx.at(0)),'f',2));
-    ui->yc_label->setText("Y: " + QString::number(static_cast<double>(randx.at(1)),'f',2));
-    ui->zc_label->setText("Z: " + QString::number(static_cast<double>(randx.at(2)),'f',2));
+    std::vector<float> current_coors = ctrl->pipette_get_coordinates();
+    ui->xc_label->setText("X: " + QString::number(static_cast<double>(current_coors.at(0)),'f',2));
+    ui->yc_label->setText("Y: " + QString::number(static_cast<double>(current_coors.at(1)),'f',2));
+    ui->zc_label->setText("Z: " + QString::number(static_cast<double>(current_coors.at(2)),'f',2));
 }
 
 void MainWindow::on_s_xp_button_clicked()
@@ -481,9 +508,10 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 std::string MainWindow::get_date_time_str()
 {
     std::string datetime= "";
-    datetime.append((QString::number(QDate::currentDate().year())).toStdString());
-    datetime.append((QString::number(QDate::currentDate().month())).toStdString());
-    datetime.append((QString::number(QDate::currentDate().day())).toStdString()+"-");
+    auto date = QDate::currentDate();
+    datetime.append((QString::number(date.year())).toStdString());
+    datetime.append((QString::number(date.month())).toStdString());
+    datetime.append((QString::number(date.day())).toStdString()+"-");
     datetime.append((QString::number(QTime::currentTime().hour())).toStdString());
     datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
     return datetime;
@@ -578,11 +606,6 @@ void MainWindow::screensample()
     ui->syringe_box->setEnabled(true);
     ui->start_screening->setText("Start Screening");
     scan_finished();
-   /* if(m_screening_thread->joinable())
-    {
-        m_screening_thread->join();
-        QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
-    }*/
 }
 
 void MainWindow::on_start_screening_clicked()
@@ -641,6 +664,8 @@ void MainWindow::set_h4(int value)
 void MainWindow::scan_stopped()
 {
     QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
+    this->m_screening_thread->join();
+    this->m_screening_thread->~thread();
 }
 
 void MainWindow::set_pip_man(int value)
@@ -727,9 +752,9 @@ void MainWindow::move_to_petri_B()
 {
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 0,0)
-
-    ctrl->stage_move_to_x_sync(-366407);
-    ctrl->stage_move_to_y_sync(0);
+        // CENTER 751431 501665
+    ctrl->stage_move_to_x_sync(751431-366407);
+    ctrl->stage_move_to_y_sync(501665);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
@@ -738,8 +763,10 @@ void MainWindow::move_to_petri_B()
 
 void MainWindow::xz_stage_pickup_sph(){
     //set Pickup speeds
+    int original_stage_speed  = ctrl->stage_get_x_speed();
     ctrl->stage_set_speed(3000);
-    ctrl->pipette_set_speed(200);
+
+     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
     QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
@@ -757,8 +784,10 @@ void MainWindow::xz_stage_pickup_sph(){
     ctrl->pipette_home_z();
     // MOVE x axis out of image
     ctrl->pipette_movex_sync(-2.6f);
+    ctrl->stage_set_speed(original_stage_speed);
     //TODO
     // this point CHECK if the spheroid picked up!
+
 }
 
 void MainWindow::on_pickup_sph_clicked()
@@ -766,7 +795,6 @@ void MainWindow::on_pickup_sph_clicked()
    m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
     //  t2.detach();
 }
-
 
 void MainWindow::on_view_scan_clicked()
 {
@@ -819,7 +847,6 @@ void MainWindow::on_p_em_button_clicked()
     ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
 }
 
-
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
@@ -856,7 +883,7 @@ void MainWindow::on_save_m_p_button_clicked()
     // XZ CALIBRATION STEP 2, user should move X to the middle of
     // IMAGE and click this button
     // this button saves X positon of the pipette.
-    // auto pick up will send back to this pos (should be mid)
+    // auto pick up will send back to this pos (should be middle of the image)
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
 }
@@ -864,8 +891,8 @@ void MainWindow::on_save_m_p_button_clicked()
 void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
     //set Picking speeds
+    //ui->found_objects->
     ctrl->stage_set_speed(3000);
-    ctrl->pipette_set_speed(200);
     //slowly center the selected sph
     QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
@@ -874,6 +901,19 @@ void MainWindow::on_found_objects_currentIndexChanged(int index)
 
 void MainWindow::on_petri_b_clicked()
 {
-    std::thread t2(&MainWindow::move_to_petri_B,this);
-    t2.detach();
+    m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
+}
+
+void MainWindow::pick_and_put()
+{
+    this->xz_stage_pickup_sph();
+    this->move_to_petri_B();
+}
+
+void MainWindow::on_pick_and_put_clicked()
+{
+    //MOVE to the petri "B" 35mm petri
+    //if the Petri "A" is centered MID (stage 0,0)
+        // CENTER 751431 501665
+    m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
 }

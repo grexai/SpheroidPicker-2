@@ -289,3 +289,29 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
     return objpos;
     //return detectedFrame;
 }
+
+void keras_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath){
+    m_graph = read_graph(modelPB);
+
+    std::cout << "Successfully imported graph" << std::endl;
+
+
+
+
+    static constexpr int NUM_CLASSES = 2;
+    static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
+    float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
+        static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //original image shape (irrelevant)
+        static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //molded image shape
+        0.0f, 0.0f, static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE),  //window (y1, x1, y2, x2)
+        1.0f,                                                                        //scale factor: was 1.0f
+        0.0f, 1.0f };                                                                 //classes (NUM_CLASSES)
+
+
+//TODO the binary
+    std::ifstream anchor_file;
+    //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
+    std::vector<float> anchors = load_anchor(modelPath, IMAGE_SIZE);
+    this->create_session();
+
+}

@@ -10,7 +10,9 @@ void imagetools::setframe(cv::Mat &input){
     if (this->frame != nullptr){
      //   delete[] (this->frame);
         this->frame->release();
+        delete this->frame;
     }
+    //kelle pointer ha igen unique de sima cv mat is jolesz
     this->frame = new cv::Mat();
     this->frame = &input;
 }

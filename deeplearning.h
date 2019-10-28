@@ -27,13 +27,11 @@
 #include <memory>
 #include <exception>
 
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <tensorflow/c/c_api.h>
-
 
 class i_deeplearning
 {
@@ -53,7 +51,7 @@ public:
     void drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask);
     std::vector<std::vector<float>> postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
     void resize(cv::Mat& input, cv::Mat& out);
-    void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) override;
+    virtual void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) override;
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
   //  std::vector<std::vector<float>> objpos;
@@ -66,9 +64,9 @@ protected:
     float maskThreshold = 0.3f; // Mask threshold
 };
 
-class keras_mrcnn :public virtual i_deeplearning
-{
 
+class keras_mrcnn : public virtual i_deeplearning
+{
     class TF_Session_Wrapper
     {
     public:
@@ -102,6 +100,8 @@ class keras_mrcnn :public virtual i_deeplearning
         TF_Session* mSession = nullptr;
     };
 
+
+
     static void DontDeleteTensor(void*, size_t, void*)
     {
     }
@@ -111,14 +111,11 @@ class keras_mrcnn :public virtual i_deeplearning
         free(pData);
     }
 public:
-    //image constants...
-    const std::vector<int> ANCHOR_SIZES = { 128, 256, 512, 768, 1024, 1536, 2048 };
-    cv::Scalar MEAN_PIXEL = cv::Scalar(123.7f, 116.8, 103.9);
-  //  const cv::Scalar MEAN_PIXEL(123.7f);
+   // keras_mrcnn();
 
-    //constants for this graph type
-    static constexpr float DETECTION_CONFIDENCE = 0.9f;
-    static constexpr float MASK_CONFIDENCE = 0.9f;
+    keras_mrcnn(){}
+    ~keras_mrcnn() override;
+
 
 
     #define TF_DELETER(X) typedef void(*TF_Delete ## X ## _Func)(TF_ ## X *);
@@ -137,6 +134,26 @@ public:
     TF_POINTER(ImportGraphDefOptions)
     TF_POINTER(SessionOptions)
     TF_POINTER(Tensor)
+
+    TF_Graph_Ptr m_graph;
+    TF_Session_Wrapper *m_session;
+  //  TF_Session* m_s;
+    TF_Status_Ptr m_status;
+    TF_SessionOptions_Ptr m_options;
+
+    //image constants...
+    const std::vector<int> ANCHOR_SIZES = { 128, 256, 512, 768, 1024, 1536, 2048 };
+    cv::Scalar MEAN_PIXEL = cv::Scalar(123.7f, 116.8, 103.9);
+  //  const cv::Scalar MEAN_PIXEL(123.7f);
+
+    //constants for this graph type
+    static constexpr float DETECTION_CONFIDENCE = 0.9f;
+    static constexpr float MASK_CONFIDENCE = 0.9f;
+    int IMAGE_SIZE=0;
+
+
+
+
 
 
     TF_Buffer_Ptr ReadFile(const char* pFile)
@@ -160,20 +177,20 @@ public:
 
     TF_Graph_Ptr  read_graph(const char* modelPB) {
 
-        TF_Graph_Ptr graph(TF_NewGraph(), TF_DeleteGraph);
+        TF_Graph_Ptr m_graph(TF_NewGraph(), TF_DeleteGraph);
                  //Reading graph
         TF_Buffer_Ptr graphDef = ReadFile(modelPB);
 
         TF_Status_Ptr importStatus(TF_NewStatus(), TF_DeleteStatus);
         TF_ImportGraphDefOptions_Ptr importOptions(TF_NewImportGraphDefOptions(), TF_DeleteImportGraphDefOptions);
-        TF_GraphImportGraphDef(graph.get(), graphDef.get(), importOptions.get(), importStatus.get());
+        TF_GraphImportGraphDef(m_graph.get(), graphDef.get(), importOptions.get(), importStatus.get());
         importOptions.reset();
         if (TF_GetCode(importStatus.get()) != TF_OK) throw std::runtime_error(std::string("Cannot import graph: ") + TF_Message(importStatus.get()));
 
         importStatus.reset();
         graphDef.reset();
 
-        return graph;
+        return m_graph;
     }
 
     std::vector <float> load_anchor(const char* modelPath,const int IMAGE_SIZE) {
@@ -201,7 +218,7 @@ public:
         return anchors;
     }
 
-    int select_anchor(cv::Mat image) {
+    int select_anchor(cv::Mat &image) {
        int maxDim = (std::max)(image.cols, image.rows);
 
         int anchorSize = ANCHOR_SIZES.back();
@@ -216,7 +233,7 @@ public:
         return anchorSize;
     }
 
-    cv::Mat mold_image(cv::Mat image, const int IMAGE_SIZE, int maxDim) {
+    cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) {
 
         //matterport's mrcnn needs squared images
         cv::Mat squareImage;
@@ -245,7 +262,24 @@ public:
         return moldedInput;
     }
 
-    void inferencing(cv::Mat image, TF_Session* session, TF_Status* status, cv::Mat moldedInput, int IMAGE_SIZE, TF_Graph* graph, std::vector <float> anchors,const char* outFileName) {
+    void inferencing(cv::Mat image, std::vector <float> &anchors) {
+        std::cout << "reading input image" << std::endl;
+      //  cv::Mat image = cv::imread(imName, cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+        if (image.empty()) throw std::runtime_error("unable to open the image");
+         this->create_session();
+
+        image.convertTo(image, CV_8UC3);
+        cv::resize(image, image, cv::Size(1024, 608));
+        const int maxDim = (std::max)(image.cols, image.rows);
+
+        IMAGE_SIZE = select_anchor(image);
+
+        std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
+
+        //matterport's mrcnn only works for image sizes that are multiples of 64
+        if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
+
+        cv::Mat moldedInput = mold_image(image, IMAGE_SIZE, maxDim);
 
         static constexpr int NUM_CLASSES = 2;
         static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
@@ -262,7 +296,7 @@ public:
         std::vector<TF_Tensor*> inputTensors;
 
         //image tensor ezt
-        TF_Operation* inputOpImage = TF_GraphOperationByName(graph, "input_image");
+        TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph.get(), "input_image");
         if (inputOpImage == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutImage = { inputOpImage, 0 };
@@ -273,7 +307,7 @@ public:
         inputTensors.push_back(inputTensorImage.get());
 
         //meta tensor
-        TF_Operation* inputOpMeta = TF_GraphOperationByName(graph, "input_image_meta");
+        TF_Operation* inputOpMeta = TF_GraphOperationByName(m_graph.get(), "input_image_meta");
         if (inputOpMeta == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutMeta = { inputOpMeta, 0 };
@@ -284,7 +318,7 @@ public:
         inputTensors.push_back(inputTensorMeta.get());
 
         //anchor tensor
-        TF_Operation* inputOpAnchor = TF_GraphOperationByName(graph, "input_anchors");
+        TF_Operation* inputOpAnchor = TF_GraphOperationByName(m_graph.get(), "input_anchors");
         if (inputOpAnchor == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output inputOutAnchor = { inputOpAnchor, 0 };
@@ -299,14 +333,14 @@ public:
         std::vector<TF_Output> outputs;
         std::vector<TF_Tensor*> outputTensorPtrs;
 
-        TF_Operation* outputOpDetection = TF_GraphOperationByName(graph, "mrcnn_detection/Reshape_1");
+        TF_Operation* outputOpDetection = TF_GraphOperationByName(m_graph.get(), "mrcnn_detection/Reshape_1");
         if (outputOpDetection == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output outputOutDetection = { outputOpDetection, 0 };
         outputs.push_back(outputOutDetection);
         outputTensorPtrs.push_back(nullptr);
 
-        TF_Operation* outputOpMask = TF_GraphOperationByName(graph, "mrcnn_mask/Reshape_1");
+        TF_Operation* outputOpMask = TF_GraphOperationByName(m_graph.get(), "mrcnn_mask/Reshape_1");
         if (outputOpMask == nullptr) throw std::runtime_error("Missing node!");
 
         TF_Output outputOutMask = { outputOpMask, 0 };
@@ -318,19 +352,19 @@ public:
 
         std::cout << " inferencing" << std::endl;
      //   auto start = std::chrono::system_clock::now();
-
+         //   TF_Session* x = m_session->Get();
         //Inferencing
-        TF_SessionRun(session, nullptr,
+        TF_SessionRun(m_session->Get(), nullptr,
             inputs.data(), inputTensors.data(), inputs.size(),
             outputs.data(), outputTensorPtrs.data(), outputs.size(),
-            nullptr, 0, nullptr, status);
+            nullptr, 0, nullptr, m_status.get());
 
         std::cout << "wrapping" << std::endl;
         //Wrapping all raw pointers
         for (TF_Tensor* outputTensor : outputTensorPtrs) outputTensors.emplace_back(TF_Tensor_Ptr(outputTensor, TF_DeleteTensor));
         outputTensorPtrs.clear();
 
-        if (TF_GetCode(status) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(status));
+        if (TF_GetCode(m_status.get()) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status.get()));
 
         static constexpr int BATCH_DIM = 0;
         static constexpr int DETECTIONS_DIM = 1;
@@ -488,7 +522,7 @@ public:
 
             // CHRONO END
      //       std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-            bool writtenSuccessfully = cv::imwrite(outFileName, newImage);
+            bool writtenSuccessfully = cv::imwrite("outFileName", newImage);
             std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
             cv::imshow("resuls", newImage);
         }
@@ -502,73 +536,37 @@ public:
 
     }
 
-    TF_Session_Wrapper create_session(TF_Graph* graph) {
-        TF_SessionOptions_Ptr options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-        TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-        TF_Session_Wrapper session(TF_NewSession(graph, options.get(), status.get()));
-        if (TF_GetCode(status.get()) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(status.get()));
-        return session;
+    void create_session() {
+     //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
+    //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
+        m_options =  TF_SessionOptions_Ptr(TF_NewSessionOptions(), TF_DeleteSessionOptions);
+        m_status =  TF_Status_Ptr(TF_NewStatus(), TF_DeleteStatus);
+        *m_session = TF_Session_Wrapper(TF_NewSession(m_graph.get(), m_options.get(), m_status.get()));
+        // m_session();
+//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options.get(), m_status.get()));
+       // m_s= TF_NewSession(m_graph.get(), m_options.get(), m_status.get());
+        if (TF_GetCode(m_status.get()) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status.get()));
+
+
+      //  return m_session;
 
     }
 
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override{
+        std::vector <float> anchors;
+        inferencing(input, anchors);
 
-     //   inferencing(input,session.Get(),status.get(), moldedInput, IMAGE_SIZE, graph.get(), anchors, outFileName);
         std::vector<std::vector<float>> obj;
         return obj;
-    }
+ //   }
+      }
 
-    TF_Graph_Ptr graph;
-    TF_Session_Wrapper session;
-    TF_Status_Ptr status;
-    TF_SessionOptions_Ptr options;
- //  virtual void setup_dnn_network(const char* imName, const char* modelPB, const char* modelPath, const char* outFileName) override ;
-    virtual void setup_dnn_network(const char* imName, const char* modelPB, const char* modelPath, const char* outFileName){
-        graph = read_graph(modelPB);
+    void setup_dnn( const char* modelPB, const char* modelPath);
 
-        std::cout << "Successfully imported graph" << std::endl;
+    virtual void setup_dnn_network(const char* modelPB, const char* modelPath) ;
 
-        std::cout << "reading input image" << std::endl;
-        cv::Mat image = cv::imread(imName, cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
-        if (image.empty()) throw std::runtime_error("unable to open the image");
-
-        image.convertTo(image, CV_8UC3);
-        cv::resize(image, image, cv::Size(1024, 608));
-        const int maxDim = (std::max)(image.cols, image.rows);
-
-
-        const int IMAGE_SIZE = select_anchor(image);
-
-        std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
-
-        //matterport's mrcnn only works for image sizes that are multiples of 64
-        if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
-
-        cv::Mat moldedInput = mold_image(image, IMAGE_SIZE, maxDim);
-
-
-        static constexpr int NUM_CLASSES = 2;
-        static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
-        float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
-            static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //original image shape (irrelevant)
-            static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //molded image shape
-            0.0f, 0.0f, static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE),  //window (y1, x1, y2, x2)
-            1.0f,                                                                        //scale factor: was 1.0f
-            0.0f, 1.0f };                                                                 //classes (NUM_CLASSES)
-
-                                                                                          //Reading graph
-
-                                                                                    //TODO the binary
-        std::ifstream anchor_file;
-        //Creating session
-    //  TF_SessionOptions_Ptr options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-    //  TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-        std::unique_ptr<TF_Status_Ptr> status = std::make_unique<TF_Status_Ptr>(TF_NewStatus(), TF_DeleteStatus);
-        std::unique_ptr<TF_SessionOptions_Ptr> options = std::make_unique<TF_SessionOptions_Ptr>(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-        session = (TF_NewSession(graph.get(), options->get(), status->get()));
-        if (TF_GetCode(status->get()) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(status->get()));
-        }
-};
+}
+    ;
 
 
 #endif // DEEPLEARNING_H

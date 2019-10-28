@@ -1,6 +1,8 @@
 #include "serialcom.h"
 
 bool serialcom::openport(QString& com){
+    if (sp.isOpen()){sp.close();}
+    std::lock_guard<std::mutex> lock(comm_mutex);
     this->sp.setPortName(com);
     this->sp.setBaudRate(QSerialPort::Baud115200);
     this->sp.setDataBits(QSerialPort::Data8);
@@ -15,6 +17,7 @@ bool serialcom::openport(QString& com){
     else{
        return false;
     }
+// sose zarom be...
 }
 
 void serialcom::send(QString& command){
@@ -56,4 +59,12 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
 void serialcom::sp_flush(){
     std::lock_guard<std::mutex> lock(comm_mutex);
     sp.flush();
+}
+
+void serialcom::close_port()
+{
+    std::lock_guard<std::mutex> lock(comm_mutex);
+    sp.flush();
+    this->sp.close();
+
 }

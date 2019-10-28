@@ -3,6 +3,7 @@
 
 cv::Mat getpcenter(const cv::Mat& cppoints){
     std::cout<< "pc" << std::endl;
+    //felesleges a tmp
     cv::Mat tmp = cppoints.col(0);
     cv::Mat pcenter;//(cv::Mat_<float>(3,1));
     tmp.copyTo(pcenter);
@@ -61,6 +62,7 @@ cv::Mat calconimgpipettecoors(cv::Mat T,std::vector<float>mpos,
  //   std::cout<< pcenter <<"pcenter" <<std::endl;
     cv::Mat mc_m_ic= mousecoors-icenter;
     //std::cout<< mc_m_ic << std::endl<< "mousecoorsminusicenter"<<std::endl;
+    // *=
     cv::Mat TM_mic = T*mc_m_ic;
     //std::cout<< TM_mic << std::endl<< "TM*mousecoorsminusicenter"<<std::endl;
     pipcoors = TM_mic+pcenter;

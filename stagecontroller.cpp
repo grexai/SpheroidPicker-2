@@ -23,7 +23,7 @@ ahm::Unit *findUnit(ahm::Unit *pUnit, ahm::TypeId typeId) {
             }
         }
     }
-    return 0; // unit with type id was not found
+    return nullptr; // unit with type id was not found
 }
 
 iop::string safe(iop::string sz) { return sz ? sz : ""; }
@@ -66,8 +66,9 @@ void Axis::printWhatIsSupported() {
         printCheck("EventSource", m_pEventSource);
         printCheck("MicronsConverter", m_pMicronsConverter);
         printCheck("MicronsPerSecondConverter", m_pMicronsPerSecondConverter);
+        printCheck("Autocalibration",m_pAutoCalibration);
+        printCheck("BasicControlValueAcceleration",m_pBasicControlValueAcceleration);
     }
-
 
     // BasicControlValue - sync control
 

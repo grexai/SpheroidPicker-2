@@ -6,6 +6,10 @@
 bool controller::connect_pressure_controller(std::string& port)
 {
     QString p1= QString::fromStdString(port);
+
+    delete apc;
+    // leak safe
+
   //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
     apc = new arduinopressurecontroller(QSP_apc,p1);
     //arduinopressurecontroller sd(QSP_apc,p1);
@@ -43,7 +47,8 @@ float controller::get_pressure()
 
 void controller::req_pressure_loop()
 {
-    while (1)
+    while (1) // bool kell ide
+        ///std atomic float
     {
         QSharedPointer<float> temp(new float);
         *temp = this->get_pressure();
@@ -59,6 +64,7 @@ QSharedPointer<float> controller::get_current_pressure(){
     return this->current_pressure;
 }
 
+
 void controller::spawn_pressure_thread()
 {
   //  m_pthread = QThread::create([this]{req_pressure_loop();});
@@ -71,6 +77,7 @@ void controller::spawn_pressure_thread()
  //   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
+/*
 class pipette_driver: public arduinogcode{
 public:
     void movex(){
@@ -78,7 +85,6 @@ public:
     }
 
 };
-/*
 // INTERFACE TEST
 //pipette_driver* pd(arduinogcode apic);
 class i_stagecontroll {
@@ -113,6 +119,7 @@ bool controller::connect_pipette_controller(std::string& port)
 {
 
     QString p1 = QString::fromStdString(port);
+    delete apipc;
     apipc = new arduinogcode(QSP_apipc,p1);
     if (apipc->isconnected == true)
     {
@@ -165,7 +172,7 @@ void controller::pipette_extrude_relative(const float e)
 
     apipc->extrude_relative(e);
 }
-
+/// struct erdemes otlet
 void controller::pipette_move(const std::vector<float> coords)
 {
     apipc->setabsoluepositioning();
@@ -212,8 +219,6 @@ void controller::pipette_home_z()
 std::vector<float> controller::pipette_get_coordinates(){
    return apipc->getcurrentpos();
 }
-
-
 
 void controller::pipette_move_to_img_coordinates(std::vector<float> coords){
     cv::Mat pipc = calconimgpipettecoors(TM,coords,m_centers.img,m_centers.pipette);
@@ -269,8 +274,6 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
 }
 
 
-
-
 // STAGE
 
 bool controller::connect_tango_stage(){
@@ -289,6 +292,7 @@ bool controller::connect_tango_stage(){
                     QTextStream(stdout) << "stage_sample: no stage found!" << endl;
                     return false;
                 }
+                stage->printWhatIsSupported();
             }
             else
             {
@@ -304,6 +308,12 @@ bool controller::connect_tango_stage(){
         return false;
     }
     return false;
+}
+
+void controller::stage_autocalibrate()
+{
+    stage->XAxis().autocalibration();
+    stage->YAxis().autocalibration();
 }
 
 void controller::stage_move_to_x_async(const int x)
@@ -374,9 +384,6 @@ std::vector<int> controller::stage_get_acceleration()
     return accelvec;
 }
 
-
-
-
 int controller::stage_get_x_coords()
 {
     return int(stage->XAxis().getCurrentPosition());
@@ -426,7 +433,6 @@ int controller::stage_get_y_max_pos()
 {
    return int(stage->YAxis().getMaxPosition());
 }
-
 
 void controller::stage_go_center()
 {
@@ -507,7 +513,7 @@ void controller::stage_run_iniciatlions()
     ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
     if (pAsyncResult) {// discard AsyncResult
         pAsyncResult->dispose();
-        pAsyncResult = 0;
+        pAsyncResult = nullptr;
     }
     std::this_thread::sleep_for(std::chrono::microseconds(1000) );
     recorder.getRecords(records, true);
@@ -541,12 +547,7 @@ bool controller::connect_microscope_unit(std::string &pa, std::string &pc)
     return true;
 }
 
-
-
-
-
-
-bool controller::connect_screening_microscope(){
+bool controller::connect_screening_microscope()
+{
     return false;
 }
-

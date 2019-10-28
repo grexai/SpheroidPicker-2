@@ -28,6 +28,7 @@ cv::Mat* CameraCV::getframe()
 void CameraCV::setframe(cv::Mat &input){
     if (this->frame != nullptr){
      //   delete[] (this->frame);
+        //nem kell a pointer
         this->frame->release();
     }
     this->frame = new cv::Mat();
@@ -40,6 +41,7 @@ cv::Mat* CameraCV::getdisplayframe(){
 }
 
 void CameraCV::setvideodevice(int devid){
+    delete camera;
     this->camera = new cv::VideoCapture(devid);
 
 }
@@ -55,7 +57,8 @@ void CameraCV::resetvideodevice(){
 void CameraCV::rmvideodevice(){
     camera->release();
     QTextStream(stdout) << camera->isOpened();
-    camera->~VideoCapture();
+    delete camera;
+    camera = nullptr;
 }
 
 QSharedPointer<cv::Mat> CameraCV::get_current_frm(){

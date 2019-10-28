@@ -92,6 +92,7 @@ public:
         m_pDirectedControlValueAsyncVelocity = find_itf<ahm::DirectedControlValueAsyncVelocity>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_VALUE_ASYNC);
         m_pBasicControlState = find_itf<ahm::BasicControlState>(m_pAxisUnit, ahm::IID_BASIC_CONTROL_STATE);
         m_pEventSource = find_itf<ahm::EventSource>(m_pAxisUnit, ahm::IID_EVENT_SOURCE);
+        m_pAutoCalibration = find_itf<ahm::AutoCalibration>(m_pAxisUnit, ahm::IID_AUTO_CALIBRATION);
         m_pMicronsConverter = m_pBasicControlValue != 0 && m_pBasicControlValue->metricsConverters() != 0 ? m_pBasicControlValue->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS) : 0;
         m_pMicronsPerSecondConverter = m_pBasicControlValueVelocity != 0 && m_pBasicControlValueVelocity->metricsConverters() != 0 ? m_pBasicControlValueVelocity->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS_PER_SECOND) : 0;
         m_pMicronsPerSecondSquaredConverter = m_pBasicControlValueAcceleration != 0 && m_pBasicControlValueAcceleration->metricsConverters() != 0 ? m_pBasicControlValueVelocity->metricsConverters()->findMetricsConverter(ahm::METRICS_MICRONS_PER_SECOND_SQUARED) : 0;
@@ -104,6 +105,9 @@ public:
     // move to position in microsteps
     bool moveTo(iop::int32 pos);
 
+    void autocalibration() {
+            m_pAutoCalibration->calibrate();
+        }
 
     iop::int32 getCurrentPosition() ;
 
@@ -179,6 +183,7 @@ private:
     ahm::BasicControlValueAcceleration *m_pBasicControlValueAcceleration;
     ahm::BasicControlState *m_pBasicControlState;
     ahm::EventSource *m_pEventSource;
+    ahm::AutoCalibration *m_pAutoCalibration;
 };
 
 class Stage : public Base {

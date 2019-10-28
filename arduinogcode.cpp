@@ -63,6 +63,7 @@ void arduinogcode::moveToXSync(float x_value){
 
 void arduinogcode::moveToYSync(float y_value)
 {
+    // error check
     QString msg= "G0";
     apipc_sc.send(msg.append("Y").append(QString::number(y_value,'f',2)).append(EOM));
 }
@@ -109,7 +110,7 @@ void arduinogcode::setrelativepositioning(){
 
 std::vector<float> arduinogcode::getcurrentpos()
 {
-    std::vector<float> coors;
+    std::vector<float> coors(3,0.0f);
     try
     {
         QString msg = "M114";
@@ -137,7 +138,7 @@ std::vector<float> arduinogcode::getcurrentpos()
             QStringList xList = xRegExp.capturedTexts();
             try
             {
-            coors.push_back( static_cast<float>(xList.begin()->toFloat()));
+            coors[i-1]=( static_cast<float>(xList.begin()->toFloat()));
             }
             catch (...)
             {
@@ -172,6 +173,7 @@ std::vector<float> arduinogcode::getcurrentpos()
 void arduinogcode::MoveToXYZSync(std::vector<float> coords)
 {
     setabsoluepositioning();
+    // one message
     moveToXSync(coords.at(0));  //X
     moveToZSync(coords.at(2));  //Z
     moveToYSync(coords.at(1));  //Y

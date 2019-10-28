@@ -3,7 +3,7 @@
 # Project created by QtCreator 2018-09-24T13:22:57
 #
 #-------------------------------------------------
-
+# gitinor . user
 QT       += core gui widgets
 
 TARGET = ASP

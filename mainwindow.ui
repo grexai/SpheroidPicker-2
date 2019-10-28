@@ -1207,48 +1207,6 @@ Stage</string>
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="save_m_p_button">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>290</y>
-       <width>61</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>setX midpoint</string>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="set_z_spinbox">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>300</y>
-       <width>62</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <double>999.000000000000000</double>
-     </property>
-     <property name="value">
-      <double>50.000000000000000</double>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>300</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>auto z height</string>
-     </property>
-    </widget>
     <zorder>get_coors_pushButton</zorder>
     <zorder>p_xm_button</zorder>
     <zorder>pip_step_spinbox</zorder>
@@ -1273,9 +1231,6 @@ Stage</string>
     <zorder>p_ym_button</zorder>
     <zorder>label_4</zorder>
     <zorder>doubleSpinBox</zorder>
-    <zorder>save_m_p_button</zorder>
-    <zorder>set_z_spinbox</zorder>
-    <zorder>label_6</zorder>
    </widget>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
@@ -1283,7 +1238,7 @@ Stage</string>
       <x>1730</x>
       <y>30</y>
       <width>171</width>
-      <height>171</height>
+      <height>61</height>
      </rect>
     </property>
     <property name="title">
@@ -1319,7 +1274,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>60</y>
        <width>41</width>
        <height>21</height>
       </rect>
@@ -1332,7 +1287,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>80</y>
        <width>41</width>
        <height>21</height>
       </rect>
@@ -1345,7 +1300,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>50</y>
+       <y>60</y>
        <width>51</width>
        <height>22</height>
       </rect>
@@ -1367,7 +1322,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>70</y>
+       <y>80</y>
        <width>51</width>
        <height>22</height>
       </rect>
@@ -1565,7 +1520,7 @@ Stage</string>
      <enum>QTabWidget::South</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="live_image">
      <attribute name="title">
@@ -1639,7 +1594,7 @@ Stage</string>
     <widget class="QDoubleSpinBox" name="p_extruder_step_box">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>170</x>
        <y>30</y>
        <width>121</width>
        <height>31</height>
@@ -1697,6 +1652,87 @@ Stage</string>
     </property>
     <property name="text">
      <string>Put to other petri</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pick_and_put">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>510</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pick and put EXPERIMENTAL</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>130</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>auto z height</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="save_m_p_button">
+    <property name="geometry">
+     <rect>
+      <x>1790</x>
+      <y>170</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>setX midpoint</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="set_z_spinbox">
+    <property name="geometry">
+     <rect>
+      <x>1820</x>
+      <y>130</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>999.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>50.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="z_dive_speed">
+    <property name="geometry">
+     <rect>
+      <x>1820</x>
+      <y>110</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>999.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>110</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Z dive speed</string>
     </property>
    </widget>
   </widget>

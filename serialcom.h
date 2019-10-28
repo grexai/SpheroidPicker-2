@@ -26,6 +26,7 @@ public:
 
     void sp_flush();
 
+    void close_port();
 };
 
 #endif // SERIALCOM_H
