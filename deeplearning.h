@@ -37,7 +37,7 @@ class i_deeplearning
 {
 public:
     i_deeplearning(){}
-    virtual ~i_deeplearning(){}
+    virtual ~i_deeplearning()= 0;
     virtual void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) = 0;
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output)= 0;
 
@@ -67,38 +67,6 @@ protected:
 
 class keras_mrcnn : public virtual i_deeplearning
 {
-    class TF_Session_Wrapper
-    {
-    public:
-        TF_Session_Wrapper(TF_Session* pSession) : mSession(pSession) {}
-        TF_Session* Get() noexcept { return mSession; }
-        const TF_Session* Get() const noexcept  { return mSession; }
-        ~TF_Session_Wrapper() { CloseAndDelete(); }
-        void CloseAndDelete(TF_Status* pStatus = nullptr)
-        {
-            if(mSession != nullptr)
-            {
-                if(pStatus == nullptr)
-                {
-                    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-                    TF_CloseSession(mSession, status.get());
-                    TF_DeleteSession(mSession, status.get());
-                }
-                else
-                {
-                    TF_CloseSession(mSession, pStatus);
-                    TF_DeleteSession(mSession, pStatus);
-                }
-            }
-            mSession = nullptr;
-        }
-        TF_Session_Wrapper(const TF_Session_Wrapper&) = delete;
-        TF_Session_Wrapper& operator=(const TF_Session_Wrapper&) = delete;
-        TF_Session_Wrapper(TF_Session_Wrapper&& pOther);
-        TF_Session_Wrapper& operator=(TF_Session_Wrapper&& pOther);
-    private:
-        TF_Session* mSession = nullptr;
-    };
 
 
 
@@ -112,6 +80,8 @@ class keras_mrcnn : public virtual i_deeplearning
     }
 public:
    // keras_mrcnn();
+
+
 
     keras_mrcnn(){}
     ~keras_mrcnn() override;
@@ -150,11 +120,6 @@ public:
     static constexpr float DETECTION_CONFIDENCE = 0.9f;
     static constexpr float MASK_CONFIDENCE = 0.9f;
     int IMAGE_SIZE=1920;
-
-
-
-
-
 
     TF_Buffer_Ptr ReadFile(const char* pFile)
     {
@@ -223,9 +188,9 @@ public:
         return anchors;
     }
 
-    int select_anchor(cv::Mat &image) {
-       int maxDim = (std::max)(image.cols, image.rows);
-
+    int select_anchor() {
+    //   int maxDim = (std::max)(image.cols, image.rows);
+        int maxDim = 1920;
         int anchorSize = ANCHOR_SIZES.back();
         //anchorSize = 512;
         for (const int anchor : ANCHOR_SIZES)
@@ -267,17 +232,14 @@ public:
         return moldedInput;
     }
 
-    void inferencing(cv::Mat image, std::vector <float> &anchors) {
-        std::cout << "reading input image" << std::endl;
-      //  cv::Mat image = cv::imread(imName, cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
-        if (image.empty()) throw std::runtime_error("unable to open the image");
-         this->create_session();
+    void inferencing(cv::Mat& image, std::vector <float> &anchors) {
+
 
         image.convertTo(image, CV_8UC3);
         cv::resize(image, image, cv::Size(1024, 608));
         const int maxDim = (std::max)(image.cols, image.rows);
 
-        IMAGE_SIZE = select_anchor(image);
+        IMAGE_SIZE = select_anchor();
 
         std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
 
@@ -527,8 +489,8 @@ public:
 
             // CHRONO END
      //       std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-            bool writtenSuccessfully = cv::imwrite("outFileName", newImage);
-            std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
+         //   bool writtenSuccessfully = cv::imwrite("outFileName", newImage);
+         //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
             cv::imshow("resuls", newImage);
         }
 
@@ -544,12 +506,11 @@ public:
     void create_session() {
      //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
     //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
+//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options, m_status));
         m_options = TF_NewSessionOptions();
         m_status =  TF_NewStatus();
-
         m_session = TF_NewSession(m_graph, m_options, m_status);
         // m_session();
-//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options, m_status));
        // m_s= TF_NewSession(m_graph, m_options, m_status);
         if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 
@@ -567,12 +528,44 @@ public:
  //   }
       }
 
-    void setup_dnn( const char* modelPB, const char* modelPath);
+    virtual void setup_dnn_network(std::string modelPB, std::string modelPath, std::string empty) override;
 
-    virtual void setup_dnn_network(const char* modelPB, const char* modelPath) ;
+    class TF_Session_Wrapper
+    {
+    public:
+        TF_Session_Wrapper(TF_Session* pSession) : mSession(pSession) {}
+        TF_Session* Get() noexcept { return mSession; }
+        const TF_Session* Get() const noexcept  { return mSession; }
+        ~TF_Session_Wrapper() { CloseAndDelete(); }
+        void CloseAndDelete(TF_Status* pStatus = nullptr)
+        {
+            if(mSession != nullptr)
+            {
+                if(pStatus == nullptr)
+                {
+                    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
+                    TF_CloseSession(mSession, status.get());
+                    TF_DeleteSession(mSession, status.get());
+                }
+                else
+                {
+                    TF_CloseSession(mSession, pStatus);
+                    TF_DeleteSession(mSession, pStatus);
+                }
+            }
+            mSession = nullptr;
+        }
+        TF_Session_Wrapper(const TF_Session_Wrapper&) = delete;
+        TF_Session_Wrapper& operator=(const TF_Session_Wrapper&) = delete;
+        TF_Session_Wrapper(TF_Session_Wrapper&& pOther);
+        TF_Session_Wrapper& operator=(TF_Session_Wrapper&& pOther);
+    private:
+        TF_Session* mSession = nullptr;
+    };
+
 
 }
-    ;
+;
 
 
 #endif // DEEPLEARNING_H

@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setValue(75);
     progress.setLabelText("Loading neural network graph");
     dl = new invecption_v2();
+
     dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
@@ -884,8 +885,22 @@ void MainWindow::on_save_m_p_button_clicked()
     // IMAGE and click this button
     // this button saves X positon of the pipette.
     // auto pick up will send back to this pos (should be middle of the image)
-    std::vector<float> pos = ctrl->pipette_get_coordinates();
-    this->mid_s_x_p = pos.at(0);
+
+    //  std::vector<float> pos = ctrl->pipette_get_coordinates();
+  //  this->mid_s_x_p = pos.at(0);
+    i_deeplearning* sad;
+    sad = new keras_mrcnn();
+    sad->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb","d:/dev/cpp/MODELS/mrcnn_sph_def0709/","null");
+//
+    auto cfrm = cameracv->get_current_frm();
+    cv::Mat image;
+    sad->dnn_inference(*cfrm, image);
+    delete qframe;
+    qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    ui->tabWidget->setCurrentWidget(ui->tab2);
+
 }
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)

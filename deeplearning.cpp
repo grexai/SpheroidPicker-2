@@ -1,5 +1,7 @@
 #include "deeplearning.h"
 
+
+i_deeplearning:: ~i_deeplearning(){}
 invecption_v2::invecption_v2()
 {
 
@@ -290,8 +292,10 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
     //return detectedFrame;
 }
 
-void keras_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath){
-    read_graph(modelPB);
+
+keras_mrcnn::~keras_mrcnn(){}
+void keras_mrcnn::setup_dnn_network( std::string modelPB, std::string modelPath, std::string empty){
+    read_graph(modelPB.c_str());
 
     std::cout << "Successfully imported graph" << std::endl;
 
@@ -311,7 +315,8 @@ void keras_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath)
 //TODO the binary
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
-    std::vector<float> anchors = load_anchor(modelPath, IMAGE_SIZE);
+    IMAGE_SIZE = select_anchor();
+    std::vector<float> anchors = load_anchor(modelPath.c_str(), IMAGE_SIZE);
     this->create_session();
 
 }
