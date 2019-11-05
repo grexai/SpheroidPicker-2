@@ -58,19 +58,25 @@ MainWindow::MainWindow(QWidget *parent) :
             ctrl->stage_set_speed(5000.0f);
             std::vector<int> s = ctrl->stage_get_speed();
             ui->s_speed_spinbox->setValue(s.at(0));
-    } else {
-
     }
     progress.setValue(75);
     progress.setLabelText("Loading neural network graph");
-    dl = new invecption_v2();
+    QMessageBox::StandardButton res1Btn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                                tr("Load Matterport Rcnn?"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (res1Btn == QMessageBox::Yes) {
+        dl = new matterport_mrcnn();
+        dl->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb",
+                                 "d:/dev/cpp/MODELS/mrcnn_sph_def0709/","");
 
-    dl->setup_dnn_network(propreader->cfg.classesFile,
+    }else{
+        dl = new invecption_v2();
+
+        dl->setup_dnn_network(propreader->cfg.classesFile,
                           propreader->cfg.model_weights,
                           propreader->cfg.textGraph);
-    mrcnn = new matterport_mrcnn();
-    mrcnn->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb",
-                             "d:/dev/cpp/MODELS/mrcnn_sph_def0709/","");
+    }
 
 
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
@@ -117,7 +123,7 @@ void MainWindow::setdarkstyle(){
 
 void MainWindow::setdefault()
 {
-    qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+   qApp->setStyle(QStyleFactory::create("WindowsDefault"));
    qApp->setPalette(this->style()->standardPalette());
    qApp->style()->standardPalette();
  //  qApp->setStyle(this->style()->standardIcon());
@@ -895,18 +901,18 @@ void MainWindow::on_save_m_p_button_clicked()
     // this button saves X positon of the pipette.
     // auto pick up will send back to this pos (should be middle of the image)
 
-    //  std::vector<float> pos = ctrl->pipette_get_coordinates();
-  //  this->mid_s_x_p = pos.at(0);
-
+    std::vector<float> pos = ctrl->pipette_get_coordinates();
+    this->mid_s_x_p = pos.at(0);
+/*
     auto cfrm = cameracv->get_current_frm();
     cv::Mat image;
-    mrcnn->dnn_inference(*cfrm, image);
+    //mrcnn->dnn_inference(*cfrm, image);
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
-
+*/
 }
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)

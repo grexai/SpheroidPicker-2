@@ -106,7 +106,7 @@ public:
 
     TF_Graph *m_graph;
    // TF_Session_Wrapper *m_session;
-   TF_Session* m_session;
+    TF_Session* m_session;
     TF_Status *m_status;
     TF_SessionOptions *m_options;
     std::vector<float> m_anchors;
@@ -139,115 +139,16 @@ public:
         return buf;
     }
 
-    void  read_graph(const char* modelPB) {
+    void  read_graph(const char* modelPB) ;
 
-        m_graph = TF_NewGraph() ;
-                 //Reading graph
+    std::vector <float> load_anchor(const char* modelPath,const int IMAGE_SIZE) ;
 
+    int select_anchor() ;
 
-        TF_Buffer_Ptr graphDef = ReadFile(modelPB);
-
-        TF_Status_Ptr importStatus(TF_NewStatus(), TF_DeleteStatus);
-
-        TF_ImportGraphDefOptions_Ptr importOptions(TF_NewImportGraphDefOptions(), TF_DeleteImportGraphDefOptions);
-
-        TF_GraphImportGraphDef(m_graph, graphDef.get(), importOptions.get(), importStatus.get());
-
-        importOptions.reset();
-        if (TF_GetCode(importStatus.get()) != TF_OK) throw std::runtime_error(std::string("Cannot import graph: ") + TF_Message(importStatus.get()));
-
-        importStatus.reset();
-        graphDef.reset();
-
-        //return m_graph;
-    }
-
-    std::vector <float> load_anchor(const char* modelPath,const int IMAGE_SIZE) {
-        std::ifstream file(modelPath + std::to_string(IMAGE_SIZE) + ".anc");
-        if (file.is_open() == false)
-        {
-            std::cout << "anchpath " << modelPath + std::to_string(IMAGE_SIZE) + ".anc ";
-            throw std::runtime_error("file is not opened ");
-        }
-
-        std::string str;
-        std::vector<float> anchors;
-        std::string segment;
-        while (std::getline(file, str))
-        {
-            std::istringstream tokenStream(str);
-            std::string out;
-            while (std::getline(tokenStream, out, ';'))
-            {
-                anchors.push_back(atof(out.c_str()));
-            }
-
-        }
-        file.close();
-        return anchors;
-    }
-
-    int select_anchor() {
-    //   int maxDim = (std::max)(image.cols, image.rows);
-        int maxDim = 1024;
-        int anchorSize = ANCHOR_SIZES.back();
-        //anchorSize = 512;
-        for (const int anchor : ANCHOR_SIZES)
-        {
-            std::cout << "anchor :: " << anchor << std::endl;
-            anchorSize = anchor;
-            if (anchorSize >= maxDim) break;
-        }
-
-        return anchorSize;
-    }
-
-    cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) {
-
-        //matterport's mrcnn needs squared images
-        cv::Mat squareImage;
-        //image is larger than the largest anchor set, need to resize
-        if (IMAGE_SIZE < maxDim)
-        {
-            cv::Mat temp = cv::Mat::zeros(maxDim, maxDim, image.type());
-            image.copyTo(temp(cv::Rect(0, 0, image.cols, image.rows)));
-            cv::resize(temp, squareImage, cv::Size(IMAGE_SIZE, IMAGE_SIZE), 0, 0, cv::INTER_LINEAR);
-        }
-        //image is square and equal to the anchor size
-        else if (IMAGE_SIZE == maxDim && image.cols == image.rows)
-        {
-            squareImage = image;
-        }
-        //image is smaller than the anchor size
-        else
-        {
-            squareImage = cv::Mat::zeros(IMAGE_SIZE, IMAGE_SIZE, image.type());
-            image.copyTo(squareImage(cv::Rect(0, 0, image.cols, image.rows)));
-        }
-
-        cv::Mat moldedInput(squareImage.size(), CV_32FC3);
-        squareImage.convertTo(moldedInput, CV_32FC3);
-        cv::subtract(moldedInput, MEAN_PIXEL, moldedInput);
-        return moldedInput;
-    }
-
+    cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) ;
     void inferencing(cv::Mat& image) ;
 
-    void create_session() {
-     //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-    //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options, m_status));
-        m_options = TF_NewSessionOptions();
-        m_status =  TF_NewStatus();
-        m_session = TF_NewSession(m_graph, m_options, m_status);
-        // m_session();
-       // m_s= TF_NewSession(m_graph, m_options, m_status);
-        if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
-
-
-      //  return m_session;
-
-    }
+    void create_session() ;
 
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override{
 
@@ -259,43 +160,7 @@ public:
       }
 
     virtual void setup_dnn_network(std::string modelPB, std::string modelPath, std::string empty) override;
-
-    class TF_Session_Wrapper
-    {
-    public:
-        TF_Session_Wrapper(TF_Session* pSession) : mSession(pSession) {}
-        TF_Session* Get() noexcept { return mSession; }
-        const TF_Session* Get() const noexcept  { return mSession; }
-        ~TF_Session_Wrapper() { CloseAndDelete(); }
-        void CloseAndDelete(TF_Status* pStatus = nullptr)
-        {
-            if(mSession != nullptr)
-            {
-                if(pStatus == nullptr)
-                {
-                    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-                    TF_CloseSession(mSession, status.get());
-                    TF_DeleteSession(mSession, status.get());
-                }
-                else
-                {
-                    TF_CloseSession(mSession, pStatus);
-                    TF_DeleteSession(mSession, pStatus);
-                }
-            }
-            mSession = nullptr;
-        }
-        TF_Session_Wrapper(const TF_Session_Wrapper&) = delete;
-        TF_Session_Wrapper& operator=(const TF_Session_Wrapper&) = delete;
-        TF_Session_Wrapper(TF_Session_Wrapper&& pOther);
-        TF_Session_Wrapper& operator=(TF_Session_Wrapper&& pOther);
-    private:
-        TF_Session* mSession = nullptr;
-    };
-
-
-}
-;
+};
 
 
 #endif // DEEPLEARNING_H
