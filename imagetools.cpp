@@ -103,7 +103,7 @@ void imagetools::getobjectprops(cv::Mat* input){
     RNG rng(12345);
       vector<vector<Point> > contours;
       vector<Vec4i> hierarchy;
-
+        //nullcheck
       /// Detect edges using canny
       Canny( *input, canny_output, 0, 100, 3 );
       /// Find contours
@@ -154,6 +154,7 @@ void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
 // Uses CV saveimg
 void imagetools::saveImg(cv::Mat* outimg, std::string outname)
 {
+    //NULLCHECK
     outname = outname + ".png";
     std::vector<int> compression_params;
     compression_params.push_back(16);

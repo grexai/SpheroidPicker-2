@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
+
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
@@ -64,7 +65,14 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setLabelText("Loading neural network graph");
     dl = new invecption_v2();
 
-    dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+    dl->setup_dnn_network(propreader->cfg.classesFile,
+                          propreader->cfg.model_weights,
+                          propreader->cfg.textGraph);
+    mrcnn = new matterport_mrcnn();
+    mrcnn->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb",
+                             "d:/dev/cpp/MODELS/mrcnn_sph_def0709/","");
+
+
     QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
     QTextStream(stdout) << propreader->cfg.textGraph.c_str() << endl;
@@ -104,11 +112,12 @@ void MainWindow::setdarkstyle(){
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     qApp->setPalette(darkPalette);
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
+
 }
 
 void MainWindow::setdefault()
 {
-  qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+    qApp->setStyle(QStyleFactory::create("WindowsDefault"));
    qApp->setPalette(this->style()->standardPalette());
    qApp->style()->standardPalette();
  //  qApp->setStyle(this->style()->standardIcon());
@@ -888,13 +897,10 @@ void MainWindow::on_save_m_p_button_clicked()
 
     //  std::vector<float> pos = ctrl->pipette_get_coordinates();
   //  this->mid_s_x_p = pos.at(0);
-    i_deeplearning* sad;
-    sad = new keras_mrcnn();
-    sad->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb","d:/dev/cpp/MODELS/mrcnn_sph_def0709/","null");
-//
+
     auto cfrm = cameracv->get_current_frm();
     cv::Mat image;
-    sad->dnn_inference(*cfrm, image);
+    mrcnn->dnn_inference(*cfrm, image);
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );

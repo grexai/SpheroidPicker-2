@@ -161,6 +161,19 @@
     <string>Select pipetting flow control system</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>390</y>
+     <width>111</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>load matterport</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

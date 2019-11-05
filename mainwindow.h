@@ -203,6 +203,7 @@ private:
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
     i_deeplearning* dl= nullptr;
+    i_deeplearning* mrcnn= nullptr;
     std::vector<cv::Mat> scanvector;
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     propertyreader* propreader = nullptr;

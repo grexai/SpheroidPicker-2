@@ -7,6 +7,7 @@ propertyreader::propertyreader()
 float f_param(std::map<std::string, std::string>& settings, std::string param)
 {
     return static_cast<float>(atof(settings[param].c_str()));
+    // LOCAL FUGGO 
 }
 
 int i_param(std::map<std::string, std::string>& settings, std::string param)

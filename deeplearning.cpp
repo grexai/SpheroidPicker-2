@@ -226,7 +226,8 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
     using namespace cv;
     using namespace std;
     using namespace dnn;
-     std::vector<std::vector<float>> objpos;
+
+    std::vector<std::vector<float>> objpos;
     std::cerr << "Read START" << std::endl;
     // Read image
 
@@ -293,8 +294,17 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
 }
 
 
-keras_mrcnn::~keras_mrcnn(){}
-void keras_mrcnn::setup_dnn_network( std::string modelPB, std::string modelPath, std::string empty){
+matterport_mrcnn::~matterport_mrcnn(){
+    //Finishing
+    TF_CloseSession(m_session,m_status);
+    TF_DeleteSession(m_session,m_status);
+//    m_session.CloseAndDelete(status.get());
+  //  if (TF_GetCode(status.get()) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(status.get()));
+
+}
+
+
+void matterport_mrcnn::setup_dnn_network( std::string modelPB, std::string modelPath, std::string empty){
     read_graph(modelPB.c_str());
 
     std::cout << "Successfully imported graph" << std::endl;
@@ -316,7 +326,289 @@ void keras_mrcnn::setup_dnn_network( std::string modelPB, std::string modelPath,
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
     IMAGE_SIZE = select_anchor();
-    std::vector<float> anchors = load_anchor(modelPath.c_str(), IMAGE_SIZE);
+    m_anchors = load_anchor(modelPath.c_str(), IMAGE_SIZE);
     this->create_session();
+
+}
+
+
+void matterport_mrcnn::inferencing(cv::Mat &image){
+
+    cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+    test.convertTo(image, CV_8UC3);
+    cv::resize(image, image, cv::Size(1024, 608));
+    const int maxDim = (std::max)(image.cols, image.rows);
+
+    IMAGE_SIZE = select_anchor();
+
+    std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
+
+    //matterport's mrcnn only works for image sizes that are multiples of 64
+    if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
+
+    cv::Mat moldedInput = mold_image(image, IMAGE_SIZE, maxDim);
+
+    static constexpr int NUM_CLASSES = 2;
+    static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
+    float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
+        static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //original image shape (irrelevant)
+        static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //molded image shape
+        0.0f, 0.0f, static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE),  //window (y1, x1, y2, x2)
+        1.0f,                                                                        //scale factor: was 1.0f
+        0.0f, 1.0f };
+
+
+    //Defining inputs
+    std::vector<TF_Output> inputs;
+    std::vector<TF_Tensor*> inputTensors;
+
+    //image tensor ezt
+    TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph, "input_image");
+    if (inputOpImage == nullptr) throw std::runtime_error("Missing node!");
+
+    TF_Output inputOutImage = { inputOpImage, 0 };
+    inputs.push_back(inputOutImage);
+
+    const int64_t inputTensorDimsImage[4] = { 1, moldedInput.rows, moldedInput.cols, moldedInput.channels() };
+    TF_Tensor_Ptr inputTensorImage(TF_NewTensor(TF_FLOAT, inputTensorDimsImage, 4, moldedInput.data, sizeof(float) * IMAGE_SIZE * IMAGE_SIZE * 3, DontDeleteTensor, nullptr), TF_DeleteTensor);
+    inputTensors.push_back(inputTensorImage.get());
+
+    //meta tensor
+    TF_Operation* inputOpMeta = TF_GraphOperationByName(m_graph, "input_image_meta");
+    if (inputOpMeta == nullptr) throw std::runtime_error("Missing node!");
+
+    TF_Output inputOutMeta = { inputOpMeta, 0 };
+    inputs.push_back(inputOutMeta);
+
+    const int64_t inputTensorDimsMeta[2] = { 1, METADATA_LEN };
+    TF_Tensor_Ptr inputTensorMeta(TF_NewTensor(TF_FLOAT, inputTensorDimsMeta, 2, IMAGE_METADATA, sizeof(IMAGE_METADATA), DontDeleteTensor, nullptr), TF_DeleteTensor);
+    inputTensors.push_back(inputTensorMeta.get());
+
+    //anchor tensor
+    TF_Operation* inputOpAnchor = TF_GraphOperationByName(m_graph, "input_anchors");
+    if (inputOpAnchor == nullptr) throw std::runtime_error("Missing node!");
+
+    TF_Output inputOutAnchor = { inputOpAnchor, 0 };
+    inputs.push_back(inputOutAnchor);
+
+    const int64_t inputTensorDimsAnchor[3] = { 1, static_cast<int64_t>(m_anchors.size()) / 4, 4 };
+    TF_Tensor_Ptr inputTensorAnchor(TF_NewTensor(TF_FLOAT, inputTensorDimsAnchor, 3, m_anchors.data(), m_anchors.size() * sizeof(float), DontDeleteTensor, nullptr), TF_DeleteTensor);
+    inputTensors.push_back(inputTensorAnchor.get());
+
+
+    // ezek
+    std::vector<TF_Output> outputs;
+    std::vector<TF_Tensor*> outputTensorPtrs;
+
+    TF_Operation* outputOpDetection = TF_GraphOperationByName(m_graph, "mrcnn_detection/Reshape_1");
+    if (outputOpDetection == nullptr) throw std::runtime_error("Missing node!");
+
+    TF_Output outputOutDetection = { outputOpDetection, 0 };
+    outputs.push_back(outputOutDetection);
+    outputTensorPtrs.push_back(nullptr);
+
+    TF_Operation* outputOpMask = TF_GraphOperationByName(m_graph, "mrcnn_mask/Reshape_1");
+    if (outputOpMask == nullptr) throw std::runtime_error("Missing node!");
+
+    TF_Output outputOutMask = { outputOpMask, 0 };
+    outputs.push_back(outputOutMask);
+    outputTensorPtrs.push_back(nullptr);
+
+    std::vector<TF_Tensor_Ptr> outputTensors;
+    outputTensors.reserve(outputTensorPtrs.size());
+
+    std::cout << " inferencing" << std::endl;
+ //   auto start = std::chrono::system_clock::now();
+     //   TF_Session* x = m_session->Get();
+    //Inferencing
+    TF_SessionRun(m_session, nullptr,
+        inputs.data(), inputTensors.data(), inputs.size(),
+        outputs.data(), outputTensorPtrs.data(), outputs.size(),
+        nullptr, 0, nullptr, m_status);
+
+    std::cout << "wrapping" << std::endl;
+    //Wrapping all raw pointers
+    for (TF_Tensor* outputTensor : outputTensorPtrs) outputTensors.emplace_back(TF_Tensor_Ptr(outputTensor, TF_DeleteTensor));
+    outputTensorPtrs.clear();
+
+    if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status));
+
+    static constexpr int BATCH_DIM = 0;
+    static constexpr int DETECTIONS_DIM = 1;
+
+    static constexpr int MRCNN_DETECTION = 0;
+
+    static constexpr int MRCNN_DETECTION_BB_LO_Y = 0;
+    static constexpr int MRCNN_DETECTION_BB_LO_X = 1;
+    static constexpr int MRCNN_DETECTION_BB_HI_Y = 2;
+    static constexpr int MRCNN_DETECTION_BB_HI_X = 3;
+    static constexpr int MRCNN_DETECTION_CLASS = 4;
+    static constexpr int MRCNN_DETECTION_SCORE = 5;
+
+    static constexpr int MRCNN_MASK = 1;
+    static constexpr int MRCNN_MASK_HEIGHT_DIM = 2;
+    static constexpr int MRCNN_MASK_WIDTH_DIM = 3;
+    static constexpr int MRCNN_MASK_CLASS_DIM = 4;
+
+    //sanity checks
+    const TF_Tensor* detTensor = outputTensors[MRCNN_DETECTION].get();
+    if (detTensor == nullptr) throw std::runtime_error("Missing output");
+    if (TF_TensorType(detTensor) != TF_FLOAT) throw std::runtime_error("Invalid output format");
+
+
+    if (TF_NumDims(detTensor) != 3) throw std::runtime_error("Invalid output format");
+
+    const int batchSize = TF_Dim(detTensor, BATCH_DIM);
+    const int maxDet = TF_Dim(detTensor, DETECTIONS_DIM);
+    if (TF_Dim(detTensor, 2) != 6) throw std::runtime_error("Invalid output format");
+
+    const TF_Tensor* maskTensor = outputTensors[MRCNN_MASK].get();
+    if (maskTensor == nullptr) throw std::runtime_error("Missing output");
+
+    if (TF_TensorType(maskTensor) != TF_FLOAT) throw std::runtime_error("Invalid output format");
+    if (TF_NumDims(maskTensor) != 5) throw std::runtime_error("Invalid output format");
+    if (batchSize != TF_Dim(maskTensor, BATCH_DIM)) throw std::runtime_error("Invalid output format");
+    if (maxDet != TF_Dim(maskTensor, DETECTIONS_DIM)) throw std::runtime_error("Invalid output format");
+
+    int32_t maskWidth = TF_Dim(maskTensor, MRCNN_MASK_WIDTH_DIM);
+    int32_t maskHeight = TF_Dim(maskTensor, MRCNN_MASK_HEIGHT_DIM);
+    if (NUM_CLASSES != TF_Dim(maskTensor, MRCNN_MASK_CLASS_DIM)) throw std::runtime_error("Invalid output format");
+
+    for (std::size_t i = 0; i < outputTensors.size(); ++i)
+    {
+        const int numdim = TF_NumDims(outputTensors[i].get());
+        std::cout << "Dimensions for " << i << ": " << numdim << std::endl;
+        for (int j = 0; j < numdim; ++j)
+        {
+            std::cout << "  " << j << ": " << TF_Dim(outputTensors[i].get(), j) << std::endl;
+        }
+    }
+
+    const int detectionIncrement = 6;
+    const int maskIncrement = maskHeight * maskWidth * NUM_CLASSES;
+
+    std::cout << "batchSize: " << batchSize << std::endl;
+
+    //NOTE: only batch size == 1 is tested
+    for (int b = 0; b < batchSize; ++b)
+    {
+        cv::Mat newImage;
+        image.copyTo(newImage);
+
+        std::cout << "image.copyTo(newImage) done" << std::endl;
+        cv::Mat labels = cv::Mat::zeros(newImage.size(), CV_32SC1);
+        //The prediction is always done on squared images
+        //If the image is smaller than the used image size, it is padded with zeros, else it is rescaled to that size
+        //This float is used to transfer the bounding boxes to the real size
+        float restoreDim = (std::max)(static_cast<float>((std::max)(image.rows, image.cols)), static_cast<float>(IMAGE_SIZE));
+        std::cout << "restoreDim casting done" <<restoreDim<< std::endl;
+
+        //getting tensor data for the batch
+        const float* detTensorData = &reinterpret_cast<const float*>(TF_TensorData(outputTensors[MRCNN_DETECTION].get()))[b * maxDet * detectionIncrement];
+        float* maskTensorData = &reinterpret_cast<float*>(TF_TensorData(outputTensors[MRCNN_MASK].get()))[b * maxDet * maskIncrement];
+        std::cout << "getting tensor data done" << std::endl;
+
+        //setting movable pointer
+        const float* detTensorPtr = detTensorData;
+        float* maskTensorPtr = maskTensorData;
+        std::cout << "setting movable pointer done" << std::endl;
+
+        //iterating through results (moving pointers)
+        for (int d = 0; d < maxDet; ++d, detTensorPtr += detectionIncrement, maskTensorPtr += maskIncrement)
+        {
+            //std::cout << "inside for detTensorPtr: " << detTensorPtr << std::endl;
+            //std::cout << "inside for maskTensorPtr: " << *maskTensorPtr << std::endl;
+
+            const float& score = detTensorPtr[MRCNN_DETECTION_SCORE];
+            if (score < DETECTION_CONFIDENCE) continue;
+            std::cout << "score: " << score << std::endl;
+            const float& classId = detTensorPtr[MRCNN_DETECTION_CLASS];
+
+            //order change
+            float box[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            box[0] = detTensorPtr[MRCNN_DETECTION_BB_LO_X];
+            box[1] = detTensorPtr[MRCNN_DETECTION_BB_LO_Y];
+            box[2] = detTensorPtr[MRCNN_DETECTION_BB_HI_X];
+            box[3] = detTensorPtr[MRCNN_DETECTION_BB_HI_Y];
+
+            //Processing result
+            int32_t bb[4] = { 0,0,0,0 };
+
+            bb[0] = static_cast<int>(std::round(box[0] * restoreDim));
+            bb[1] = static_cast<int>(std::round(box[1] * restoreDim));
+            bb[2] = static_cast<int>(std::round(box[2] * restoreDim));
+            bb[3] = static_cast<int>(std::round(box[3] * restoreDim));
+
+            //However we want boxes only on the original image
+            //box is outside the original image dimensions
+            if (bb[0] >= image.cols) continue;
+            if (bb[1] >= image.rows) continue;
+
+            bb[0] = (std::min)((std::max)(bb[0], 0), image.cols);
+            bb[1] = (std::min)((std::max)(bb[1], 0), image.rows);
+            bb[2] = (std::min)((std::max)(bb[2], 0), image.cols);
+            bb[3] = (std::min)((std::max)(bb[3], 0), image.rows);
+
+            std:: cout << "t:" << bb[0] << "t:"<< bb[1]<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
+            int baseLine = 10;
+            cv::Size labelSize = getTextSize("label", cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+            rectangle(newImage, cv::Point(bb[0], bb[1] - round(1.5*labelSize.height)), cv::Point(bb[0] + round(1.5*labelSize.width), bb[1] + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+                //putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0,0,0),1);
+
+
+            cv::Mat mask(maskHeight, maskWidth, CV_MAKETYPE(CV_32F, NUM_CLASSES), maskTensorPtr);
+
+            cv::Rect rect(cv::Point(bb[0], bb[1]), cv::Point(bb[2], bb[3]));
+            cv::resize(mask, mask, rect.size(), 0.0, 0.0, cv::INTER_LINEAR);
+
+            cv::Mat label = cv::Mat::zeros(mask.size(), CV_32SC1);
+            const int64_t total = mask.total();
+            const float* maskPtr = reinterpret_cast<const float*>(mask.data);
+            int32_t* labelPtr = reinterpret_cast<int32_t*>(label.data);
+            for (int64_t index = 0; index < total; ++index, maskPtr += NUM_CLASSES)
+            {
+                if (maskPtr[1] > MASK_CONFIDENCE)
+                {
+                    labelPtr[index] = d + 1;
+                }
+            }
+
+            cv::Mat roi = labels(rect);
+
+            label.copyTo(roi);
+
+
+        }
+
+        const int64_t total = labels.total();
+        uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
+        const int32_t* labelPtr = reinterpret_cast<const int32_t*>(labels.data);
+
+        //   labels.convertTo(labels,CV_8UC3);
+      //  cv::imwrite("outFileName.png", labels);
+
+        for (int64_t index = 0; index < total; ++index)
+        {
+            if (labelPtr[index] != 0)
+            {
+                imgPtr[(index * 3) + 1] = 255;
+            }
+        }
+
+      //  auto end = std::chrono::system_clock::now();
+        //
+    //    std::chrono::duration<double> elapsed_seconds = end - start;
+
+        // CHRONO END
+ //       std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+
+     //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
+       // cv::imshow("resuls", newImage);
+        newImage.copyTo(image);
+    }
+
+
+
+
 
 }
