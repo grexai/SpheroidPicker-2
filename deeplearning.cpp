@@ -432,25 +432,16 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,c
 }
 
 void matterport_mrcnn::create_session(){
-    //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
-   //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
-//        m_session = TF_Session_Wrapper(TF_NewSession(m_graph, m_options, m_status));
-       m_options = TF_NewSessionOptions();
-       m_status =  TF_NewStatus();
-       m_session = TF_NewSession(m_graph, m_options, m_status);
-       // m_session();
-      // m_s= TF_NewSession(m_graph, m_options, m_status);
-       if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
-
-
-     //  return m_session;
-
-   }
+    m_options = TF_NewSessionOptions();
+    m_status =  TF_NewStatus();
+    m_session = TF_NewSession(m_graph, m_options, m_status);
+    if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
+}
 
 std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
-    cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
-    test.convertTo(image, CV_8UC3);
+    //cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+    image.convertTo(image, CV_8UC3);
     cv::resize(image, image, cv::Size(1024, 576));/// WTF
     float  nx = 1920.0f/1024.0f;
     float ny = 1080.0f/576.0f;

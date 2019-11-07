@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 //    setstyle();
 
     hardwareselector w;
-    QPixmap pixmap("../BIOMAGwhite-01.png");
+    QPixmap pixmap("BIOMAGwhite-01.png");
     QSplashScreen splash(pixmap);
 
     splash.show();

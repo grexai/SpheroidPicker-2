@@ -208,7 +208,7 @@ private:
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     propertyreader* propreader = nullptr;
 
-    std::atomic_bool m_s_t_acitive = false;
+    std::atomic_bool m_s_t_acitive;
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
     std::thread* m_predict_thread = nullptr;

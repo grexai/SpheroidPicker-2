@@ -32,8 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
    // timer->setSingleShot(false); // always restarts
     disp_pressure= new QTimer(this);
     ctrl = new controller;
-  //  m_s_t_acitive(false);
-
+    m_s_t_acitive.store(false);
     ui->scanning_progress->setValue(static_cast<int>(m_status));
     progress.setValue(25);
     progress.setLabelText("configuring hardware");
@@ -66,8 +65,13 @@ MainWindow::MainWindow(QWidget *parent) :
     if (res1Btn == QMessageBox::Yes) {
         dl = new matterport_mrcnn();
         dl->setup_dnn_network(propreader->cfg.matterport_graph,
-                                 propreader->cfg.matterport_folder,"");
-
+                                 propreader->cfg.matterport_folder,
+                              "");
+        cv::Mat test= cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+        // start a fake inference for finish preload
+        std::thread t_inf(&i_deeplearning::dnn_inference,dl,
+                          test,test);
+        t_inf.detach();
     }else{
         dl = new invecption_v2();
 
@@ -243,8 +247,6 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
     }
 }
 
-
-
 void MainWindow::update_window()
 {
 
@@ -261,7 +263,6 @@ void MainWindow::update_window()
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
 
-
 void MainWindow::predict_sph(){
 
 }
@@ -270,15 +271,14 @@ void MainWindow::on_predict_sph_clicked()
 {
    // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
     auto cfrm = cameracv->get_current_frm();
-
-    cv::Mat image;
     if (global_obj_im_coordinates != nullptr)
     {
         delete global_obj_im_coordinates;
     }
+    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
 
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
   /*  ui->found_objects->clear();
 
     for (int idx = 0; idx < im_obj.size(); ++idx)
@@ -289,7 +289,7 @@ void MainWindow::on_predict_sph_clicked()
     //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     */
     delete qframe;
-    qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
+    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
@@ -519,21 +519,25 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 std::string MainWindow::get_date_time_str()
 {
     std::string datetime= "";
-    auto date = QDate::currentDate();
-    datetime.append((QString::number(date.year())).toStdString());
-    datetime.append((QString::number(date.month())).toStdString());
-    datetime.append((QString::number(date.day())).toStdString()+"-");
-    datetime.append((QString::number(QTime::currentTime().hour())).toStdString());
-    datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
+    auto current_time = QTime::currentTime();
+    auto current_date = QDate::currentDate();
+    datetime.append((QString::number(current_date.year())).toStdString());
+    datetime.append((QString::number(current_date.month())).toStdString());
+    datetime.append((QString::number(current_date.day())).toStdString()+"-");
+    datetime.append((QString::number(current_time.hour())).toStdString());
+    datetime.append((QString::number(current_time.minute())).toStdString());
     return datetime;
 }
 
 void MainWindow::screensample()
 {
     using namespace  cv;
+    //LOCKING CONTROLLER
     ui->pip_c_box->setDisabled(true);
     ui->S_c_box->setDisabled(true); //  int platesize= 350000; //    100nm (means one step) --> for the stage
     ui->syringe_box->setDisabled(true);
+    //TODO
+    //MOVE the pipette OUT
     const float platesize= ui->set_plate_size_spinbox->value()*10000;
     float  img_w_5p5x = 27426;  //    100nm
     float  img_h_5p5x = 15421;  //    100nm
@@ -544,14 +548,7 @@ void MainWindow::screensample()
     ss << (ui->set_plate_size_spinbox->value());
     std::string plate_size_mm = ss.str();
     folder.append(plate_size_mm).append("mm_");
-    auto current_time = QTime::currentTime();
-    auto current_date = QDate::currentDate();
-    datetime.append((QString::number(current_date.year())).toStdString());
-    datetime.append((QString::number(current_date.month())).toStdString());
-    datetime.append((QString::number(current_date.day())).toStdString()+"-");
-    datetime.append((QString::number(current_time.hour())).toStdString());
-    datetime.append((QString::number(current_time.minute())).toStdString());
-    folder.append(datetime+"/");
+    folder.append(get_date_time_str()+"/");
     if (QDir().exists(folder.c_str())){
         QTextStream(stdout) << "this folder already folder exists"<< endl;
     }
@@ -684,7 +681,6 @@ void MainWindow::scan_stopped()
 {
     QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
     this->m_screening_thread->join();
-    this->m_screening_thread->~thread();
 }
 
 void MainWindow::set_pip_man(int value)
@@ -910,22 +906,11 @@ void MainWindow::on_save_m_p_button_clicked()
 
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
-/*
-    auto cfrm = cameracv->get_current_frm();
-    cv::Mat image;
-    //mrcnn->dnn_inference(*cfrm, image);
-    delete qframe;
-    qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
-    ui->tabWidget->setCurrentWidget(ui->tab2);
-*/
 }
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
     //set Picking speeds
-    //ui->found_objects->
     ctrl->stage_set_speed(3000);
     //slowly center the selected sph
     QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
@@ -947,7 +932,7 @@ void MainWindow::pick_and_put()
 void MainWindow::on_pick_and_put_clicked()
 {
     //MOVE to the petri "B" 35mm petri
-    //if the Petri "A" is centered MID (stage 0,0)
-        // CENTER 751431 501665
+    //if the Petri "A" is centered MID (stage 751431,501665)
+    // CENTER 751431 501665 after auto calibration
     m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
 }
