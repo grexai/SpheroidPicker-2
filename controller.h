@@ -144,8 +144,8 @@ protected:
     QSerialPort QSP_apc;
     QSerialPort QSP_apipc;
     //ardino drivers
-    arduinopressurecontroller* apc;
-    arduinogcode* apipc;
+    arduinopressurecontroller* apc = nullptr;
+    arduinogcode* apipc = nullptr;
     std::mutex m_pressurevaluebuff;
     QSharedPointer<float> current_pressure;
     std::thread m_get_pressure_t;

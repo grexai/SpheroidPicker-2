@@ -39,9 +39,12 @@ MainWindow::MainWindow(QWidget *parent) :
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
+    QTextStream(stdout) << "1";
     propreader->apply_settings(settings);
+    QTextStream(stdout) << "2";
 
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+    QTextStream(stdout) << "3";
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
@@ -300,7 +303,7 @@ void MainWindow::on_Campushbtn_clicked()
 {
     cameracv = new CameraCV(cameraIndex);
     if (Iscameraopen==true){
-        ui->Campushbtn->setText("Camera on");
+        ui->Campushbtn->setText("Camera o`n");
         delete cameracv;
         cameracv= nullptr;
         Iscameraopen= false;
