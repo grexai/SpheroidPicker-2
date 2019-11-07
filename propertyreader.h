@@ -15,6 +15,8 @@ typedef struct props{
     std::string model_weights;
     std::string textGraph;
     std::string classesFile;
+    std::string matterport_graph;
+    std::string matterport_folder;
 }props;
 class propertyreader
 {

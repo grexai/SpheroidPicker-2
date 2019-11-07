@@ -29,7 +29,7 @@ public:
 
     cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput);
 
-    void getobjectprops(cv::Mat* input);
+    std::vector<double> getobjectprops(cv::Mat& input);
 
 
 protected:

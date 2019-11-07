@@ -1,7 +1,11 @@
 #include "deeplearning.h"
+#include "imagetools.h"
 
+i_deeplearning:: ~i_deeplearning()
+{
 
-i_deeplearning:: ~i_deeplearning(){}
+}
+
 invecption_v2::invecption_v2()
 {
 
@@ -421,6 +425,12 @@ void matterport_mrcnn::setup_dnn_network( std::string modelPB, std::string model
 
 }
 
+std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,cv::Mat& output) {
+    std::vector<std::vector<float>> obj = this->inferencing(input);
+    output = input;
+    return obj;
+}
+
 void matterport_mrcnn::create_session(){
     //   TF_SessionOptions_Ptr m_options(TF_NewSessionOptions(), TF_DeleteSessionOptions);
    //    TF_Status_Ptr status(TF_NewStatus(), TF_DeleteStatus);
@@ -437,13 +447,16 @@ void matterport_mrcnn::create_session(){
 
    }
 
-void matterport_mrcnn::inferencing(cv::Mat &image){
+std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
     cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
     test.convertTo(image, CV_8UC3);
-    cv::resize(image, image, cv::Size(1024, 608));
-    const int maxDim = (std::max)(image.cols, image.rows);
+    cv::resize(image, image, cv::Size(1024, 576));/// WTF
+    float  nx = 1920.0f/1024.0f;
+    float ny = 1080.0f/576.0f;
 
+    const int maxDim = (std::max)(image.cols, image.rows);
+    std::vector<std::vector<float>> objpos;
     IMAGE_SIZE = select_anchor();
 
     std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
@@ -524,7 +537,6 @@ void matterport_mrcnn::inferencing(cv::Mat &image){
 
     std::cout << " inferencing" << std::endl;
  //   auto start = std::chrono::system_clock::now();
-     //   TF_Session* x = m_session->Get();
     //Inferencing
     TF_SessionRun(m_session, nullptr,
         inputs.data(), inputTensors.data(), inputs.size(),
@@ -653,12 +665,15 @@ void matterport_mrcnn::inferencing(cv::Mat &image){
             bb[1] = (std::min)((std::max)(bb[1], 0), image.rows);
             bb[2] = (std::min)((std::max)(bb[2], 0), image.cols);
             bb[3] = (std::min)((std::max)(bb[3], 0), image.rows);
+            std:: cout << nx <<":" << ny << std::endl;
+            float bx = static_cast<float>(bb[0])*nx;
+            float by = static_cast<float>(bb[1]*ny);
+            std::vector <float> outcoors;
+            outcoors.push_back( bx);
+            outcoors.push_back(by);
+            objpos.push_back(outcoors);
 
-            std:: cout << "t:" << bb[0] << "t:"<< bb[1]<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
-            int baseLine = 10;
-            cv::Size labelSize = getTextSize("label", cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-            rectangle(newImage, cv::Point(bb[0], bb[1] - round(1.5*labelSize.height)), cv::Point(bb[0] + round(1.5*labelSize.width), bb[1] + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
-                //putText(frame, label, Point(box.x, box.y), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0,0,0),1);
+            std:: cout << "t:" << bb[0]*nx << "t:"<< bb[1]*ny<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
 
 
             cv::Mat mask(maskHeight, maskWidth, CV_MAKETYPE(CV_32F, NUM_CLASSES), maskTensorPtr);
@@ -678,10 +693,11 @@ void matterport_mrcnn::inferencing(cv::Mat &image){
                 }
             }
 
+            imagetools asd;
+            std::vector<double> features = asd.getobjectprops(label);
+
             cv::Mat roi = labels(rect);
-
             label.copyTo(roi);
-
 
         }
 
@@ -696,7 +712,8 @@ void matterport_mrcnn::inferencing(cv::Mat &image){
         {
             if (labelPtr[index] != 0)
             {
-                imgPtr[(index * 3) + 1] = 255;
+                imgPtr[(index * 3) +1] = 255;
+                imgPtr[(index * 3) +2] = 150;
             }
         }
 
@@ -709,13 +726,10 @@ void matterport_mrcnn::inferencing(cv::Mat &image){
 
      //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
        // cv::imshow("resuls", newImage);
+        cv::resize(newImage, newImage, cv::Size(1920, 1080));
         newImage.copyTo(image);
     }
-
-
-
-
-
+    return objpos;
 }
 
 

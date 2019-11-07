@@ -77,11 +77,14 @@ class matterport_mrcnn : public virtual i_deeplearning
     {
         free(pData);
     }
+protected:
+    TF_Graph *m_graph;
+    TF_Session* m_session;
+    TF_Status *m_status;
+    TF_SessionOptions *m_options;
+    std::vector<float> m_anchors;
+
 public:
-   // matterport_mrcnn();
-
-
-
     matterport_mrcnn(){}
     ~matterport_mrcnn() override;
 
@@ -104,12 +107,6 @@ public:
     TF_POINTER(SessionOptions)
     TF_POINTER(Tensor)
 
-    TF_Graph *m_graph;
-   // TF_Session_Wrapper *m_session;
-    TF_Session* m_session;
-    TF_Status *m_status;
-    TF_SessionOptions *m_options;
-    std::vector<float> m_anchors;
     //image constants...
     const std::vector<int> ANCHOR_SIZES = { 128, 256, 512, 768, 1024, 1536, 2048 };
     cv::Scalar MEAN_PIXEL = cv::Scalar(123.7f, 116.8, 103.9);
@@ -119,6 +116,8 @@ public:
     static constexpr float DETECTION_CONFIDENCE = 0.9f;
     static constexpr float MASK_CONFIDENCE = 0.9f;
     int IMAGE_SIZE=1024;
+
+
 
     TF_Buffer_Ptr ReadFile(const char* pFile)
     {
@@ -146,19 +145,11 @@ public:
     int select_anchor() ;
 
     cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) ;
-    void inferencing(cv::Mat& image) ;
+    std::vector<std::vector<float>> inferencing(cv::Mat& image) ;
 
     void create_session() ;
 
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override{
-
-        inferencing(input);
-        output = input;
-        std::vector<std::vector<float>> obj;
-        return obj;
- //   }
-      }
-
+    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
     virtual void setup_dnn_network(std::string modelPB, std::string modelPath, std::string empty) override;
 };
 

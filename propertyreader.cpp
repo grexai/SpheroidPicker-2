@@ -65,6 +65,8 @@ void propertyreader::apply_settings(std::map<std::string, std::string>& settings
     cfg.model_weights = s_param(settings,"dl.modelweights");
     cfg.textGraph = s_param(settings,"dl.textgraph");
     cfg.classesFile = s_param(settings,"dl.classes");
+    cfg.matterport_graph = s_param(settings,"matterport.graph");
+    cfg.matterport_folder = s_param(settings,"matterport.folder");
 }
 
 

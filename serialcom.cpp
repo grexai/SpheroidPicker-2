@@ -2,7 +2,7 @@
 
 bool serialcom::openport(QString& com){
     if (sp.isOpen()){sp.close();}
-    std::lock_guard<std::mutex> lock(comm_mutex);
+    //std::lock_guard<std::mutex> lock(comm_mutex);
     this->sp.setPortName(com);
     this->sp.setBaudRate(QSerialPort::Baud115200);
     this->sp.setDataBits(QSerialPort::Data8);

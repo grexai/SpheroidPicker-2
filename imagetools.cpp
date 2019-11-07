@@ -96,54 +96,59 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 }
 
-void imagetools::getobjectprops(cv::Mat* input){
+// returns a feature vector contour length,area, and circularity
+std::vector<double> imagetools::getobjectprops(cv::Mat& input){
     using namespace cv;
-    using namespace std;
-    Mat canny_output;
-    RNG rng(12345);
-      vector<vector<Point> > contours;
-      vector<Vec4i> hierarchy;
-        //nullcheck
-      /// Detect edges using canny
-      Canny( *input, canny_output, 0, 100, 3 );
-      /// Find contours
-      findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        using namespace std;
+        input.convertTo(input,CV_8UC1);
+    //	waitKey(0);
+        Mat canny_output;
+        RNG rng(12345);
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        //cvtColor(src, src_gray, CV_BGR2GRAY);
+        /// Detect edges using canny
+       // copyMakeBorder(input, input, 10, 10, 10, 10, BORDER_CONSTANT, 0);
 
-      /// Get the moments
-      vector<Moments> mu(contours.size() );
-      for( int i = 0; i < contours.size(); i++ )
-         { mu[i] = moments( contours[i], false ); }
+        Canny(input, canny_output, 0, 255, 3);
+        /// Find contours
+    //	imshow("asd", canny_output);
+        findContours(input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+        cout << contours.size() << "sizeof c" << endl;
+        /// Get the moments
+        vector<Moments> mu(contours.size());
+        for (int i = 0; i < 1; i++)
+        {
+            mu[i] = moments(contours[i], true);
+        }
 
-      ///  Get the mass centers:
-      vector<Point2f> mc( contours.size() );
-      for( int i = 0; i < contours.size(); i++ )
-         { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+        ///  Get the mass centers:
+        vector<Point2f> mc(1);
+        for (int i = 0; i < 1; i++)
+        {
+            mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
+        }
+        std::vector<double> object_features(3,0.0f);
+        /// Draw contours
+        Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
+        for (int i = 0; i< 1; ++i)
+        {
+            double area = contourArea(contours[i]);
+            double arclength = arcLength(contours[i], true);
+            object_features.push_back(arclength);
+            object_features.push_back( area);
+            object_features.push_back( 4 * CV_PI * area / (arclength * arclength));
 
-      /// Draw contours
-      Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-      for( int i = 0; i< contours.size(); i++ )
-         {
-          double area = contourArea(contours[i]);
-          double arclength = arcLength(contours[i], true);
-          double circularity = 4 * CV_PI * area / (arclength * arclength);
-          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-          drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
-          circle( drawing, mc[i], 4, color, -1, 8, 0 );
-         }
+            // cout << i << "object circularity " << circularity << endl;
+            Scalar color = Scalar(255,  255, 255);
+            drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+       //     circle(drawing, mc[i], 4, color, -1, 8, 0);
+        }
 
-      /// Show in a window
-      namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
-      imshow( "Contours", drawing );
+             input = drawing;
 
-      /// Calculate the area with the moments 00 and compare with the result of the OpenCV function
-      printf("\t Info: Area and Contour Length \n");
-      for( int i = 0; i< contours.size(); i++ )
-         {
-           printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength( contours[i], true ) );
-           Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-           drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
-           circle( drawing, mc[i], 4, color, -1, 8, 0 );
-         }
+
+        return object_features;
 }
 
 void imagetools::addPointToImage(cv::Mat& img,cv::Point point)

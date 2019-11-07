@@ -19,8 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setMinimumDuration(0);
     progress.setValue(0);
 
-
-
     ui->setupUi(this);
     ui->graphicsView->setScene(new QGraphicsScene(this));
     ui->graphicsView->scene()->addItem(&qpxmi);
@@ -31,10 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setValue(10);
     imtools = new imagetools;
     timer = new QTimer(this);
-    timer->setSingleShot(false); // always restarts
+   // timer->setSingleShot(false); // always restarts
     disp_pressure= new QTimer(this);
     ctrl = new controller;
-    m_s_t_acitive= false;
+  //  m_s_t_acitive(false);
 
     ui->scanning_progress->setValue(static_cast<int>(m_status));
     progress.setValue(25);
@@ -67,8 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
                                                                 QMessageBox::Yes);
     if (res1Btn == QMessageBox::Yes) {
         dl = new matterport_mrcnn();
-        dl->setup_dnn_network("d:/dev/cpp/MODELS/mrcnn_sph_def0709/mrcnn_sph_def0709.pb",
-                                 "d:/dev/cpp/MODELS/mrcnn_sph_def0709/","");
+        dl->setup_dnn_network(propreader->cfg.matterport_graph,
+                                 propreader->cfg.matterport_folder,"");
 
     }else{
         dl = new invecption_v2();
@@ -77,12 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
                           propreader->cfg.model_weights,
                           propreader->cfg.textGraph);
     }
-
-
-    QTextStream(stdout) << propreader->cfg.classesFile.c_str() << endl;
-    QTextStream(stdout) << propreader->cfg.model_weights.c_str() << endl;
-    QTextStream(stdout) << propreader->cfg.textGraph.c_str() << endl;
-
 
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
@@ -255,6 +247,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
 
 void MainWindow::update_window()
 {
+
     auto cfrm=  cameracv->get_current_frm();
     if (cfrm == nullptr)
     {
@@ -277,6 +270,7 @@ void MainWindow::on_predict_sph_clicked()
 {
    // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
     auto cfrm = cameracv->get_current_frm();
+
     cv::Mat image;
     if (global_obj_im_coordinates != nullptr)
     {
@@ -284,15 +278,16 @@ void MainWindow::on_predict_sph_clicked()
     }
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
 
-    ui->found_objects->clear();
-
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(*cfrm,image);
+  /*  ui->found_objects->clear();
+
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
         global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
         ui->found_objects->addItem(QString::number(idx));
     }
     //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
+    */
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(image.data),image.cols,image.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
@@ -549,11 +544,13 @@ void MainWindow::screensample()
     ss << (ui->set_plate_size_spinbox->value());
     std::string plate_size_mm = ss.str();
     folder.append(plate_size_mm).append("mm_");
-    datetime.append((QString::number(QDate::currentDate().year())).toStdString());
-    datetime.append((QString::number(QDate::currentDate().month())).toStdString());
-    datetime.append((QString::number(QDate::currentDate().day())).toStdString()+"-");
-    datetime.append((QString::number(QTime::currentTime().hour())).toStdString());
-    datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
+    auto current_time = QTime::currentTime();
+    auto current_date = QDate::currentDate();
+    datetime.append((QString::number(current_date.year())).toStdString());
+    datetime.append((QString::number(current_date.month())).toStdString());
+    datetime.append((QString::number(current_date.day())).toStdString()+"-");
+    datetime.append((QString::number(current_time.hour())).toStdString());
+    datetime.append((QString::number(current_time.minute())).toStdString());
     folder.append(datetime+"/");
     if (QDir().exists(folder.c_str())){
         QTextStream(stdout) << "this folder already folder exists"<< endl;
@@ -599,8 +596,14 @@ void MainWindow::screensample()
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                   QTextStream (stdout) <<object_counter << endl;
+                   // put text TEXT
+                   int baseLine ;
+                   std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
+                   cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 3,5, &baseLine);
+                 //  rectangle(scanvector.at(counter), cv::Point(im_objects.at(object_counter).at(0), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+                 //  putText(scanvector.at(counter), label_txt,cv::Point(im_objects.at(object_counter).at(0), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
                    object_counter++;
+                   QTextStream (stdout) <<object_counter << endl;
                 }
                 counter++;
             }else{
@@ -644,7 +647,7 @@ void MainWindow::on_start_screening_clicked()
         if(m_screening_thread->joinable())
         {
             m_screening_thread->join();
-            m_screening_thread->~thread();
+
             scanvector.clear();
             global_obj_im_coordinates->clear();
         }
@@ -843,6 +846,9 @@ void MainWindow::on_view_scan_clicked()
 
         }
     }
+    // CV cell label txt
+
+
     imtools->saveImg(Mimage,"mozaic");
     qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
@@ -886,6 +892,7 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::on_actionHW_selector_triggered()
 {
     this->parentWidget()->show();
+
     this->deleteLater();
 }
 
