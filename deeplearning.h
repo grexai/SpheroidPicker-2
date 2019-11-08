@@ -78,10 +78,10 @@ class matterport_mrcnn : public virtual i_deeplearning
         free(pData);
     }
 protected:
-    TF_Graph *m_graph;
-    TF_Session* m_session;
-    TF_Status *m_status;
-    TF_SessionOptions *m_options;
+    TF_Graph *m_graph = nullptr;
+    TF_Session* m_session = nullptr;
+    TF_Status *m_status = nullptr;
+    TF_SessionOptions *m_options= nullptr;
     std::vector<float> m_anchors;
 
 public:

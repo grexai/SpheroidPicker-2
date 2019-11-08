@@ -23,7 +23,17 @@ bool serialcom::openport(QString& com){
 void serialcom::send(QString& command){
     std::lock_guard<std::mutex> lock(comm_mutex);
     QByteArray byte_command =command.toLocal8Bit();
-    sp.write(byte_command);
+    const qint64 bytesWritten = sp.write(byte_command);
+    QTextStream m_standardOutput;
+    if (bytesWritten == -1) {
+        m_standardOutput << QObject::tr("Failed to write the data to port ")
+
+                         << endl;
+    } else if (bytesWritten != byte_command.size()) {
+        m_standardOutput << QObject::tr("Failed to write all the data to port")
+
+                         << endl;
+    }
     sp.waitForBytesWritten(50);
 };
 

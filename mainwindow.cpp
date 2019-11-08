@@ -666,6 +666,7 @@ void MainWindow::set_progressbar( int value ){
     }
 }
 
+
 void MainWindow::set_h4(int value)
 {
     if(value == 0)
@@ -890,8 +891,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionHW_selector_triggered()
 {
-    this->parentWidget()->show();
-
+    this->close_and_return_hw();
     this->deleteLater();
 }
 

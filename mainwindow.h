@@ -48,7 +48,9 @@ signals:
    // void signalTargetCoordinate(QPointF point);
     void prog_changed(int progress);
     void scan_finished();
+    void close_and_return_hw();
 public slots:
+   // void show_hw_selector();
     void scan_stopped();
     void set_progressbar( int value );
     void set_h4(int value);

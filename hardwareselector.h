@@ -14,11 +14,9 @@ class hardwareselector : public QDialog
 public:
     explicit hardwareselector(QWidget *parent = nullptr);
     ~hardwareselector();
-
-
 private slots:
     void on_pushButton_clicked();
-
+    void show_hw_selector();
 private:
     Ui::hardwareselector *ui;
     MainWindow *main;

@@ -301,6 +301,10 @@ matterport_mrcnn::~matterport_mrcnn(){
     //Finishing
     TF_CloseSession(m_session,m_status);
     TF_DeleteSession(m_session,m_status);
+    delete m_session;
+    delete m_options;
+    delete m_graph;
+    delete m_status;
 //    m_session.CloseAndDelete(status.get());
   //  if (TF_GetCode(status.get()) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(status.get()));
 
@@ -440,6 +444,7 @@ void matterport_mrcnn::create_session(){
 
 std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
+    auto start = std::chrono::system_clock::now();
     //cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
     image.convertTo(image, CV_8UC3);
     cv::resize(image, image, cv::Size(1024, 576));/// WTF
@@ -448,7 +453,7 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
     const int maxDim = (std::max)(image.cols, image.rows);
     std::vector<std::vector<float>> objpos;
-    IMAGE_SIZE = select_anchor();
+    //IMAGE_SIZE = select_anchor();
 
     std::cout << "IMAGE_SIZE: " << IMAGE_SIZE << std::endl;
 
@@ -708,12 +713,12 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             }
         }
 
-      //  auto end = std::chrono::system_clock::now();
+        auto end = std::chrono::system_clock::now();
         //
-    //    std::chrono::duration<double> elapsed_seconds = end - start;
+        std::chrono::duration<double> elapsed_seconds = end - start;
 
         // CHRONO END
- //       std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
      //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
        // cv::imshow("resuls", newImage);
