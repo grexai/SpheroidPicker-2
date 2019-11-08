@@ -129,7 +129,7 @@ std::vector<double> imagetools::getobjectprops(cv::Mat& input){
             mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
         }
         std::vector<double> object_features(3,0.0f);
-        /// Draw contours
+        // Draw contours
         Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
         for (int i = 0; i< 1; ++i)
         {
