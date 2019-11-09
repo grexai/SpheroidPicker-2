@@ -17,6 +17,7 @@
 *.exe
 *.app
 *.autosave
+*.pro.user*
 ASP/x64
 ASP/ipch
 ASP/ASP/x64
