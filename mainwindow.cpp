@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
 #include <QMouseEvent>
-//#include <iostream>
 #include <QStyle>
 #include <QMessageBox>
 #include <QProgressDialog>
@@ -25,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
    // ui->P_C_box->hide();
-
     progress.setValue(10);
     imtools = new imagetools;
     timer = new QTimer(this);
@@ -39,12 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
-    QTextStream(stdout) << "1";
     propreader->apply_settings(settings);
-    QTextStream(stdout) << "2";
 
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-    QTextStream(stdout) << "3";
+
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
@@ -130,7 +126,6 @@ void MainWindow::setdefault()
    qApp->setStyleSheet("");
 }
 
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -154,6 +149,7 @@ void MainWindow::show_currentpressure(){
     disp_pressure->start(500);
 }
 
+// events
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     if (obj == ui->graphicsView && true)
        {
@@ -181,6 +177,7 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     }
 
 }
+
 void MainWindow::keyPressEvent( QKeyEvent* e )
 {
     switch( e->key() )
@@ -203,6 +200,21 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     default: ;
     }
     QMainWindow::keyPressEvent(e);
+}
+
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
+
+    } else {
+        event->accept();
+        QCoreApplication::quit();
+    }
 }
 
 // OLD calibration for 3axis pipette
@@ -266,37 +278,10 @@ void MainWindow::update_window()
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
 
-void MainWindow::predict_sph(){
-
-}
-
 void MainWindow::on_predict_sph_clicked()
 {
    // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
-    auto cfrm = cameracv->get_current_frm();
-    if (global_obj_im_coordinates != nullptr)
-    {
-        delete global_obj_im_coordinates;
-    }
-    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
-    global_obj_im_coordinates = new std::vector<std::vector<float>>;
-
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
-  /*  ui->found_objects->clear();
-
-    for (int idx = 0; idx < im_obj.size(); ++idx)
-    {
-        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-        ui->found_objects->addItem(QString::number(idx));
-    }
-    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
-    */
-    delete qframe;
-    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
-    ui->tabWidget->setCurrentWidget(ui->tab2);
-
+    this->predict_sph();
 }
 
 void MainWindow::on_Campushbtn_clicked()
@@ -446,7 +431,6 @@ void MainWindow::on_p_zp_button_clicked()
     ctrl->pipette_movez_sync(ui->pip_step_spinbox->value());
 }
 
-
 void MainWindow::on_p_zm_btton_clicked()
 {
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
@@ -475,6 +459,8 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
 }
 
+// right click actions
+
 void MainWindow::move_action(){
     std::vector<float> mouse ;
     mouse.push_back(point_mouse->x()*1.5f);
@@ -491,7 +477,6 @@ void MainWindow::center_this_point_action()
     this->center_spheroid(mouse);
     ctrl->stage_set_speed(15000.0f);
 }
-
 
 void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
@@ -517,6 +502,298 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
         calib->Iscalibrating= true;
         calib->show();
     }
+}
+
+// buttons
+
+void MainWindow::on_start_screening_clicked()
+{
+
+    if(!m_s_t_acitive)
+    {
+        m_s_t_acitive = true;
+        connect(this, SIGNAL(prog_changed(int)),
+            this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
+        m_screening_thread = new std::thread(&MainWindow::screensample,this);
+        ui->start_screening->setText("Stop Screening");
+    }
+    else
+    {
+        m_s_t_acitive= false;
+        ui->pip_c_box->setEnabled(true);
+        ui->S_c_box->setEnabled(true);
+        ui->start_screening->setText("Start Screening");
+        if(m_screening_thread->joinable())
+        {
+            m_screening_thread->join();
+
+            scanvector.clear();
+            global_obj_im_coordinates->clear();
+        }
+        QMessageBox::warning(this,"Scanning canceled",
+                             "Scanning of the plate is canceled,pipette and stage controller unlocked");
+    }
+}
+
+void MainWindow::set_progressbar( int value ){
+    if ( value != m_progvalue ) {
+        m_progvalue = value;
+        ui->scanning_progress->setValue(m_progvalue );
+    //    scan_progress
+        QTextStream(stdout)<< m_progvalue;
+        emit prog_changed( m_progvalue );
+    }
+}
+
+void MainWindow::set_h4(int value)
+{
+    if(value == 0)
+    {
+        ui->P_C_box->hide();
+        ui->syringe_box->show();
+    }
+    if (value == 1)
+    {
+       ui->P_C_box->show();
+       ui->syringe_box->hide();
+    }
+}
+
+void MainWindow::scan_stopped()
+{
+    QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
+    this->m_screening_thread->join();
+}
+
+void MainWindow::set_pip_man(int value)
+{
+    if(value == 0)
+    {
+        ui->p_home_y->hide();
+        ui->p_ymax->hide();
+        ui->p_ym_button->hide();
+        ui->p_yp_button->hide();
+    }
+    if (value == 1)
+    {
+        ui->p_home_y->show();
+        ui->p_ymax->show();
+        ui->p_ym_button->show();
+        ui->p_yp_button->show();
+    }
+}
+
+void MainWindow::on_actionSpheroid_picker_triggered()
+{
+    std::map<std::string, std::string> settings;
+    propreader = new propertyreader;
+    propreader->read_settings("config.txt",settings);
+
+    propreader->apply_settings(settings);
+    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+  //  dl = new deeplearning;
+  //  dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
+
+}
+
+void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
+{
+     QTextStream(stdout)<< "speed changed to: " << arg1 ;
+     ctrl->pipette_set_speed(arg1);
+}
+
+void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
+{
+     ctrl->stage_set_speed(static_cast<int>(arg1));
+}
+
+void MainWindow::on_pickup_sph_clicked()
+{
+   m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
+    //  t2.detach();
+}
+
+void MainWindow::on_view_scan_clicked()
+{
+    // CREATING the mosaic of analyzed images
+   m_create_mosaic_thread = new std::thread(&MainWindow::create_mosaic,this);
+}
+
+void MainWindow::on_p_ep_button_clicked()
+{
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+}
+
+void MainWindow::on_p_em_button_clicked()
+{
+    ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}
+
+void MainWindow::on_actionHW_selector_triggered()
+{
+    this->close_and_return_hw();
+    this->deleteLater();
+}
+
+void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
+{
+    ctrl->stage_set_acceleration(arg1);
+}
+
+void MainWindow::on_save_m_p_button_clicked()
+{
+    // XZ CALIBRATION STEP 2, user should move X to the middle of
+    // IMAGE and click this button
+    // this button saves X positon of the pipette.
+    // auto pick up will send back to this pos (should be middle of the image)
+
+    std::vector<float> pos = ctrl->pipette_get_coordinates();
+    this->mid_s_x_p = pos.at(0);
+}
+
+void MainWindow::on_petri_b_clicked()
+{
+    m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
+}
+
+void MainWindow::on_pick_and_put_clicked()
+{
+
+    m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
+}
+
+void MainWindow::on_found_objects_currentIndexChanged(int index)
+{
+    //set Picking speeds
+    ctrl->stage_set_speed(3000);
+    //slowly center the selected sph
+    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
+}
+
+//auto pickup,scanning methods and helpers
+
+void MainWindow::pickup_sph()
+{
+    QTextStream(stdout) << "pciking up" << endl;
+    //ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
+    std::this_thread::sleep_for(std::chrono::milliseconds(7000));
+    ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    ctrl->pipette_home_z();
+}
+
+std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_coors)
+{
+    std:: vector<float> center_coordinates;
+    const float  img_w_5p5x = 27426; //    100nm
+    const float  img_h_5p5x = 15421;
+    const float x_conv =  img_w_5p5x/1920;
+    const float y_conv = img_h_5p5x/1080;
+    QTextStream(stdout) << x_conv <<"xc : yc " << y_conv << endl;
+    QTextStream(stdout) << "dla0a0:  "<< sph_coors.at(0) << endl;
+    QTextStream(stdout) << "dla0a1:  " <<  sph_coors.at(1) << endl;
+    float mid_obj_pxl_x =  960 - sph_coors.at(0);
+    float mid_obj_pxl_y =  540 - sph_coors.at(1);
+    float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
+    float obj_pos_um_y = (  mid_obj_pxl_y *y_conv);
+    center_coordinates.push_back( ctrl->stage_get_x_coords()-(obj_pos_um_x));
+    center_coordinates.push_back(  ctrl->stage_get_y_coords()-(obj_pos_um_y));
+    return center_coordinates;
+}
+
+void MainWindow::center_spheroid(std::vector<float> coors)
+{
+    ctrl->stage_set_speed(5000.0f);
+    std:: vector<float> c_coords = this->get_centered_coordinates(coors);
+    ctrl->stage_move_to_x_sync(static_cast<int>(c_coords.at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
+    ctrl->stage_set_speed(15000.0f);
+}
+
+void MainWindow::move_to_petri_B()
+{
+    //MOVE to the petri "B" 35mm petri
+    //if the Petri "A" is centered MID (stage 751431,501665)
+    ctrl->stage_move_to_x_sync(751431-366407);
+    ctrl->stage_move_to_y_sync(501665);
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_home_z();
+}
+
+void MainWindow::xz_stage_pickup_sph(){
+    //set Pickup speeds
+    int original_stage_speed  = ctrl->stage_get_x_speed();
+    ctrl->stage_set_speed(3000);
+
+     ctrl->pipette_set_speed(ui->z_dive_speed->value());
+    //slowly center the selected sph
+    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
+    //
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //move to the middle of image with the pipette
+    ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
+    //move Z axis down to the petri (auto Z height)
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // PICK UP WITH SYRINGE
+    ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    ctrl->pipette_home_z();
+    // MOVE x axis out of image
+    ctrl->pipette_movex_sync(-2.6f);
+    ctrl->stage_set_speed(original_stage_speed);
+    //TODO
+    // this point CHECK if the spheroid picked up!
+
+}
+
+void MainWindow::pick_and_put()
+{
+    //MOVE to the petri "B" 35mm petri
+    //if the Petri "A" is centered MID (stage 751431,501665)
+    // CENTER 751431 501665 after auto calibration
+    this->xz_stage_pickup_sph();
+    this->move_to_petri_B();
+}
+
+void MainWindow::predict_sph(){
+    auto cfrm = cameracv->get_current_frm();
+    if (global_obj_im_coordinates != nullptr)
+    {
+        delete global_obj_im_coordinates;
+    }
+    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
+    global_obj_im_coordinates = new std::vector<std::vector<float>>;
+
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
+
+
+    /*  ui->found_objects->clear();
+
+    for (int idx = 0; idx < im_obj.size(); ++idx)
+    {
+        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
+        ui->found_objects->addItem(QString::number(idx));
+    }
+    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
+    */
+    delete qframe;
+    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    ui->tabWidget->setCurrentWidget(ui->tab2);
+
 }
 
 std::string MainWindow::get_date_time_str()
@@ -600,8 +877,8 @@ void MainWindow::screensample()
                    int baseLine ;
                    std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
                    cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 3,5, &baseLine);
-                 //  rectangle(scanvector.at(counter), cv::Point(im_objects.at(object_counter).at(0), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
-                 //  putText(scanvector.at(counter), label_txt,cv::Point(im_objects.at(object_counter).at(0), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
+                   rectangle(scanvector.at(counter), cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+                   putText(scanvector.at(counter), label_txt,cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
                    object_counter++;
                    QTextStream (stdout) <<object_counter << endl;
                 }
@@ -627,196 +904,7 @@ void MainWindow::screensample()
     scan_finished();
 }
 
-void MainWindow::on_start_screening_clicked()
-{
-
-    if(!m_s_t_acitive)
-    {
-        m_s_t_acitive = true;
-        connect(this, SIGNAL(prog_changed(int)),
-            this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
-        m_screening_thread = new std::thread(&MainWindow::screensample,this);
-        ui->start_screening->setText("Stop Screening");
-    }
-    else
-    {
-        m_s_t_acitive= false;
-        ui->pip_c_box->setEnabled(true);
-        ui->S_c_box->setEnabled(true);
-        ui->start_screening->setText("Start Screening");
-        if(m_screening_thread->joinable())
-        {
-            m_screening_thread->join();
-
-            scanvector.clear();
-            global_obj_im_coordinates->clear();
-        }
-        QMessageBox::warning(this,"Scanning canceled",
-                             "Scanning of the plate is canceled,pipette and stage controller unlocked");
-    }
-}
-
-void MainWindow::set_progressbar( int value ){
-    if ( value != m_progvalue ) {
-        m_progvalue = value;
-        ui->scanning_progress->setValue(m_progvalue );
-    //    scan_progress
-        QTextStream(stdout)<< m_progvalue;
-        emit prog_changed( m_progvalue );
-    }
-}
-
-
-void MainWindow::set_h4(int value)
-{
-    if(value == 0)
-    {
-        ui->P_C_box->hide();
-        ui->syringe_box->show();
-    }
-    if (value == 1)
-    {
-       ui->P_C_box->show();
-       ui->syringe_box->hide();
-    }
-}
-
-void MainWindow::scan_stopped()
-{
-    QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
-    this->m_screening_thread->join();
-}
-
-void MainWindow::set_pip_man(int value)
-{
-    if(value == 0)
-    {
-        ui->p_home_y->hide();
-        ui->p_ymax->hide();
-        ui->p_ym_button->hide();
-        ui->p_yp_button->hide();
-    }
-    if (value == 1)
-    {
-        ui->p_home_y->show();
-        ui->p_ymax->show();
-        ui->p_ym_button->show();
-        ui->p_yp_button->show();
-    }
-}
-
-void MainWindow::on_actionSpheroid_picker_triggered()
-{
-    std::map<std::string, std::string> settings;
-    propreader = new propertyreader;
-    propreader->read_settings("config.txt",settings);
-
-    propreader->apply_settings(settings);
-    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-  //  dl = new deeplearning;
-  //  dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
-
-}
-
-void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
-{
-     QTextStream(stdout)<< "speed changed to: " << arg1 ;
-     ctrl->pipette_set_speed(arg1);
-}
-
-void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
-{
-     ctrl->stage_set_speed(static_cast<int>(arg1));
-}
-
-void MainWindow::pickup_sph()
-{
-    QTextStream(stdout) << "pciking up" << endl;
-    //ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
-    std::this_thread::sleep_for(std::chrono::milliseconds(7000));
-    ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    ctrl->pipette_home_z();
-}
-
-std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_coors)
-{
-    std:: vector<float> center_coordinates;
-    const float  img_w_5p5x = 27426; //    100nm
-    const float  img_h_5p5x = 15421;
-    const float x_conv =  img_w_5p5x/1920;
-    const float y_conv = img_h_5p5x/1080;
-    QTextStream(stdout) << x_conv <<"xc : yc " << y_conv << endl;
-    QTextStream(stdout) << "dla0a0:  "<< sph_coors.at(0) << endl;
-    QTextStream(stdout) << "dla0a1:  " <<  sph_coors.at(1) << endl;
-    float mid_obj_pxl_x =  960 - sph_coors.at(0);
-    float mid_obj_pxl_y =  540 - sph_coors.at(1);
-    float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
-    float obj_pos_um_y = (  mid_obj_pxl_y *y_conv);
-    center_coordinates.push_back( ctrl->stage_get_x_coords()-(obj_pos_um_x));
-    center_coordinates.push_back(  ctrl->stage_get_y_coords()-(obj_pos_um_y));
-    return center_coordinates;
-}
-
-void MainWindow::center_spheroid(std::vector<float> coors)
-{
-    ctrl->stage_set_speed(5000.0f);
-    std:: vector<float> c_coords = this->get_centered_coordinates(coors);
-    ctrl->stage_move_to_x_sync(static_cast<int>(c_coords.at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
-    ctrl->stage_set_speed(15000.0f);
-}
-
-void MainWindow::move_to_petri_B()
-{
-    //MOVE to the petri "B" 35mm petri
-    //if the Petri "A" is centered MID (stage 0,0)
-        // CENTER 751431 501665
-    ctrl->stage_move_to_x_sync(751431-366407);
-    ctrl->stage_move_to_y_sync(501665);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
-    ctrl->pipette_home_z();
-}
-
-void MainWindow::xz_stage_pickup_sph(){
-    //set Pickup speeds
-    int original_stage_speed  = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(3000);
-
-     ctrl->pipette_set_speed(ui->z_dive_speed->value());
-    //slowly center the selected sph
-    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
-    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
-    //
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //move to the middle of image with the pipette
-    ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
-    //move Z axis down to the petri (auto Z height)
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // PICK UP WITH SYRINGE
-    ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ctrl->pipette_home_z();
-    // MOVE x axis out of image
-    ctrl->pipette_movex_sync(-2.6f);
-    ctrl->stage_set_speed(original_stage_speed);
-    //TODO
-    // this point CHECK if the spheroid picked up!
-
-}
-
-void MainWindow::on_pickup_sph_clicked()
-{
-   m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
-    //  t2.detach();
-}
-
-void MainWindow::on_view_scan_clicked()
-{
+void MainWindow::create_mosaic(){
     // CREATING the mosaic of analyzed images
     using namespace  cv;
    // int platesize = 350000; //    100nm // *0.1um
@@ -850,92 +938,11 @@ void MainWindow::on_view_scan_clicked()
 
 
     imtools->saveImg(Mimage,"mozaic");
+    scanvector.clear();
     qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
-    scanvector.clear();
     prog_changed(0);
     }
-}
-
-void MainWindow::on_p_ep_button_clicked()
-{
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
-}
-
-void MainWindow::on_p_em_button_clicked()
-{
-    ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
-}
-
-void MainWindow::closeEvent (QCloseEvent *event)
-{
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
-                                                                tr("Are you sure?\n"),
-                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
-        event->ignore();
-
-    } else {
-        event->accept();
-        QCoreApplication::quit();
-    }
-}
-
-void MainWindow::on_actionExit_triggered()
-{
-    QCoreApplication::quit();
-}
-
-void MainWindow::on_actionHW_selector_triggered()
-{
-    this->close_and_return_hw();
-    this->deleteLater();
-}
-
-void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
-{
-    ctrl->stage_set_acceleration(arg1);
-}
-
-void MainWindow::on_save_m_p_button_clicked()
-{
-    // XZ CALIBRATION STEP 2, user should move X to the middle of
-    // IMAGE and click this button
-    // this button saves X positon of the pipette.
-    // auto pick up will send back to this pos (should be middle of the image)
-
-    std::vector<float> pos = ctrl->pipette_get_coordinates();
-    this->mid_s_x_p = pos.at(0);
-}
-
-void MainWindow::on_found_objects_currentIndexChanged(int index)
-{
-    //set Picking speeds
-    ctrl->stage_set_speed(3000);
-    //slowly center the selected sph
-    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
-    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
-}
-
-void MainWindow::on_petri_b_clicked()
-{
-    m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
-}
-
-void MainWindow::pick_and_put()
-{
-    this->xz_stage_pickup_sph();
-    this->move_to_petri_B();
-}
-
-void MainWindow::on_pick_and_put_clicked()
-{
-    //MOVE to the petri "B" 35mm petri
-    //if the Petri "A" is centered MID (stage 751431,501665)
-    // CENTER 751431 501665 after auto calibration
-    m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
 }

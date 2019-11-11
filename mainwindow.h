@@ -26,7 +26,6 @@ class MainWindow : public QMainWindow
 public:
 
     QString con_str= "Connected";
-
     QString fail_str = "Failed";
     QThread thread;
     bool Iscameraopen= false;
@@ -36,13 +35,7 @@ public:
     void setdarkstyle();
     ~MainWindow();
     void setdefault();
-    void displayImage();
-
-    void SpawnThreadAndLaunch();
- //   void MainWindow::mouseMoveEvent(QMouseEvent *event);
-    void porttest();
     cv::Mat TM;
-
 signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
@@ -66,28 +59,50 @@ protected:
     QPoint* point_mouse= nullptr;
 
 private slots:
-      bool eventFilter(QObject *obj,  QEvent *event);
+    // events
+    bool eventFilter(QObject *obj,  QEvent *event);
 
- //    void ShowContextMenu(const QPoint &pos);
+    void keyPressEvent( QKeyEvent* e );
 
-     void on_Campushbtn_clicked();
+    void closeEvent (QCloseEvent *event);
 
-     void calib_frame_view(cv::Mat& disp);
+    // View
 
-     void update_window();
-     void predict_sph();
+    void calib_frame_view(cv::Mat& disp);
 
-     void update_currentpressure();
+    void update_window();
 
-     void move_action();
+    //right click actions
 
-     void center_this_point_action();
+    void move_action();
 
-     void keyPressEvent( QKeyEvent* e );
+    void center_this_point_action();
+
+    void on_graphicsView_customContextMenuRequested(const QPoint &pos);
+
+    // Menus
+
+    void on_actionLight_triggered();
+
+    void on_actionDark_Mode_triggered();
+
+    void on_actionCalibrate_Pipette_triggered();
+
+    void on_actionSpheroid_picker_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_actionHW_selector_triggered();
+
+    void on_actionOpen_console_triggered();
+
+    // buttons
+
+    void on_Campushbtn_clicked();
+
+    void update_currentpressure();
 
      void show_currentpressure();
-
-     void on_actionDark_Mode_triggered();
 
      void on_Home_pip_clicked();
 
@@ -125,8 +140,6 @@ private slots:
 
      void on_p_zm_btton_clicked();
 
-     void on_actionOpen_console_triggered();
-
      void on_s_center_button_clicked();
 
      void on_exptime_button_clicked();
@@ -139,25 +152,33 @@ private slots:
 
      void on_s_get_coors_pushButton_clicked();
 
-     void on_graphicsView_customContextMenuRequested(const QPoint &pos);
-
      void on_start_screening_clicked();
-
-     void screensample();
-
-     void on_actionCalibrate_Pipette_triggered();
-
-     void on_actionSpheroid_picker_triggered();
 
      void on_p_set_speed_spinbox_valueChanged(int arg1);
 
      void on_s_speed_spinbox_valueChanged(int arg1);
 
-     void on_actionLight_triggered();
+     void on_p_ep_button_clicked();
+
+     void on_p_em_button_clicked();
+
+     void on_pickup_sph_clicked();
+
+     void on_s_accel_spinbox_valueChanged(int arg1);
+
+     void on_save_m_p_button_clicked();
+
+     void on_found_objects_currentIndexChanged(int index);
 
      void on_predict_sph_clicked();
 
-     void on_pickup_sph_clicked();
+     void on_pick_and_put_clicked();
+
+     void on_petri_b_clicked();
+
+     void on_view_scan_clicked();
+
+     //auto pickup,scanning methods and helpers
 
      void pickup_sph();
 
@@ -169,31 +190,17 @@ private slots:
 
      void xz_stage_pickup_sph();
 
+     void pick_and_put();
+
+     //scanning
+
+     void predict_sph();
+
      std::string get_date_time_str();
 
-     void on_view_scan_clicked();
+     void screensample();
 
-     void on_p_ep_button_clicked();
-
-     void on_p_em_button_clicked();
-
-     void closeEvent (QCloseEvent *event);
-
-     void on_actionExit_triggered();
-
-     void on_actionHW_selector_triggered();
-
-     void on_s_accel_spinbox_valueChanged(int arg1);
-
-     void on_save_m_p_button_clicked();
-
-     void on_found_objects_currentIndexChanged(int index);
-
-     void on_petri_b_clicked();
-
-     void on_pick_and_put_clicked();
-
-     void pick_and_put();
+     void create_mosaic();
 
 private:
     QTimer *timer= nullptr;
@@ -216,6 +223,7 @@ private:
     std::thread* m_predict_thread = nullptr;
     std::thread* m_move_petri_b_thread = nullptr;
     std::thread* m_put_and_pick_thread = nullptr;
+    std::thread* m_create_mosaic_thread = nullptr;
     //TEST
     float m_status = 0;
     QTimer *timer1= nullptr ;

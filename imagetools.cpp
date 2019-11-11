@@ -141,13 +141,11 @@ std::vector<double> imagetools::getobjectprops(cv::Mat& input){
 
             // cout << i << "object circularity " << circularity << endl;
             Scalar color = Scalar(255,  255, 255);
-            drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+            drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
        //     circle(drawing, mc[i], 4, color, -1, 8, 0);
         }
 
-             input = drawing;
-
-
+        input = drawing;
         return object_features;
 }
 
@@ -156,10 +154,11 @@ void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
    cv::circle(img,point, 5, cv::Scalar(0,0,255), -1);
 }
 
-// Uses CV saveimg
+// Uses OPENCV save image as png UNCOMPRESSED
 void imagetools::saveImg(cv::Mat* outimg, std::string outname)
 {
     //NULLCHECK
+    if (outimg == nullptr){return;}
     outname = outname + ".png";
     std::vector<int> compression_params;
     compression_params.push_back(16);

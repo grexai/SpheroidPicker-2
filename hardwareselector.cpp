@@ -24,7 +24,6 @@ void hardwareselector::show_hw_selector(){
 void hardwareselector::on_pushButton_clicked()
 {
     this->hide();
-
     main = new MainWindow(nullptr);
     main->show();
     main->set_h4(ui->comboBox_3->currentIndex());

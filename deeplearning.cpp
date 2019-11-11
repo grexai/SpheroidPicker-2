@@ -301,12 +301,12 @@ matterport_mrcnn::~matterport_mrcnn(){
     //Finishing
     TF_CloseSession(m_session,m_status);
     TF_DeleteSession(m_session,m_status);
-    delete m_session;
-    delete m_options;
-    delete m_graph;
-    delete m_status;
+    TF_DeleteGraph(m_graph);
+    TF_DeleteSessionOptions(m_options);
+    if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status));
+    TF_DeleteStatus(m_status);
+
 //    m_session.CloseAndDelete(status.get());
-  //  if (TF_GetCode(status.get()) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(status.get()));
 
 }
 
@@ -671,7 +671,6 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
             std:: cout << "t:" << bb[0]*nx << "t:"<< bb[1]*ny<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
 
-
             cv::Mat mask(maskHeight, maskWidth, CV_MAKETYPE(CV_32F, NUM_CLASSES), maskTensorPtr);
 
             cv::Rect rect(cv::Point(bb[0], bb[1]), cv::Point(bb[2], bb[3]));
@@ -709,7 +708,7 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             if (labelPtr[index] != 0)
             {
                 imgPtr[(index * 3) +1] = 255;
-                imgPtr[(index * 3) +2] = 150;
+                imgPtr[(index * 3) +2] = 90;
             }
         }
 
