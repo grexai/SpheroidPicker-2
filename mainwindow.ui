@@ -1791,19 +1791,9 @@ Stage</string>
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionOpen_console">
-   <property name="text">
-    <string>Open python console</string>
-   </property>
-  </action>
   <action name="actionCalibrate_Pipette">
    <property name="text">
     <string>Calibrate Pipette</string>
-   </property>
-  </action>
-  <action name="actionSpheroid_picker">
-   <property name="text">
-    <string>Spheroid picker</string>
    </property>
   </action>
   <action name="actionLight">

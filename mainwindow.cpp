@@ -333,15 +333,6 @@ void MainWindow::on_height_button_clicked()
     cameracv->setimagewidth(h);
 }
 
-void MainWindow::on_actionDark_Mode_triggered()
-{
-    setdarkstyle();
-}
-
-void MainWindow::on_actionLight_triggered()
-{
-    setdefault();
-}
 
 void MainWindow::on_Home_pip_clicked()
 {
@@ -436,10 +427,6 @@ void MainWindow::on_p_zm_btton_clicked()
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
 }
 
-void MainWindow::on_actionOpen_console_triggered()
-{
-    QTextStream(stdout) << "your program  has succesfully crashed." << endl;
-}
 
 void MainWindow::on_s_center_button_clicked()
 {
@@ -494,6 +481,29 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
     contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
 }
 
+//menus
+
+void MainWindow::on_actionDark_Mode_triggered()
+{
+    setdarkstyle();
+}
+
+void MainWindow::on_actionLight_triggered()
+{
+    setdefault();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}
+
+void MainWindow::on_actionHW_selector_triggered()
+{
+    this->close_and_return_hw();
+    this->deleteLater();
+}
+
 void MainWindow::on_actionCalibrate_Pipette_triggered()
 {
     if (Iscameraopen)
@@ -539,8 +549,6 @@ void MainWindow::set_progressbar( int value ){
     if ( value != m_progvalue ) {
         m_progvalue = value;
         ui->scanning_progress->setValue(m_progvalue );
-    //    scan_progress
-        QTextStream(stdout)<< m_progvalue;
         emit prog_changed( m_progvalue );
     }
 }
@@ -583,18 +591,6 @@ void MainWindow::set_pip_man(int value)
     }
 }
 
-void MainWindow::on_actionSpheroid_picker_triggered()
-{
-    std::map<std::string, std::string> settings;
-    propreader = new propertyreader;
-    propreader->read_settings("config.txt",settings);
-
-    propreader->apply_settings(settings);
-    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-  //  dl = new deeplearning;
-  //  dl->setup_dnn_network(propreader->cfg.classesFile,propreader->cfg.model_weights,propreader->cfg.textGraph);
-
-}
 
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 {
@@ -610,12 +606,10 @@ void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
 void MainWindow::on_pickup_sph_clicked()
 {
    m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
-    //  t2.detach();
 }
 
 void MainWindow::on_view_scan_clicked()
 {
-    // CREATING the mosaic of analyzed images
    m_create_mosaic_thread = new std::thread(&MainWindow::create_mosaic,this);
 }
 
@@ -627,17 +621,6 @@ void MainWindow::on_p_ep_button_clicked()
 void MainWindow::on_p_em_button_clicked()
 {
     ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
-}
-
-void MainWindow::on_actionExit_triggered()
-{
-    QCoreApplication::quit();
-}
-
-void MainWindow::on_actionHW_selector_triggered()
-{
-    this->close_and_return_hw();
-    this->deleteLater();
 }
 
 void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
@@ -679,6 +662,20 @@ void MainWindow::on_found_objects_currentIndexChanged(int index)
 
 //auto pickup,scanning methods and helpers
 
+void MainWindow::lock_ui()
+{
+    ui->pip_c_box->setDisabled(true);
+    ui->S_c_box->setDisabled(true);
+    ui->syringe_box->setDisabled(true);
+}
+
+void MainWindow::unlock_ui()
+{
+    ui->pip_c_box->setEnabled(true);
+    ui->S_c_box->setEnabled(true);
+    ui->syringe_box->setEnabled(true);
+}
+
 void MainWindow::pickup_sph()
 {
     QTextStream(stdout) << "pciking up" << endl;
@@ -719,6 +716,7 @@ void MainWindow::center_spheroid(std::vector<float> coors)
 
 void MainWindow::move_to_petri_B()
 {
+
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     ctrl->stage_move_to_x_sync(751431-366407);
@@ -813,9 +811,7 @@ void MainWindow::screensample()
 {
     using namespace  cv;
     //LOCKING CONTROLLER
-    ui->pip_c_box->setDisabled(true);
-    ui->S_c_box->setDisabled(true); //  int platesize= 350000; //    100nm (means one step) --> for the stage
-    ui->syringe_box->setDisabled(true);
+    this->lock_ui();
     //TODO
     //MOVE the pipette OUT
     const float platesize= ui->set_plate_size_spinbox->value()*10000;
@@ -897,15 +893,14 @@ void MainWindow::screensample()
     {
         ui->found_objects->addItem(QString::number(i));
     }
-    ui->pip_c_box->setEnabled(true);
-    ui->S_c_box->setEnabled(true);
-    ui->syringe_box->setEnabled(true);
+    this->unlock_ui();
     ui->start_screening->setText("Start Screening");
     scan_finished();
 }
 
+// CREATING the mosaic of analyzed images
 void MainWindow::create_mosaic(){
-    // CREATING the mosaic of analyzed images
+
     using namespace  cv;
    // int platesize = 350000; //    100nm // *0.1um
     if (scanvector.size()>0){
@@ -935,7 +930,6 @@ void MainWindow::create_mosaic(){
         }
     }
     // CV cell label txt
-
 
     imtools->saveImg(Mimage,"mozaic");
     scanvector.clear();

@@ -22,7 +22,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 QT += serialport
-#CONFIG += console
 CONFIG(release, debug|release) {
   CONFIG += console
 }
@@ -74,9 +73,9 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
-#else:unix: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
+else:unix: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
 
 INCLUDEPATH += $$PWD/'../../../Libraries/Leica sdk/C++/include'
 DEPENDPATH += $$PWD/'../../../Libraries/Leica sdk/C++/lib64'

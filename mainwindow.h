@@ -72,6 +72,9 @@ private slots:
 
     void update_window();
 
+   // void update_currentpressure();
+ //   void show_currentpressure();
+
     //right click actions
 
     void move_action();
@@ -88,13 +91,13 @@ private slots:
 
     void on_actionCalibrate_Pipette_triggered();
 
-    void on_actionSpheroid_picker_triggered();
+//    void on_actionSpheroid_picker_triggered();
 
     void on_actionExit_triggered();
 
     void on_actionHW_selector_triggered();
 
-    void on_actionOpen_console_triggered();
+  //  void on_actionOpen_console_triggered();
 
     // buttons
 
@@ -179,6 +182,10 @@ private slots:
      void on_view_scan_clicked();
 
      //auto pickup,scanning methods and helpers
+
+     void lock_ui();
+
+     void unlock_ui();
 
      void pickup_sph();
 
