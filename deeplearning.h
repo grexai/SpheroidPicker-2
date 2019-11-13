@@ -63,7 +63,6 @@ protected:
     float maskThreshold = 0.3f; // Mask threshold
 };
 
-
 class matterport_mrcnn : public virtual i_deeplearning
 {
 
@@ -109,15 +108,15 @@ public:
 
     //image constants...
     const std::vector<int> ANCHOR_SIZES = { 128, 256, 512, 768, 1024, 1536, 2048 };
-    cv::Scalar MEAN_PIXEL = cv::Scalar(123.7f, 116.8, 103.9);
+    cv::Scalar MEAN_PIXEL = cv::Scalar(123.7, 116.8, 103.9);
   //  const cv::Scalar MEAN_PIXEL(123.7f);
 
     //constants for this graph type
     static constexpr float DETECTION_CONFIDENCE = 0.9f;
+
     static constexpr float MASK_CONFIDENCE = 0.9f;
+
     int IMAGE_SIZE=1024;
-
-
 
     TF_Buffer_Ptr ReadFile(const char* pFile)
     {
@@ -142,14 +141,16 @@ public:
 
     std::vector <float> load_anchor(const char* modelPath,const int IMAGE_SIZE) ;
 
-    int select_anchor() ;
+    int select_anchor();
 
     cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) ;
+
     std::vector<std::vector<float>> inferencing(cv::Mat& image) ;
 
     void create_session() ;
 
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
+
     virtual void setup_dnn_network(std::string modelPB, std::string modelPath, std::string empty) override;
 };
 

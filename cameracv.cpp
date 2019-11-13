@@ -66,6 +66,13 @@ QSharedPointer<cv::Mat> CameraCV::get_current_frm(){
    return this->currentFrame;
 }
 
+void CameraCV::set_current_frm(cv::Mat &p_frm)
+{
+
+    QSharedPointer<cv::Mat> temp( &p_frm);
+    this->currentFrame = temp;
+}
+
 void CameraCV::getCameraframe(){
     while(mActive== true)
     {

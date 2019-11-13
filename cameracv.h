@@ -31,6 +31,8 @@ public:
 
     QSharedPointer<cv::Mat> get_current_frm();
 
+    void set_current_frm(cv::Mat &p_frm);
+
     void getCameraframe();
 
     void spawnCameraLoop();
@@ -54,7 +56,7 @@ public:
     bool is_loop=false;
 protected:
     std::atomic_bool mActive;
-    QSharedPointer<cv::Mat> currentFrame;
+    QSharedPointer<cv::Mat> currentFrame =nullptr;
     std::thread mBGThread;
     std::mutex mFrameBufferMutex;
     cv::VideoCapture* camera=nullptr;

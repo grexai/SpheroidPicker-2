@@ -419,7 +419,6 @@ void matterport_mrcnn::setup_dnn_network( std::string modelPB, std::string model
         1.0f,                                                                        //scale factor: was 1.0f
         0.0f, 1.0f };                                                                 //classes (NUM_CLASSES)
 
-
 //TODO the binary
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
@@ -445,7 +444,6 @@ void matterport_mrcnn::create_session(){
 std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
     auto start = std::chrono::system_clock::now();
-    //cv::Mat test = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
     image.convertTo(image, CV_8UC3);
     cv::resize(image, image, cv::Size(1024, 576));/// WTF
     float  nx = 1920.0f/1024.0f;

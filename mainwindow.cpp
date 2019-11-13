@@ -149,7 +149,8 @@ void MainWindow::show_currentpressure(){
     disp_pressure->start(500);
 }
 
-// events
+//Events
+
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     if (obj == ui->graphicsView && true)
        {
@@ -217,7 +218,9 @@ void MainWindow::closeEvent (QCloseEvent *event)
     }
 }
 
-// OLD calibration for 3axis pipette
+//View
+//Calibration view for 3axis pipette
+
 void MainWindow::calib_frame_view(cv::Mat& disp){
     using namespace cv;
     if (Iscameraopen== true && calib!=nullptr )
@@ -262,6 +265,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
     }
 }
 
+//update main graphics scene
 void MainWindow::update_window()
 {
 
@@ -277,6 +281,76 @@ void MainWindow::update_window()
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
+
+//right click actions
+
+void MainWindow::move_action(){
+    std::vector<float> mouse ;
+    mouse.push_back(point_mouse->x()*1.5f);
+    mouse.push_back(point_mouse->y()*1.5f);
+    ctrl->pipette_move_to_img_coordinates(mouse);
+}
+
+void MainWindow::center_this_point_action()
+{
+    std::vector<float> mouse;
+    ctrl->stage_set_speed(5000.0f);
+    mouse.push_back(point_mouse->x()*1.5f);
+    mouse.push_back(point_mouse->y()*1.5f);
+    this->center_spheroid(mouse);
+    ctrl->stage_set_speed(15000.0f);
+}
+
+void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
+    QAction action1("Move Pipette Here", ui->graphicsView->viewport());
+    connect(&action1, SIGNAL(triggered()), this, SLOT(move_action()));
+    QAction action2("Center this postion", ui->graphicsView->viewport());
+    connect(&action2, SIGNAL(triggered()), this, SLOT(center_this_point_action()));
+    QAction action3("Pick up", ui->graphicsView->viewport());
+    QAction action4("Deploy", ui->graphicsView->viewport());
+    contextMenu.addAction(&action1);
+    contextMenu.addAction(&action2);
+    contextMenu.addAction(&action3);
+    contextMenu.addAction(&action4);
+    contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
+}
+
+//menus
+
+void MainWindow::on_actionDark_Mode_triggered()
+{
+    setdarkstyle();
+}
+
+void MainWindow::on_actionLight_triggered()
+{
+    setdefault();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}
+
+void MainWindow::on_actionHW_selector_triggered()
+{
+    this->close_and_return_hw();
+    this->deleteLater();
+}
+
+void MainWindow::on_actionCalibrate_Pipette_triggered()
+{
+    if (Iscameraopen)
+    {
+        calib = new calibratedialog;
+        calib->Iscalibrating= true;
+        calib->show();
+    }
+}
+
+// buttons
 
 void MainWindow::on_predict_sph_clicked()
 {
@@ -332,7 +406,6 @@ void MainWindow::on_height_button_clicked()
     float h =  ui->height_spin->value();
     cameracv->setimagewidth(h);
 }
-
 
 void MainWindow::on_Home_pip_clicked()
 {
@@ -427,7 +500,6 @@ void MainWindow::on_p_zm_btton_clicked()
     ctrl->pipette_movez_sync(-(ui->pip_step_spinbox->value()));
 }
 
-
 void MainWindow::on_s_center_button_clicked()
 {
     ctrl->stage_go_center();
@@ -445,76 +517,6 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     ui->s_xpos_label->setText("X: " + QString::number(coords.at(0),'f',2));
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
 }
-
-// right click actions
-
-void MainWindow::move_action(){
-    std::vector<float> mouse ;
-    mouse.push_back(point_mouse->x()*1.5f);
-    mouse.push_back(point_mouse->y()*1.5f);
-    ctrl->pipette_move_to_img_coordinates(mouse);
-}
-
-void MainWindow::center_this_point_action()
-{
-    std::vector<float> mouse;
-    ctrl->stage_set_speed(5000.0f);
-    mouse.push_back(point_mouse->x()*1.5f);
-    mouse.push_back(point_mouse->y()*1.5f);
-    this->center_spheroid(mouse);
-    ctrl->stage_set_speed(15000.0f);
-}
-
-void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
-{
-    QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
-    QAction action1("Move Pipette Here", ui->graphicsView->viewport());
-    connect(&action1, SIGNAL(triggered()), this, SLOT(move_action()));
-    QAction action2("Center this postion", ui->graphicsView->viewport());
-    connect(&action2, SIGNAL(triggered()), this, SLOT(center_this_point_action()));
-    QAction action3("Pick up", ui->graphicsView->viewport());
-    QAction action4("Deploy", ui->graphicsView->viewport());
-    contextMenu.addAction(&action1);
-    contextMenu.addAction(&action2);
-    contextMenu.addAction(&action3);
-    contextMenu.addAction(&action4);
-    contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
-}
-
-//menus
-
-void MainWindow::on_actionDark_Mode_triggered()
-{
-    setdarkstyle();
-}
-
-void MainWindow::on_actionLight_triggered()
-{
-    setdefault();
-}
-
-void MainWindow::on_actionExit_triggered()
-{
-    QCoreApplication::quit();
-}
-
-void MainWindow::on_actionHW_selector_triggered()
-{
-    this->close_and_return_hw();
-    this->deleteLater();
-}
-
-void MainWindow::on_actionCalibrate_Pipette_triggered()
-{
-    if (Iscameraopen)
-    {
-        calib = new calibratedialog;
-        calib->Iscalibrating= true;
-        calib->show();
-    }
-}
-
-// buttons
 
 void MainWindow::on_start_screening_clicked()
 {
@@ -591,7 +593,6 @@ void MainWindow::set_pip_man(int value)
     }
 }
 
-
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 {
      QTextStream(stdout)<< "speed changed to: " << arg1 ;
@@ -660,8 +661,9 @@ void MainWindow::on_found_objects_currentIndexChanged(int index)
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
 }
 
-//auto pickup,scanning methods and helpers
+//Auto pickup,scanning methods and helpers
 
+//Lock the control panels of the ui
 void MainWindow::lock_ui()
 {
     ui->pip_c_box->setDisabled(true);
@@ -669,6 +671,7 @@ void MainWindow::lock_ui()
     ui->syringe_box->setDisabled(true);
 }
 
+//Unlock the control panels of the ui
 void MainWindow::unlock_ui()
 {
     ui->pip_c_box->setEnabled(true);
@@ -686,6 +689,8 @@ void MainWindow::pickup_sph()
     ctrl->pipette_home_z();
 }
 
+//calculate a global stage coordinate from image coordinate
+//screen center that position
 std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_coors)
 {
     std:: vector<float> center_coordinates;
@@ -705,6 +710,7 @@ std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_c
     return center_coordinates;
 }
 
+//Center a spheroid with a given coordinates
 void MainWindow::center_spheroid(std::vector<float> coors)
 {
     ctrl->stage_set_speed(5000.0f);
@@ -714,11 +720,10 @@ void MainWindow::center_spheroid(std::vector<float> coors)
     ctrl->stage_set_speed(15000.0f);
 }
 
+//MOVE to the petri "B" 35mm petri
+//if the Petri "A" is centered MID (stage 751431,501665)
 void MainWindow::move_to_petri_B()
 {
-
-    //MOVE to the petri "B" 35mm petri
-    //if the Petri "A" is centered MID (stage 751431,501665)
     ctrl->stage_move_to_x_sync(751431-366407);
     ctrl->stage_move_to_y_sync(501665);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
@@ -767,6 +772,13 @@ void MainWindow::pick_and_put()
 
 void MainWindow::predict_sph(){
     auto cfrm = cameracv->get_current_frm();
+    //if (cfrm.get() == nullptr){
+     //   cv::Mat tmp = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_029.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+     //   cv::imshow("dsfdsa", tmp);
+     //   cv::waitKey(0);
+     //   cameracv->set_current_frm(tmp);
+     //   cfrm= cameracv->get_current_frm();
+    //}
     if (global_obj_im_coordinates != nullptr)
     {
         delete global_obj_im_coordinates;
@@ -776,7 +788,6 @@ void MainWindow::predict_sph(){
 
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
 
-
     /*  ui->found_objects->clear();
 
     for (int idx = 0; idx < im_obj.size(); ++idx)
@@ -784,8 +795,8 @@ void MainWindow::predict_sph(){
         global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
         ui->found_objects->addItem(QString::number(idx));
     }
-    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     */
+    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
@@ -807,6 +818,10 @@ std::string MainWindow::get_date_time_str()
     return datetime;
 }
 
+// screening a given squard area at 5X magnification
+// predicting every scan
+// calculating every spheroids coordinates to make it middle of screen
+//saving every image, to scanning folder with date, time, size stamp
 void MainWindow::screensample()
 {
     using namespace  cv;
@@ -870,11 +885,11 @@ void MainWindow::screensample()
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
                    // put text TEXT
-                   int baseLine ;
-                   std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
-                   cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 3,5, &baseLine);
-                   rectangle(scanvector.at(counter), cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
-                   putText(scanvector.at(counter), label_txt,cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
+                //   int baseLine ;
+                //   std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
+                //   cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 3,5, &baseLine);
+                //   rectangle(scanvector.at(counter), cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+                //   putText(scanvector.at(counter), label_txt,cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
                    object_counter++;
                    QTextStream (stdout) <<object_counter << endl;
                 }
@@ -887,7 +902,7 @@ void MainWindow::screensample()
     }
     prog_changed(100);
     m_s_t_acitive=false;
-    ctrl->stage_set_speed(20000.0f);
+   // ctrl->stage_set_speed(20000.0f);
     ui->found_objects->clear();
     for (int i=0 ;i<global_obj_im_coordinates->size();++i )
     {
