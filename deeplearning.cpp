@@ -128,7 +128,7 @@ void invecption_v2::resize(cv::Mat &input, cv::Mat &out)
 }
 
 //Setup a DNN network
-void invecption_v2::setup_dnn_network(std::string cf, std::string model_w, std::string t_g)
+void invecption_v2::setup_dnn_network(const char* cf, const char* model_w, const char* t_g)
 {
     using namespace cv;
     using namespace std;
@@ -402,8 +402,8 @@ cv::Mat matterport_mrcnn::mold_image(cv::Mat &image, const int IMAGE_SIZE, int m
     return moldedInput;
 }
 
-void matterport_mrcnn::setup_dnn_network( std::string modelPB, std::string modelPath, std::string empty){
-    read_graph(modelPB.c_str());
+void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath, const char* empty){
+    read_graph(modelPB);
 
     std::cout << "Successfully imported graph" << std::endl;
 
@@ -423,7 +423,7 @@ void matterport_mrcnn::setup_dnn_network( std::string modelPB, std::string model
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
     IMAGE_SIZE = select_anchor();
-    m_anchors = load_anchor(modelPath.c_str(), IMAGE_SIZE);
+    m_anchors = load_anchor(modelPath, IMAGE_SIZE);
     this->create_session();
 
 }

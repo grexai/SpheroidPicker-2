@@ -38,7 +38,7 @@ class i_deeplearning
 public:
     i_deeplearning(){}
     virtual ~i_deeplearning()= 0;
-    virtual void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) = 0;
+    virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) = 0;
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output)= 0;
 };
 
@@ -50,7 +50,7 @@ public:
     void drawBox(cv::Mat& frame, int classId, float conf, cv::Rect box, cv::Mat& objectMask);
     std::vector<std::vector<float>> postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
     void resize(cv::Mat& input, cv::Mat& out);
-    virtual void setup_dnn_network(std::string cf, std::string model_w, std::string t_g) override;
+    virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) override;
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
   //  std::vector<std::vector<float>> objpos;
@@ -151,7 +151,7 @@ public:
 
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
 
-    virtual void setup_dnn_network(std::string modelPB, std::string modelPath, std::string empty) override;
+    virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;
 };
 
 

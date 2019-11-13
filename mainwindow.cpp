@@ -63,9 +63,9 @@ MainWindow::MainWindow(QWidget *parent) :
                                                                 QMessageBox::Yes);
     if (res1Btn == QMessageBox::Yes) {
         dl = new matterport_mrcnn();
-        dl->setup_dnn_network(propreader->cfg.matterport_graph,
-                                 propreader->cfg.matterport_folder,
-                              "");
+        dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
+                              propreader->cfg.matterport_folder.c_str(),
+                              nullptr);
         cv::Mat test= cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
         // start a fake inference for finish preload
         std::thread t_inf(&i_deeplearning::dnn_inference,dl,
@@ -74,9 +74,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         dl = new invecption_v2();
 
-        dl->setup_dnn_network(propreader->cfg.classesFile,
-                          propreader->cfg.model_weights,
-                          propreader->cfg.textGraph);
+        dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
+                          propreader->cfg.model_weights.c_str(),
+                          propreader->cfg.textGraph.c_str());
     }
 
     // USER interface connections
