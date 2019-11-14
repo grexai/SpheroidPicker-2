@@ -40,18 +40,18 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader->apply_settings(settings);
 
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-
+    automethods = new auto_methods(ctrl,cameracv);
+    progress.setValue(50);
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes) {
-            progress.setValue(50);
-            ctrl->stage_set_speed(30000.0f);
+            ctrl->stage_set_speed(30000);
             progress.setLabelText("Stage inicialization");
             ctrl->stage_autocalibrate();
             /// basic setup
-            ctrl->stage_set_speed(5000.0f);
+            ctrl->stage_set_speed(5000);
             std::vector<int> s = ctrl->stage_get_speed();
             ui->s_speed_spinbox->setValue(s.at(0));
     }
@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
         dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
                               propreader->cfg.matterport_folder.c_str(),
                               nullptr);
-        cv::Mat test= cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_012.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+        cv::Mat test= cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
         // start a fake inference for finish preload
         std::thread t_inf(&i_deeplearning::dnn_inference,dl,
                           test,test);
@@ -195,7 +195,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     case Qt::Key_D:on_s_xp_button_clicked();break;
     case Qt::Key_1:on_p_em_button_clicked();break;
     case Qt::Key_3:on_p_ep_button_clicked();break;
-    case Qt::Key_L: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); QTextStream(stdout)<< ui->tabWidget->currentIndex();break;
+    case Qt::Key_L: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); break;
     case Qt::Key_Space:on_pc_pulse_button_clicked();break;
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
@@ -362,7 +362,7 @@ void MainWindow::on_Campushbtn_clicked()
 {
     cameracv = new CameraCV(cameraIndex);
     if (Iscameraopen==true){
-        ui->Campushbtn->setText("Camera o`n");
+        ui->Campushbtn->setText("Camera on");
         delete cameracv;
         cameracv= nullptr;
         Iscameraopen= false;
@@ -653,13 +653,10 @@ void MainWindow::on_pick_and_put_clicked()
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
-    //set Picking speeds
-    ctrl->stage_set_speed(3000);
-    //slowly center the selected sph
-    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
-    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
+    m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
 }
+
+
 
 //Auto pickup,scanning methods and helpers
 
@@ -691,16 +688,13 @@ void MainWindow::pickup_sph()
 
 //calculate a global stage coordinate from image coordinate
 //screen center that position
-std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_coors)
+std::vector<float> MainWindow::get_centered_coordinates(std::vector<float>& sph_coors)
 {
     std:: vector<float> center_coordinates;
     const float  img_w_5p5x = 27426; //    100nm
     const float  img_h_5p5x = 15421;
     const float x_conv =  img_w_5p5x/1920;
     const float y_conv = img_h_5p5x/1080;
-    QTextStream(stdout) << x_conv <<"xc : yc " << y_conv << endl;
-    QTextStream(stdout) << "dla0a0:  "<< sph_coors.at(0) << endl;
-    QTextStream(stdout) << "dla0a1:  " <<  sph_coors.at(1) << endl;
     float mid_obj_pxl_x =  960 - sph_coors.at(0);
     float mid_obj_pxl_y =  540 - sph_coors.at(1);
     float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
@@ -711,13 +705,24 @@ std::vector<float> MainWindow::get_centered_coordinates(std::vector<float> sph_c
 }
 
 //Center a spheroid with a given coordinates
-void MainWindow::center_spheroid(std::vector<float> coors)
+void MainWindow::center_spheroid(std::vector<float>& coors)
 {
-    ctrl->stage_set_speed(5000.0f);
+    ctrl->stage_set_speed(3000);
     std:: vector<float> c_coords = this->get_centered_coordinates(coors);
     ctrl->stage_move_to_x_sync(static_cast<int>(c_coords.at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
-    ctrl->stage_set_speed(15000.0f);
+    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
+}
+
+void MainWindow::center_selected_sph(int index)
+{
+    //set Picking speeds
+    ctrl->stage_set_speed(3000);
+    //slowly center the selected sph
+    //QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(index).at(1)<< endl;
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
+    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
 }
 
 //MOVE to the petri "B" 35mm petri
@@ -733,13 +738,13 @@ void MainWindow::move_to_petri_B()
 }
 
 void MainWindow::xz_stage_pickup_sph(){
-    //set Pickup speeds
-    int original_stage_speed  = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(3000);
 
-     ctrl->pipette_set_speed(ui->z_dive_speed->value());
+    auto start = std::chrono::system_clock::now();
+    //set Pickup speeds
+    int original_stage_speed = ctrl->stage_get_x_speed();
+    ctrl->stage_set_speed(3000);
+    ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
-    QTextStream (stdout) <<"global coors"<<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0) <<":" <<global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)<< endl;
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
     //
@@ -756,8 +761,15 @@ void MainWindow::xz_stage_pickup_sph(){
     // MOVE x axis out of image
     ctrl->pipette_movex_sync(-2.6f);
     ctrl->stage_set_speed(original_stage_speed);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     //TODO
     // this point CHECK if the spheroid picked up!
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+
+        // CHRONO END
+    std::cout << "[PICK UP]elapsed time: " << elapsed_seconds.count() << "s\n";
 
 }
 
@@ -788,15 +800,14 @@ void MainWindow::predict_sph(){
 
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
 
-    /*  ui->found_objects->clear();
+    ui->found_objects->clear();
 
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
         global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
         ui->found_objects->addItem(QString::number(idx));
     }
-    */
-    //cv::Mat displayfrm = imtools->convert_bgr_to_rgb(image.data);
+
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
@@ -825,6 +836,8 @@ std::string MainWindow::get_date_time_str()
 void MainWindow::screensample()
 {
     using namespace  cv;
+    auto start = std::chrono::system_clock::now();
+
     //LOCKING CONTROLLER
     this->lock_ui();
     //TODO
@@ -891,7 +904,6 @@ void MainWindow::screensample()
                 //   rectangle(scanvector.at(counter), cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
                 //   putText(scanvector.at(counter), label_txt,cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
                    object_counter++;
-                   QTextStream (stdout) <<object_counter << endl;
                 }
                 counter++;
             }else{
@@ -900,6 +912,11 @@ void MainWindow::screensample()
         }
 
     }
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+
+        // CHRONO END
+    std::cout << "[SCANNING] elapsed time: " << elapsed_seconds.count() << "s\n";
     prog_changed(100);
     m_s_t_acitive=false;
    // ctrl->stage_set_speed(20000.0f);
@@ -915,7 +932,6 @@ void MainWindow::screensample()
 
 // CREATING the mosaic of analyzed images
 void MainWindow::create_mosaic(){
-
     using namespace  cv;
    // int platesize = 350000; //    100nm // *0.1um
     if (scanvector.size()>0){

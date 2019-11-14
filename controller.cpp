@@ -312,55 +312,92 @@ bool controller::connect_tango_stage(){
 
 void controller::stage_autocalibrate()
 {
-    stage->XAxis().autocalibration();
-    stage->YAxis().autocalibration();
+    if (stage != nullptr)
+    {
+        stage->XAxis().autocalibration();
+        stage->YAxis().autocalibration();
+    }
 }
 
 void controller::stage_move_to_x_async(const int x)
 {
-    stage->XAxis().moveToAsync(static_cast<iop::int32>(x));
+    if (stage != nullptr)
+    {
+        stage->XAxis().moveToAsync(static_cast<iop::int32>(x));
+    }
 }
 
 void controller::stage_move_to_y_async(const int y)
 {
+    if (stage != nullptr)
+    {
     stage->YAxis().moveToAsync(static_cast<iop::int32>(y));
+    }
 }
 
 void controller::stage_move_to_x_sync(const int x)
 {
+    if (stage != nullptr)
+    {
     stage->XAxis().moveTo(static_cast<iop::int32>(x));
+    }
 }
 
 void controller::stage_move_to_y_sync(const int y)
 {
+    if (stage != nullptr)
+    {
     stage->YAxis().moveTo(static_cast<iop::int32>(y));
+    }
 }
 
 void controller::stage_set_speed(const int speed)
 {
-    stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
-    stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+    if (stage != nullptr)
+    {
+        stage->XAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+        stage->YAxis().setCurrentSpeed(static_cast<iop::int32>(speed));
+    }
 }
 
 void controller::stage_set_acceleration(const int accel)
 {
-    stage->XAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
-    stage->YAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
+    if (stage != nullptr)
+    {
+        stage->XAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
+        stage->YAxis().setCurrentAcceleration(static_cast<iop::int32>(accel));
+    }
 }
 
 int controller::stage_get_x_speed()
 {
+    if (stage != nullptr)
+    {
     return int(stage->XAxis().getCurrentSpeed());
+    }
+    else
+    {
+        int x_s= 0;
+        return x_s;
+    }
 }
 
 int controller::stage_get_y_speed()
 {
-    return int(stage->YAxis().getCurrentSpeed());
+    if (stage != nullptr)
+    {
+        return int(stage->YAxis().getCurrentSpeed());
+    }
+    else
+    {
+        int y_s= 0;
+        return y_s;
+    }
 }
 
 std::vector<int> controller::stage_get_speed()
 {
-    std::vector<int> speedvec;
+    std::vector<int> speedvec; //= {2,0};
     speedvec.push_back(this->stage_get_x_speed());
     speedvec.push_back(this->stage_get_y_speed());
     return speedvec;
@@ -368,74 +405,123 @@ std::vector<int> controller::stage_get_speed()
 
 int controller::stage_get_x_acceleration()
 {
-   return int(stage->XAxis().getCurrentAcceleration());
+    if (stage != nullptr)
+    {
+    return int(stage->XAxis().getCurrentAcceleration());
+    }
 }
 
 int controller::stage_get_y_acceleration()
 {
-   return int(stage->YAxis().getCurrentAcceleration());
+    if (stage != nullptr)
+    {
+        return int(stage->YAxis().getCurrentAcceleration());
+    }
 }
 
 std::vector<int> controller::stage_get_acceleration()
 {
     std::vector<int> accelvec;
+    if (stage != nullptr)
+    {
     accelvec.push_back(this->stage_get_x_acceleration());
     accelvec.push_back(this->stage_get_y_acceleration());
+    }
     return accelvec;
 }
 
 int controller::stage_get_x_coords()
 {
+    if (stage != nullptr)
+    {
     return int(stage->XAxis().getCurrentPosition());
+    }else
+    {
+        return int(0);
+    }
 }
 
 int controller::stage_get_y_coords()
 {
-    return int(stage->YAxis().getCurrentPosition());
+    if (stage != nullptr)
+    {
+        return int(stage->YAxis().getCurrentPosition());
+    }
+    else
+    {
+        return int(0);
+    }
 }
 
 std::vector<int>  controller::stage_get_coords()
 {
-    std::vector<int> coords;
-    coords.push_back(this->stage_get_x_coords());
-    coords.push_back(this->stage_get_y_coords());
+    std::vector<int> coords = {2,0};
+    if (stage != nullptr)
+    {
+        coords.at(0)= (this->stage_get_x_coords());
+        coords.at(1)=(this->stage_get_y_coords());
+    }
     return coords;
 }
 
 void controller::stage_move_x_async(const int x)
 {
-   int x0 = this->stage_get_x_coords();
-   this->stage_move_to_x_async(x0+x);
+    if (stage != nullptr)
+    {
+        int x0 = this->stage_get_x_coords();
+        this->stage_move_to_x_async(x0+x);
+    }
 }
 
 void controller::stage_move_y_async(const int y)
 {
-    int y0 = this->stage_get_y_coords();
-    this->stage_move_to_y_async(y0+y);
+    if (stage != nullptr)
+    {
+        int y0 = this->stage_get_y_coords();
+        this->stage_move_to_y_async(y0+y);
+    }
 }
 
 int controller::stage_get_x_min_pos()
 {
-   return int(stage->XAxis().getMinPosition());
+    if (stage != nullptr)
+    {
+        return int(stage->XAxis().getMinPosition());
+    }
 }
 
 int controller::stage_get_x_max_pos()
 {
-   return int(stage->XAxis().getMaxPosition());
+    if (stage != nullptr)
+    {
+        return int(stage->XAxis().getMaxPosition());
+    }
 }
 
 int controller::stage_get_y_min_pos()
 {
+    if (stage != nullptr)
+    {
     return int(stage->YAxis().getMinPosition());
+    }
 }
 
 int controller::stage_get_y_max_pos()
 {
-   return int(stage->YAxis().getMaxPosition());
+    if (stage != nullptr)
+    {
+        return int(stage->YAxis().getMaxPosition());
+    }
+    else
+    {
+        return int(0);
+    }
 }
 
 void controller::stage_go_center()
 {
+    if (stage != nullptr)
+    {
     iop::int32 x0 = stage->XAxis().getMinPosition();
     iop::int32 x1 = stage->XAxis().getMaxPosition();
 
@@ -445,6 +531,7 @@ void controller::stage_go_center()
     iop::int32 x = x0 + static_cast<iop::int32>( (x1-x0)/2.0);
     iop::int32 y = y0 + static_cast<iop::int32>( (y1-y0)/2.0);
     stage->moveToAsync(x,y, false);
+    }
 }
 
 void controller::stage_run_iniciatlions()

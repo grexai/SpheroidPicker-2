@@ -1,18 +1,35 @@
 #include "auto_methods.h"
 
-auto_methods::auto_methods()
+auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera)
 {
+    if(p_ctrl!=nullptr){
+        this->m_controller = p_ctrl;
+        //this = p_ctrl;
+    }
+    else
+    {
+        std::cerr << "controller not incialiazed";
+    }
+    if(p_camera!=nullptr){
+        this->m_camera = p_camera;
+        //this = p_ctrl;
+    }
+    else
+    {
+        std::cerr << "camera not incialiazed";
+    }
+
 }
 auto_methods::~auto_methods(){}
 
 
 void auto_methods::pickup_sph(float pulse_value,float pulse_time,std::vector<float> objpos){
   //   QTextStream(stdout) << "pciking up" << endl;
-       this->pipette_move_to_img_coordinates(objpos);
+       m_controller->pipette_move_to_img_coordinates(objpos);
        std::this_thread::sleep_for(std::chrono::milliseconds(7000));
-       this->vaccum_pulse(pulse_value,pulse_time);
+       m_controller->vaccum_pulse(pulse_value,pulse_time);
        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-       this->pipette_home_z();
+       m_controller->pipette_home_z();
 }
 
 void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
@@ -41,11 +58,11 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
-    int xpos=this->stage_get_x_coords();
-    int ypos=this->stage_get_y_coords();
+    int xpos=m_controller->stage_get_x_coords();
+    int ypos=m_controller->stage_get_y_coords();
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
-    this->stage_set_speed(7000.0f);
+    m_controller->stage_set_speed(7000.0f);
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 1;
     float p_v=0.0f;
@@ -58,7 +75,7 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
         {
             if(m_s_t_acitive)
             {
-                this->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
+                m_controller->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
                 p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;
                 //Qt fill combobox prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -76,9 +93,9 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
                 break;
             }
         }
-        this->stage_set_speed(70000.0f);
-        this->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
-        this->stage_set_speed(5000.0f);
+        m_controller->stage_set_speed(70000.0f);
+        m_controller->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+        m_controller->stage_set_speed(5000.0f);
 
 
     }

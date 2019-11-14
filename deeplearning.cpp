@@ -210,10 +210,10 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::
 
     auto end = std::chrono::system_clock::now();
 
-        std::chrono::duration<double> elapsed_seconds = end - start;
+    std::chrono::duration<double> elapsed_seconds = end - start;
 
         // CHRONO END
-        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+    std::cout << "[Inference] elapsed time: " << elapsed_seconds.count() << "s\n";
     }
 
   //  Mat detectedFrame;
@@ -365,7 +365,6 @@ int matterport_mrcnn::select_anchor(){
         //anchorSize = 512;
         for (const int anchor : ANCHOR_SIZES)
         {
-            std::cout << "anchor :: " << anchor << std::endl;
             anchorSize = anchor;
             if (anchorSize >= maxDim) break;
         }
@@ -698,7 +697,7 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
         uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
         const int32_t* labelPtr = reinterpret_cast<const int32_t*>(labels.data);
 
-        //   labels.convertTo(labels,CV_8UC3);
+      //   labels.convertTo(labels,CV_8UC3);
       //  cv::imwrite("outFileName.png", labels);
 
         for (int64_t index = 0; index < total; ++index)
@@ -715,7 +714,7 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
         std::chrono::duration<double> elapsed_seconds = end - start;
 
         // CHRONO END
-        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
+        std::cout << "[INFERENCE] elapsed time: " << elapsed_seconds.count() << "s\n";
 
      //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
        // cv::imshow("resuls", newImage);

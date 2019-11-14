@@ -14,7 +14,7 @@
 #include <cameracv.h>
 #include <deeplearning.h>
 #include <propertyreader.h>
-
+#include <auto_methods.h>
 namespace Ui {
 class MainWindow;
 }
@@ -24,16 +24,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-
-    QString con_str= "Connected";
-    QString fail_str = "Failed";
-    QThread thread;
     bool Iscameraopen= false;
     int cameraIndex=0;
-
     explicit MainWindow(QWidget *parent = nullptr);
-    void setdarkstyle();
     ~MainWindow();
+    void setdarkstyle();
     void setdefault();
     cv::Mat TM;
 signals:
@@ -53,6 +48,10 @@ protected:
     controller* ctrl = nullptr;
     CameraCV* cameracv = nullptr;
     imagetools* imtools= nullptr;
+    i_deeplearning* dl= nullptr;
+    propertyreader* propreader = nullptr;
+    auto_methods* automethods = nullptr;
+
     std::vector<float>* cpos1 = nullptr;
     std::vector<float>* cpos2 = nullptr;
     std::vector<float>* cpos3= nullptr;
@@ -189,9 +188,11 @@ private slots:
 
      void pickup_sph();
 
-     std::vector<float> get_centered_coordinates(std::vector<float> sph_coors);
+     std::vector<float> get_centered_coordinates(std::vector<float>& sph_coors);
 
-     void center_spheroid(std::vector<float> coors);
+     void center_spheroid(std::vector<float>& coors);
+
+     void center_selected_sph(int index);
 
      void move_to_petri_B();
 
@@ -218,19 +219,21 @@ private:
     QImage* qframe = nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-    i_deeplearning* dl= nullptr;
-    i_deeplearning* mrcnn= nullptr;
+
     std::vector<cv::Mat> scanvector;
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
-    propertyreader* propreader = nullptr;
+
 
     std::atomic_bool m_s_t_acitive;
+
+    //threads
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
     std::thread* m_predict_thread = nullptr;
     std::thread* m_move_petri_b_thread = nullptr;
     std::thread* m_put_and_pick_thread = nullptr;
     std::thread* m_create_mosaic_thread = nullptr;
+    std::thread* m_center_selected_sph_thread = nullptr;
     //TEST
     float m_status = 0;
     QTimer *timer1= nullptr ;
