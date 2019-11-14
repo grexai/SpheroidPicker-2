@@ -273,7 +273,6 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
 
 }
 
-
 // STAGE
 
 bool controller::connect_tango_stage(){
@@ -331,7 +330,7 @@ void controller::stage_move_to_y_async(const int y)
 {
     if (stage != nullptr)
     {
-    stage->YAxis().moveToAsync(static_cast<iop::int32>(y));
+        stage->YAxis().moveToAsync(static_cast<iop::int32>(y));
     }
 }
 
@@ -339,7 +338,7 @@ void controller::stage_move_to_x_sync(const int x)
 {
     if (stage != nullptr)
     {
-    stage->XAxis().moveTo(static_cast<iop::int32>(x));
+        stage->XAxis().moveTo(static_cast<iop::int32>(x));
     }
 }
 
@@ -347,7 +346,7 @@ void controller::stage_move_to_y_sync(const int y)
 {
     if (stage != nullptr)
     {
-    stage->YAxis().moveTo(static_cast<iop::int32>(y));
+        stage->YAxis().moveTo(static_cast<iop::int32>(y));
     }
 }
 
@@ -407,7 +406,12 @@ int controller::stage_get_x_acceleration()
 {
     if (stage != nullptr)
     {
-    return int(stage->XAxis().getCurrentAcceleration());
+        return int(stage->XAxis().getCurrentAcceleration());
+    }
+    else
+    {
+        int x_a= 0;
+        return x_a;
     }
 }
 
@@ -416,6 +420,11 @@ int controller::stage_get_y_acceleration()
     if (stage != nullptr)
     {
         return int(stage->YAxis().getCurrentAcceleration());
+    }
+    else
+    {
+        int y_a= 0;
+        return y_a;
     }
 }
 

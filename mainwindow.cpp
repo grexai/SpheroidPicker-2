@@ -653,10 +653,14 @@ void MainWindow::on_pick_and_put_clicked()
 
 void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
-    m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
+
 }
 
 
+void MainWindow::on_found_objects_highlighted(int index)
+{
+    m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
+}
 
 //Auto pickup,scanning methods and helpers
 
@@ -794,24 +798,27 @@ void MainWindow::predict_sph(){
     if (global_obj_im_coordinates != nullptr)
     {
         delete global_obj_im_coordinates;
+        global_obj_im_coordinates = nullptr;
     }
-    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
-
+    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
-
+    QTextStream(stdout) << "1" ;
     ui->found_objects->clear();
-
+    QTextStream(stdout) << "1" ;
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
-        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
+       global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
         ui->found_objects->addItem(QString::number(idx));
     }
-
-    delete qframe;
-    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    QTextStream(stdout) << "1" ;
+    delete qfrm_t2;
+    qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
+    QTextStream(stdout) << "1" ;
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
+    QTextStream(stdout) << "1" ;
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    QTextStream(stdout) << "1" ;
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
 }
@@ -964,10 +971,12 @@ void MainWindow::create_mosaic(){
 
     imtools->saveImg(Mimage,"mozaic");
     scanvector.clear();
-    qframe = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qframe) );
+    delete qfrm_t2;
+    qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
+    im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
     prog_changed(0);
     }
 }
+

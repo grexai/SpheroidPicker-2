@@ -210,6 +210,8 @@ private slots:
 
      void create_mosaic();
 
+     void on_found_objects_highlighted(int index);
+
 private:
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
@@ -217,6 +219,7 @@ private:
     QGraphicsPixmapItem  qpxmi;
     QGraphicsPixmapItem  im_view_pxmi;
     QImage* qframe = nullptr;
+    QImage* qfrm_t2= nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
 

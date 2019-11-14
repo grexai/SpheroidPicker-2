@@ -115,7 +115,6 @@ std::vector<float> arduinogcode::getcurrentpos()
     {
         QString msg = "M114";
         QByteArray answer=apipc_sc.sendAndReceive(msg,EOM);
-
         QString s(answer);
         //split strings by ":"
         QStringList resultStrings =  s.split(':');
@@ -162,7 +161,7 @@ std::vector<float> arduinogcode::getcurrentpos()
     {
         std::cout << e.what() << '\n';
         m_counter = 0;
-        return coors = {0,0,0};
+        return coors;
     }
 }
 
