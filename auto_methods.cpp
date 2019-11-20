@@ -8,7 +8,7 @@ auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera)
     }
     else
     {
-        std::cerr << "controller not incialiazed";
+        std::cerr << "controller not incialiazed"<< std::endl;
     }
     if(p_camera!=nullptr){
         this->m_camera = p_camera;
@@ -16,7 +16,7 @@ auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera)
     }
     else
     {
-        std::cerr << "camera not incialiazed";
+        std::cerr << "camera not incialiazed" << std::endl;
     }
 
 }
@@ -58,8 +58,8 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
-    int xpos=m_controller->stage_get_x_coords();
-    int ypos=m_controller->stage_get_y_coords();
+    int xpos = m_controller->stage_get_x_coords();
+    int ypos = m_controller->stage_get_y_coords();
     int wmax = static_cast<int>(platesize/img_w_5p5x); // um
     int hmax = static_cast<int>(platesize/img_h_5p5x); // um
     m_controller->stage_set_speed(7000.0f);
@@ -85,7 +85,7 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
                 std::string posx = std::to_string(i)+ "/" + std::to_string(wmax);
 
           //    ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
-          //    auto tmp = cameracv->get_current_frm();
+                auto tmp = m_camera->get_current_frm();
            //   imtools->saveImg(tmp.get(),num2str.c_str());
              //   scanvector.push_back(*tmp.get());
                 counter += 1;

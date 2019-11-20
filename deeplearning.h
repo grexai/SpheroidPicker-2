@@ -147,7 +147,7 @@ public:
 
     std::vector<std::vector<float>> inferencing(cv::Mat& image) ;
 
-    void create_session() ;
+    void create_session();
 
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
 

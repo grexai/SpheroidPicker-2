@@ -26,6 +26,7 @@ CONFIG += console
 CONFIG(release, debug|release) {
 }
 
+
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
@@ -113,8 +114,24 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/open
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
 
+
+
 DISTFILES +=
 
+CONFIG(release,tf-cpu|release){
+win32: LIBS += -L$$PWD/../../../Libraries/tf-cpu113/lib/ -llib64tf131
+
+INCLUDEPATH += $$PWD/../../../Libraries/tf-cpu113/include
+DEPENDPATH += $$PWD/../../../Libraries/tf-cpu113/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-cpu113/lib/lib64tfcpu131.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-cpu113/lib/liblib64tf131.a
+
+win32:CONFIG(release, debug|release): LIBS += $$PWD/../../../Libraries/tf-cpu113/lib/lib64tfcpu131.lib
+else:win32:CONFIG(debug, debug|release): $$PWD/../../../Libraries/tf-cpu113/lib/liblib64tf131.a
+}
+else
+{
 win32: LIBS += -L$$PWD/../../../Libraries/tf-gpu131/lib/ -llib64tf131
 
 INCLUDEPATH += $$PWD/../../../Libraries/tf-gpu131/include
@@ -125,4 +142,4 @@ else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-gpu131/lib/liblib6
 
 win32:CONFIG(release, debug|release): LIBS += $$PWD/../../../Libraries/tf-gpu131/lib/lib64tf131.lib
 else:win32:CONFIG(debug, debug|release): $$PWD/../../../Libraries/tf-gpu131/lib/liblib64tf131.a
-
+}

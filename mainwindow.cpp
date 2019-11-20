@@ -48,12 +48,13 @@ MainWindow::MainWindow(QWidget *parent) :
                                                                 QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes) {
             ctrl->stage_set_speed(30000);
-            progress.setLabelText("Stage inicialization");
+            progress.setLabelText("Stage inicialization, may take about 1 min");
             ctrl->stage_autocalibrate();
             /// basic setup
-            ctrl->stage_set_speed(5000);
-            std::vector<int> s = ctrl->stage_get_speed();
-            ui->s_speed_spinbox->setValue(s.at(0));
+            ctrl->stage_set_speed(ui->s_speed_spinbox->value());
+
+    }else {
+        ctrl->stage_set_speed(ui->s_speed_spinbox->value());
     }
     progress.setValue(75);
     progress.setLabelText("Loading neural network graph");
@@ -73,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) :
         t_inf.detach();
     }else{
         dl = new invecption_v2();
-
         dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
                           propreader->cfg.model_weights.c_str(),
                           propreader->cfg.textGraph.c_str());
@@ -86,12 +86,6 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
-  //  timer->start(16);
-/*
-    setdarkstyle();*/
-
-   // qApp->installEventFilter(this);
-   // std::cout << "AKOS EDITION v1.1" << std::endl;
 }
 
 void MainWindow::setdarkstyle(){
@@ -572,7 +566,9 @@ void MainWindow::set_h4(int value)
 void MainWindow::scan_stopped()
 {
     QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
-    this->m_screening_thread->join();
+    m_s_t_acitive=false;
+   // this->m_screening_thread->join();
+
 }
 
 void MainWindow::set_pip_man(int value)
@@ -655,7 +651,6 @@ void MainWindow::on_found_objects_currentIndexChanged(int index)
 {
 
 }
-
 
 void MainWindow::on_found_objects_highlighted(int index)
 {
@@ -788,13 +783,6 @@ void MainWindow::pick_and_put()
 
 void MainWindow::predict_sph(){
     auto cfrm = cameracv->get_current_frm();
-    //if (cfrm.get() == nullptr){
-     //   cv::Mat tmp = cv::imread("e:/speroid_picker/Screeningdata/Test_images_Picker/Images/Test_029.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
-     //   cv::imshow("dsfdsa", tmp);
-     //   cv::waitKey(0);
-     //   cameracv->set_current_frm(tmp);
-     //   cfrm= cameracv->get_current_frm();
-    //}
     if (global_obj_im_coordinates != nullptr)
     {
         delete global_obj_im_coordinates;
@@ -803,22 +791,16 @@ void MainWindow::predict_sph(){
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
-    QTextStream(stdout) << "1" ;
     ui->found_objects->clear();
-    QTextStream(stdout) << "1" ;
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-        ui->found_objects->addItem(QString::number(idx));
+       ui->found_objects->addItem(QString::number(idx));
     }
-    QTextStream(stdout) << "1" ;
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
-    QTextStream(stdout) << "1" ;
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
-    QTextStream(stdout) << "1" ;
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
-    QTextStream(stdout) << "1" ;
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
 }
@@ -849,7 +831,8 @@ void MainWindow::screensample()
     this->lock_ui();
     //TODO
     //MOVE the pipette OUT
-    const float platesize= ui->set_plate_size_spinbox->value()*10000;
+    const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
+    const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
     float  img_w_5p5x = 27426;  //    100nm
     float  img_h_5p5x = 15421;  //    100nm
     int object_counter = 0;
@@ -870,8 +853,8 @@ void MainWindow::screensample()
     QTextStream(stdout)<< "starting..";
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
-    const int wmax = static_cast<int>(platesize/img_w_5p5x); // um
-    const int hmax = static_cast<int>(platesize/img_h_5p5x); // um
+    const int wmax = static_cast<int>(platesize_x/img_w_5p5x); // um
+    const int hmax = static_cast<int>(platesize_y/img_h_5p5x); // um
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 0;
     float p_v=0.0f;
@@ -942,11 +925,12 @@ void MainWindow::create_mosaic(){
     using namespace  cv;
    // int platesize = 350000; //    100nm // *0.1um
     if (scanvector.size()>0){
-    const float platesize = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
+    const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
+    const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
     float  img_w_5p5x = 27426; //    100nm
     float  img_h_5p5x = 15421;//19466; //    100nm
-    int wmax = static_cast<int>(platesize / img_w_5p5x); // um
-    int hmax = static_cast<int>(platesize / img_h_5p5x); // um
+    int wmax = static_cast<int>(platesize_x / img_w_5p5x); // um
+    int hmax = static_cast<int>(platesize_y / img_h_5p5x); // um
 
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
     for (int i = 0; i < hmax; ++i)
@@ -974,7 +958,7 @@ void MainWindow::create_mosaic(){
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
     prog_changed(0);
     }

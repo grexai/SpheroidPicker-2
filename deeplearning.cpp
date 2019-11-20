@@ -206,7 +206,7 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::
     std::cerr << "ok" << std::endl;
 
     // Extract the bounding box and mask for each of the detected objects
-   objpos = postprocess(frame, outs);
+    objpos = postprocess(frame, outs);
 
     auto end = std::chrono::system_clock::now();
 
@@ -303,7 +303,6 @@ matterport_mrcnn::~matterport_mrcnn(){
     TF_DeleteSession(m_session,m_status);
     TF_DeleteGraph(m_graph);
     TF_DeleteSessionOptions(m_options);
-    if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Error during processing: ") + TF_Message(m_status));
     TF_DeleteStatus(m_status);
 
 //    m_session.CloseAndDelete(status.get());
@@ -421,7 +420,7 @@ void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* model
 //TODO the binary
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
-    IMAGE_SIZE = select_anchor();
+    //IMAGE_SIZE = select_anchor();
     m_anchors = load_anchor(modelPath, IMAGE_SIZE);
     this->create_session();
 
@@ -445,9 +444,11 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
     auto start = std::chrono::system_clock::now();
     image.convertTo(image, CV_8UC3);
     cv::resize(image, image, cv::Size(1024, 576));/// WTF
+  //  cv::resize(image, image, cv::Size(512, 288));/// WTF
     float  nx = 1920.0f/1024.0f;
     float ny = 1080.0f/576.0f;
-
+ //   float  nx = 1920.0f/512.0f;
+//    float ny = 1080.0f/288.0f;
     const int maxDim = (std::max)(image.cols, image.rows);
     std::vector<std::vector<float>> objpos;
     //IMAGE_SIZE = select_anchor();
@@ -658,7 +659,6 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             bb[1] = (std::min)((std::max)(bb[1], 0), image.rows);
             bb[2] = (std::min)((std::max)(bb[2], 0), image.cols);
             bb[3] = (std::min)((std::max)(bb[3], 0), image.rows);
-            std:: cout << nx <<":" << ny << std::endl;
             float bx = static_cast<float>(bb[0])*nx;
             float by = static_cast<float>(bb[1]*ny);
             std::vector <float> outcoors;
