@@ -18,6 +18,7 @@ typedef struct props{
     std::string matterport_graph;
     std::string matterport_folder;
 }props;
+
 class propertyreader
 {
 public:

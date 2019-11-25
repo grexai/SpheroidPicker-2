@@ -17,36 +17,14 @@ void imagetools::setframe(cv::Mat &input){
     this->frame = &input;
 }
 
-/*
-0. CV_CAP_PROP_POS_MSEC Current position of the video file in milliseconds.
-1. CV_CAP_PROP_POS_FRAMES 0-based index of the frame to be decoded/captured next.
-2. CV_CAP_PROP_POS_AVI_RATIO Relative position of the video file
-3. CV_CAP_PROP_FRAME_WIDTH Width of the frames in the video stream.
-4. CV_CAP_PROP_FRAME_HEIGHT Height of the frames in the video stream.
-5. CV_CAP_PROP_FPS Frame rate.
-6. CV_CAP_PROP_FOURCC 4-character code of codec.
-7. CV_CAP_PROP_FRAME_COUNT Number of frames in the video file.
-8. CV_CAP_PROP_FORMAT Format of the Mat objects returned by retrieve() .
-9. CV_CAP_PROP_MODE Backend-specific value indicating the current capture mode.
-10. CV_CAP_PROP_BRIGHTNESS Brightness of the image (only for cameras).
-11. CV_CAP_PROP_CONTRAST Contrast of the image (only for cameras).
-12. CV_CAP_PROP_SATURATION Saturation of the image (only for cameras).
-13. CV_CAP_PROP_HUE Hue of the image (only for cameras).
-14. CV_CAP_PROP_GAIN Gain of the image (only for cameras).
-15. CV_CAP_PROP_EXPOSURE Exposure (only for cameras).
-16. CV_CAP_PROP_CONVERT_RGB Boolean flags indicating whether images should be converted to RGB.
-17. CV_CAP_PROP_WHITE_BALANCE Currently unsupported
-18. CV_CAP_PROP_RECTIFICATION Rectification flag for stereo cameras (note: only supported by DC1394 v 2.x backend currently)
-*/
-
 cv::Mat* imagetools::get_display_frm()
 {
     return this->dispfrm.get();
 }
 
-cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput){
+cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> p_input){
     cv::Mat rgb;
-    cvtColor(*pinput,rgb,CV_BGR2RGB,0);
+    cvtColor(*p_input,rgb,CV_BGR2RGB,0);
     return rgb;
 }
 
@@ -96,12 +74,18 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 }
 
-// returns a feature vector contour length,area, and circularity
-std::vector<double> imagetools::getobjectprops(cv::Mat& input){
-    using namespace cv;
+/*!
+ * Returns a feature vector in the following order
+ * contour length,area, and circularity
+ * Handles only one object
+ */
+
+std::vector<float> imagetools::getobjectprops(cv::Mat& input){
+        using namespace cv;
         using namespace std;
         input.convertTo(input,CV_8UC1);
     //	waitKey(0);
+        std::vector<float> object_features(3,0.0f);
         Mat canny_output;
         RNG rng(12345);
         vector<vector<Point> > contours;
@@ -128,18 +112,19 @@ std::vector<double> imagetools::getobjectprops(cv::Mat& input){
         {
             mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
         }
-        std::vector<double> object_features(3,0.0f);
+
         // Draw contours
         Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
         for (int i = 0; i< 1; ++i)
         {
             double area = contourArea(contours[i]);
             double arclength = arcLength(contours[i], true);
-            object_features.push_back(arclength);
-            object_features.push_back( area);
-            object_features.push_back( 4 * CV_PI * area / (arclength * arclength));
-
-            // cout << i << "object circularity " << circularity << endl;
+            double circularity = (4 * CV_PI * area / (arclength * arclength));
+            object_features.at(0) = (static_cast <float>(arclength));
+             object_features.at(1) =  static_cast <float>(area);
+             object_features.at(2)= static_cast <float>( circularity);
+            std::cout<<"es itt megvan" << area << std::endl;
+             cout << i << "object circularity " << object_features.at(0) << std::endl;
             Scalar color = Scalar(255,  255, 255);
             drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
        //     circle(drawing, mc[i], 4, color, -1, 8, 0);
@@ -154,7 +139,11 @@ void imagetools::addPointToImage(cv::Mat& img,cv::Point point)
    cv::circle(img,point, 5, cv::Scalar(0,0,255), -1);
 }
 
-// Uses OPENCV save image as png UNCOMPRESSED
+/*!
+ * Saves Mat image as Uncompressed png,
+ *
+ */
+
 void imagetools::saveImg(cv::Mat* outimg, std::string outname)
 {
     //NULLCHECK

@@ -4,9 +4,8 @@
 #include <QMouseEvent>
 #include <QStyle>
 #include <QMessageBox>
-#include <QProgressDialog>
 #include <QLabel>
-
+#include <marcros.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -81,8 +80,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
-
-
+    connect(this, SIGNAL(stich_prog_changed(int)),
+        this, SLOT(set_stich_progressbar(int)),Qt::QueuedConnection);
     progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
@@ -532,10 +531,10 @@ void MainWindow::on_start_screening_clicked()
         if(m_screening_thread->joinable())
         {
             m_screening_thread->join();
-
             scanvector.clear();
             global_obj_im_coordinates->clear();
         }
+        scanvector.clear();
         QMessageBox::warning(this,"Scanning canceled",
                              "Scanning of the plate is canceled,pipette and stage controller unlocked");
     }
@@ -546,6 +545,14 @@ void MainWindow::set_progressbar( int value ){
         m_progvalue = value;
         ui->scanning_progress->setValue(m_progvalue );
         emit prog_changed( m_progvalue );
+    }
+}
+
+void MainWindow::set_stich_progressbar( int value ){
+    if ( value != m_stich_progvalue ) {
+        m_stich_progvalue = value;
+        m_stich_prog->setValue(m_stich_progvalue );
+        emit stich_prog_changed( m_stich_progvalue );
     }
 }
 
@@ -643,13 +650,7 @@ void MainWindow::on_petri_b_clicked()
 
 void MainWindow::on_pick_and_put_clicked()
 {
-
     m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
-}
-
-void MainWindow::on_found_objects_currentIndexChanged(int index)
-{
-
 }
 
 void MainWindow::on_found_objects_highlighted(int index)
@@ -690,10 +691,10 @@ void MainWindow::pickup_sph()
 std::vector<float> MainWindow::get_centered_coordinates(std::vector<float>& sph_coors)
 {
     std:: vector<float> center_coordinates;
-    const float  img_w_5p5x = 27426; //    100nm
-    const float  img_h_5p5x = 15421;
-    const float x_conv =  img_w_5p5x/1920;
-    const float y_conv = img_h_5p5x/1080;
+    // const float  img_w_5p5x = 27426; //    100nm
+    //  const float  img_h_5p5x = 15421;
+    const float x_conv =  IMG_W_M5p5x/FULL_HD_IMAGE_WIDTH;
+    const float y_conv = IMG_H_M5p5x/FULL_HD_IMAGE_HEIGHT;
     float mid_obj_pxl_x =  960 - sph_coors.at(0);
     float mid_obj_pxl_y =  540 - sph_coors.at(1);
     float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
@@ -728,8 +729,8 @@ void MainWindow::center_selected_sph(int index)
 //if the Petri "A" is centered MID (stage 751431,501665)
 void MainWindow::move_to_petri_B()
 {
-    ctrl->stage_move_to_x_sync(751431-366407);
-    ctrl->stage_move_to_y_sync(501665);
+    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
+    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
@@ -795,7 +796,8 @@ void MainWindow::predict_sph(){
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-       ui->found_objects->addItem(QString::number(idx));
+       std::cout<< "itt megvanemore" << im_obj.at(idx).at(2) << std::endl;
+       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)+" A:" + QString::number(im_obj.at(idx).at(3),'f',1)+ " C:" + QString::number(im_obj.at(idx).at(4),'f',3));
     }
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
@@ -833,8 +835,6 @@ void MainWindow::screensample()
     //MOVE the pipette OUT
     const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
     const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
-    float  img_w_5p5x = 27426;  //    100nm
-    float  img_h_5p5x = 15421;  //    100nm
     int object_counter = 0;
     std::string folder = "Scandata_";
     std::string datetime = "_";
@@ -853,8 +853,8 @@ void MainWindow::screensample()
     QTextStream(stdout)<< "starting..";
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
-    const int wmax = static_cast<int>(platesize_x/img_w_5p5x); // um
-    const int hmax = static_cast<int>(platesize_y/img_h_5p5x); // um
+    const int wmax = static_cast<int>(platesize_x/IMG_W_M5p5x); // um
+    const int hmax = static_cast<int>(platesize_y/IMG_H_M5p5x); // um
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 0;
     float p_v=0.0f;
@@ -864,13 +864,13 @@ void MainWindow::screensample()
     for (int j = 0; j < hmax; ++j )
     {
         ctrl->stage_set_speed(7000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+img_h_5p5x*j));
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+IMG_W_M5p5x*j));
         ctrl->stage_set_speed(5000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
             {
-                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
+                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+IMG_W_M5p5x*i));
                 p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
                 QTextStream(stdout)<<"progvalue"<< p_v<< endl;
                 prog_changed(static_cast<int>(p_v));
@@ -881,12 +881,17 @@ void MainWindow::screensample()
                 std::string posx = std::to_string(i+1)+ "/" + std::to_string(wmax);
                 ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
                 auto tmp = cameracv->get_current_frm();
-                scanvector.push_back(*tmp.get());
+                cv::Mat displayfrm = imtools->convert_bgr_to_rgb(tmp);
+                scanvector.push_back(displayfrm);
                 imtools->saveImg(tmp.get(),num2str.c_str());
                 std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter));
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
+                   for (int idx = 2;idx<5;++idx)
+                   {
+                       global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
+                   }
                    // put text TEXT
                 //   int baseLine ;
                 //   std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
@@ -897,7 +902,8 @@ void MainWindow::screensample()
                 }
                 counter++;
             }else{
-                break;
+                scanvector.clear();
+                return;
             }
         }
 
@@ -911,9 +917,12 @@ void MainWindow::screensample()
     m_s_t_acitive=false;
    // ctrl->stage_set_speed(20000.0f);
     ui->found_objects->clear();
+    std::cout<< global_obj_im_coordinates->at(0).size() << std::endl;
     for (int i=0 ;i<global_obj_im_coordinates->size();++i )
     {
-        ui->found_objects->addItem(QString::number(i));
+       // ui->found_objects->addItem(QString::number(i));
+
+       ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
     }
     this->unlock_ui();
     ui->start_screening->setText("Start Screening");
@@ -923,21 +932,27 @@ void MainWindow::screensample()
 // CREATING the mosaic of analyzed images
 void MainWindow::create_mosaic(){
     using namespace  cv;
-   // int platesize = 350000; //    100nm // *0.1um
     if (scanvector.size()>0){
     const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
     const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
-    float  img_w_5p5x = 27426; //    100nm
-    float  img_h_5p5x = 15421;//19466; //    100nm
-    int wmax = static_cast<int>(platesize_x / img_w_5p5x); // um
-    int hmax = static_cast<int>(platesize_y / img_h_5p5x); // um
+    int wmax = static_cast<int>(platesize_x / IMG_W_M5p5x); // um
+    int hmax = static_cast<int>(platesize_y / IMG_H_M5p5x); // um
 
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
+    delete m_stich_prog;
+    m_stich_prog  =  new QProgressDialog("Stiching", nullptr, 0, 0);
+    m_stich_prog->setRange(0,100);
+    m_stich_prog->setWindowModality(Qt::WindowModal);
+    m_stich_prog->setMinimumDuration(0);
+    m_stich_prog->setValue(0);
+    float p_v=0.0f;
     for (int i = 0; i < hmax; ++i)
     {
         for (int j = 0; j < wmax; ++j)
         {
-
+            p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
+            QTextStream(stdout)<<"progvalue"<< p_v<< endl;
+            stich_prog_changed(static_cast<int>(p_v));
             for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
             {
                 for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
@@ -947,10 +962,12 @@ void MainWindow::create_mosaic(){
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
                 }
             }
-
-
         }
     }
+    m_stich_prog->setLabelText("Done");
+    m_stich_prog->setValue(100);
+    m_stich_prog->setAutoClose(true);
+    m_stich_prog = nullptr;
     // CV cell label txt
 
     imtools->saveImg(Mimage,"mozaic");
@@ -960,7 +977,8 @@ void MainWindow::create_mosaic(){
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
-    prog_changed(0);
+   // prog_changed(0);
     }
+
 }
 

@@ -27,10 +27,9 @@ public:
 
     void saveImg(cv::Mat* outimg, std::string outname);
 
-    cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> pinput);
+    cv::Mat convert_bgr_to_rgb(QSharedPointer<cv::Mat> p_input);
 
-    std::vector<double> getobjectprops(cv::Mat& input);
-
+    std::vector<float> getobjectprops(cv::Mat& input);
 
 protected:
     cv::Mat* frame= nullptr;

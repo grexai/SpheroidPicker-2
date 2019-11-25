@@ -197,8 +197,6 @@ void Axis::printWhatIsSupported() {
         return false;
     }
 
-
-
     iop::int32 Axis::getCurrentSpeed() { // retrieve current native speed
         if (m_pBasicControlValueVelocity) {
             try {

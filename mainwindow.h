@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QProgressDialog>
 
 #include <imagetools.h>
 #include <stagecontroller.h>
@@ -35,16 +36,20 @@ signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
     void prog_changed(int progress);
+    void stich_prog_changed(int progress);
     void scan_finished();
     void close_and_return_hw();
 public slots:
    // void show_hw_selector();
     void scan_stopped();
     void set_progressbar( int value );
+    void set_stich_progressbar( int value );
     void set_h4(int value);
     void set_pip_man(int value);
 protected:
-    int m_progvalue;
+    QProgressDialog* m_stich_prog= nullptr;
+    int m_progvalue=0;
+    int m_stich_progvalue=0;
     controller* ctrl = nullptr;
     CameraCV* cameracv = nullptr;
     imagetools* imtools= nullptr;
@@ -169,8 +174,6 @@ private slots:
      void on_s_accel_spinbox_valueChanged(int arg1);
 
      void on_save_m_p_button_clicked();
-
-     void on_found_objects_currentIndexChanged(int index);
 
      void on_predict_sph_clicked();
 

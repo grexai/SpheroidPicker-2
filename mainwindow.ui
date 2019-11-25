@@ -1581,6 +1581,9 @@ Stage</string>
       <height>22</height>
      </rect>
     </property>
+    <property name="minimum">
+     <double>3.000000000000000</double>
+    </property>
    </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
@@ -1713,6 +1716,12 @@ Stage</string>
       <width>62</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="minimum">
+     <double>2.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>2.000000000000000</double>
     </property>
    </widget>
    <widget class="QComboBox" name="found_objects">

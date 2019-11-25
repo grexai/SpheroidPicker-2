@@ -9,8 +9,7 @@ bool controller::connect_pressure_controller(std::string& port)
 
     delete apc;
     // leak safe
-
-  //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
+    //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
     apc = new arduinopressurecontroller(QSP_apc,p1);
     //arduinopressurecontroller sd(QSP_apc,p1);
     if (apc->isconnected == true)
@@ -114,6 +113,7 @@ asd->move_x
    i_stagecontroll* asd  = new TangoStage();
    asd->move_x();
 */
+
 // Pipette
 bool controller::connect_pipette_controller(std::string& port)
 {
@@ -372,7 +372,7 @@ int controller::stage_get_x_speed()
 {
     if (stage != nullptr)
     {
-    return int(stage->XAxis().getCurrentSpeed());
+        return int(stage->XAxis().getCurrentSpeed());
     }
     else
     {
@@ -410,7 +410,7 @@ int controller::stage_get_x_acceleration()
     }
     else
     {
-        int x_a= 0;
+        int x_a = 0;
         return x_a;
     }
 }
@@ -423,7 +423,7 @@ int controller::stage_get_y_acceleration()
     }
     else
     {
-        int y_a= 0;
+        int y_a = 0;
         return y_a;
     }
 }
@@ -433,8 +433,8 @@ std::vector<int> controller::stage_get_acceleration()
     std::vector<int> accelvec;
     if (stage != nullptr)
     {
-    accelvec.push_back(this->stage_get_x_acceleration());
-    accelvec.push_back(this->stage_get_y_acceleration());
+        accelvec.push_back(this->stage_get_x_acceleration());
+        accelvec.push_back(this->stage_get_y_acceleration());
     }
     return accelvec;
 }
@@ -443,8 +443,9 @@ int controller::stage_get_x_coords()
 {
     if (stage != nullptr)
     {
-    return int(stage->XAxis().getCurrentPosition());
-    }else
+        return int(stage->XAxis().getCurrentPosition());
+    }
+    else
     {
         return int(0);
     }
@@ -511,8 +512,9 @@ int controller::stage_get_y_min_pos()
 {
     if (stage != nullptr)
     {
-    return int(stage->YAxis().getMinPosition());
+        return int(stage->YAxis().getMinPosition());
     }
+
 }
 
 int controller::stage_get_y_max_pos()
@@ -531,15 +533,15 @@ void controller::stage_go_center()
 {
     if (stage != nullptr)
     {
-    iop::int32 x0 = stage->XAxis().getMinPosition();
-    iop::int32 x1 = stage->XAxis().getMaxPosition();
+        iop::int32 x0 = stage->XAxis().getMinPosition();
+        iop::int32 x1 = stage->XAxis().getMaxPosition();
 
-    iop::int32 y0 = stage->YAxis().getMinPosition();
-    iop::int32 y1 = stage->YAxis().getMaxPosition();
+        iop::int32 y0 = stage->YAxis().getMinPosition();
+        iop::int32 y1 = stage->YAxis().getMaxPosition();
 
-    iop::int32 x = x0 + static_cast<iop::int32>( (x1-x0)/2.0);
-    iop::int32 y = y0 + static_cast<iop::int32>( (y1-y0)/2.0);
-    stage->moveToAsync(x,y, false);
+        iop::int32 x = x0 + static_cast<iop::int32>( (x1-x0)/2.0);
+        iop::int32 y = y0 + static_cast<iop::int32>( (y1-y0)/2.0);
+        stage->moveToAsync(x,y, false);
     }
 }
 
@@ -580,7 +582,8 @@ void controller::stage_run_iniciatlions()
     std::cout << "after one second the stage is " << (flagMoving ? "still" : "not") << " moving" << std::endl;
     std::cout << "in this time " << records.size() << " events were received" << std::endl;
 
-    for (size_t i = 0; i<records.size(); i++) {
+    for (size_t i = 0; i<records.size(); i++)
+    {
         std::cout << "[" << i << "] - ";
         stage->print(std::cout, records[i], t0);
         std::cout << std::endl;
@@ -607,7 +610,8 @@ void controller::stage_run_iniciatlions()
     t0 = ::GetTickCount();
 
     ahm::AsyncResult *pAsyncResult = stage->XAxis().moveToAsync(x0);
-    if (pAsyncResult) {// discard AsyncResult
+    if (pAsyncResult)
+    {// discard AsyncResult
         pAsyncResult->dispose();
         pAsyncResult = nullptr;
     }
@@ -619,7 +623,8 @@ void controller::stage_run_iniciatlions()
     std::cout << "after one second the stage is " << (flagMoving ? "still" : "not") << " moving" << std::endl;
     std::cout << "in this time " << records.size() << " events were received" << std::endl;
 
-    for (size_t i = 0; i<records.size(); i++) {
+    for (size_t i = 0; i<records.size(); i++)
+    {
         std::cout << "[" << i << "] - ";
         stage->print(std::cout, records[i], t0);
         std::cout << std::endl;
@@ -636,7 +641,7 @@ bool controller::connect_microscope_unit(std::string &pa, std::string &pc)
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);*/
-    this->connect_pipette_controller(pa) ;
+    this->connect_pipette_controller(pa);
     this->connect_pressure_controller(pc);
     this->connect_tango_stage();
 //  this->spawn_pressure_thread();

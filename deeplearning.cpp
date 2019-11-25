@@ -314,7 +314,6 @@ void matterport_mrcnn::read_graph(const char *modelPB){
     m_graph = TF_NewGraph() ;
              //Reading graph
 
-
     TF_Buffer_Ptr graphDef = ReadFile(modelPB);
 
     TF_Status_Ptr importStatus(TF_NewStatus(), TF_DeleteStatus);
@@ -405,9 +404,6 @@ void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* model
 
     std::cout << "Successfully imported graph" << std::endl;
 
-
-
-
     static constexpr int NUM_CLASSES = 2;
     static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
     float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
@@ -423,7 +419,6 @@ void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* model
     //IMAGE_SIZE = select_anchor();
     m_anchors = load_anchor(modelPath, IMAGE_SIZE);
     this->create_session();
-
 }
 
 std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,cv::Mat& output) {
@@ -443,12 +438,10 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
     auto start = std::chrono::system_clock::now();
     image.convertTo(image, CV_8UC3);
-    cv::resize(image, image, cv::Size(1024, 576));/// WTF
-  //  cv::resize(image, image, cv::Size(512, 288));/// WTF
+    cv::resize(image, image, cv::Size(1024, 576));
+  //  cv::resize(image, image, cv::Size(512, 288));
     float  nx = 1920.0f/1024.0f;
-    float ny = 1080.0f/576.0f;
  //   float  nx = 1920.0f/512.0f;
-//    float ny = 1080.0f/288.0f;
     const int maxDim = (std::max)(image.cols, image.rows);
     std::vector<std::vector<float>> objpos;
     //IMAGE_SIZE = select_anchor();
@@ -529,8 +522,6 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
     std::vector<TF_Tensor_Ptr> outputTensors;
     outputTensors.reserve(outputTensorPtrs.size());
 
-    std::cout << " inferencing" << std::endl;
- //   auto start = std::chrono::system_clock::now();
     //Inferencing
     TF_SessionRun(m_session, nullptr,
         inputs.data(), inputTensors.data(), inputs.size(),
@@ -588,7 +579,6 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
     for (std::size_t i = 0; i < outputTensors.size(); ++i)
     {
         const int numdim = TF_NumDims(outputTensors[i].get());
-        std::cout << "Dimensions for " << i << ": " << numdim << std::endl;
         for (int j = 0; j < numdim; ++j)
         {
             std::cout << "  " << j << ": " << TF_Dim(outputTensors[i].get(), j) << std::endl;
@@ -598,38 +588,29 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
     const int detectionIncrement = 6;
     const int maskIncrement = maskHeight * maskWidth * NUM_CLASSES;
 
-    std::cout << "batchSize: " << batchSize << std::endl;
-
     //NOTE: only batch size == 1 is tested
     for (int b = 0; b < batchSize; ++b)
     {
         cv::Mat newImage;
         image.copyTo(newImage);
 
-        std::cout << "image.copyTo(newImage) done" << std::endl;
         cv::Mat labels = cv::Mat::zeros(newImage.size(), CV_32SC1);
         //The prediction is always done on squared images
         //If the image is smaller than the used image size, it is padded with zeros, else it is rescaled to that size
         //This float is used to transfer the bounding boxes to the real size
         float restoreDim = (std::max)(static_cast<float>((std::max)(image.rows, image.cols)), static_cast<float>(IMAGE_SIZE));
-        std::cout << "restoreDim casting done" <<restoreDim<< std::endl;
 
         //getting tensor data for the batch
         const float* detTensorData = &reinterpret_cast<const float*>(TF_TensorData(outputTensors[MRCNN_DETECTION].get()))[b * maxDet * detectionIncrement];
         float* maskTensorData = &reinterpret_cast<float*>(TF_TensorData(outputTensors[MRCNN_MASK].get()))[b * maxDet * maskIncrement];
-        std::cout << "getting tensor data done" << std::endl;
 
         //setting movable pointer
         const float* detTensorPtr = detTensorData;
         float* maskTensorPtr = maskTensorData;
-        std::cout << "setting movable pointer done" << std::endl;
 
         //iterating through results (moving pointers)
         for (int d = 0; d < maxDet; ++d, detTensorPtr += detectionIncrement, maskTensorPtr += maskIncrement)
         {
-            //std::cout << "inside for detTensorPtr: " << detTensorPtr << std::endl;
-            //std::cout << "inside for maskTensorPtr: " << *maskTensorPtr << std::endl;
-
             const float& score = detTensorPtr[MRCNN_DETECTION_SCORE];
             if (score < DETECTION_CONFIDENCE) continue;
             std::cout << "score: " << score << std::endl;
@@ -659,14 +640,9 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             bb[1] = (std::min)((std::max)(bb[1], 0), image.rows);
             bb[2] = (std::min)((std::max)(bb[2], 0), image.cols);
             bb[3] = (std::min)((std::max)(bb[3], 0), image.rows);
-            float bx = static_cast<float>(bb[0])*nx;
-            float by = static_cast<float>(bb[1]*ny);
-            std::vector <float> outcoors;
-            outcoors.push_back( bx);
-            outcoors.push_back(by);
-            objpos.push_back(outcoors);
 
-            std:: cout << "t:" << bb[0]*nx << "t:"<< bb[1]*ny<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
+
+        //    std:: cout << "t:" << bb[0]*nx << "t:"<< bb[1]*ny<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
 
             cv::Mat mask(maskHeight, maskWidth, CV_MAKETYPE(CV_32F, NUM_CLASSES), maskTensorPtr);
 
@@ -685,21 +661,26 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
                 }
             }
 
+            //saving coordinates and features
+            float bx = static_cast<float>(bb[0])*nx;
+            float by = static_cast<float>(bb[1]*nx);
+            std::vector <float> outcoors;
+            outcoors.push_back( bx);
+            outcoors.push_back(by);
             imagetools asd;
-            std::vector<double> features = asd.getobjectprops(label);
-
+            std::vector<float> features = asd.getobjectprops(label);
+            outcoors.push_back(features.at(0));
+            outcoors.push_back(features.at(1));
+            outcoors.push_back(features.at(2));
+            std::cout<< "es itt? megvanemore" << outcoors.at(2) << std::endl;
+            objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);
 
         }
-
         const int64_t total = labels.total();
         uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
         const int32_t* labelPtr = reinterpret_cast<const int32_t*>(labels.data);
-
-      //   labels.convertTo(labels,CV_8UC3);
-      //  cv::imwrite("outFileName.png", labels);
-
         for (int64_t index = 0; index < total; ++index)
         {
             if (labelPtr[index] != 0)
@@ -715,9 +696,6 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
 
         // CHRONO END
         std::cout << "[INFERENCE] elapsed time: " << elapsed_seconds.count() << "s\n";
-
-     //   std::cout << "imwrite done: " << writtenSuccessfully << " FINISHED" << std::endl;
-       // cv::imshow("resuls", newImage);
         cv::resize(newImage, newImage, cv::Size(1920, 1080));
         newImage.copyTo(image);
     }
