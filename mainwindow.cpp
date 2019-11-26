@@ -632,12 +632,15 @@ void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
     ctrl->stage_set_acceleration(arg1);
 }
 
+/*!
+ * XZ CALIBRATION STEP 2, user should move X to the middle of
+ * IMAGE and click this button
+ * this button saves X positon of the pipette.
+ * auto pick up will send back to this pos (should be middle of the image)
+ */
+
 void MainWindow::on_save_m_p_button_clicked()
 {
-    // XZ CALIBRATION STEP 2, user should move X to the middle of
-    // IMAGE and click this button
-    // this button saves X positon of the pipette.
-    // auto pick up will send back to this pos (should be middle of the image)
 
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
@@ -793,12 +796,13 @@ void MainWindow::predict_sph(){
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
     std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
     ui->found_objects->clear();
+
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-       std::cout<< "itt megvanemore" << im_obj.at(idx).at(2) << std::endl;
        ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)+" A:" + QString::number(im_obj.at(idx).at(3),'f',1)+ " C:" + QString::number(im_obj.at(idx).at(4),'f',3));
     }
+
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
@@ -924,12 +928,14 @@ void MainWindow::screensample()
 
        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
     }
+
     this->unlock_ui();
     ui->start_screening->setText("Start Screening");
     scan_finished();
 }
-
-// CREATING the mosaic of analyzed images
+/*!
+ * CREATING the mosaic of analyzed images
+ */
 void MainWindow::create_mosaic(){
     using namespace  cv;
     if (scanvector.size()>0){

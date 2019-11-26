@@ -121,8 +121,8 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
             double arclength = arcLength(contours[i], true);
             double circularity = (4 * CV_PI * area / (arclength * arclength));
             object_features.at(0) = (static_cast <float>(arclength));
-             object_features.at(1) =  static_cast <float>(area);
-             object_features.at(2)= static_cast <float>( circularity);
+            object_features.at(1) =  static_cast <float>(area);
+            object_features.at(2)= static_cast <float>( circularity);
             std::cout<<"es itt megvan" << area << std::endl;
              cout << i << "object circularity " << object_features.at(0) << std::endl;
             Scalar color = Scalar(255,  255, 255);
