@@ -10,16 +10,22 @@
 #define  IMG_H_M5p5x 15421
 
 #define IMG_W_M5X 30000
-#define IMAGE_H_M5X 20000
+#define IMG_H_M5X 20000
 
 #define IMG_W_M4X 40000
-#define IMAGE_H_M4X 25000
+#define IMG_H_M4X 25000
 
 #define IMG_W_M3X 50000
-#define IMAGE_H_M3X 30000
+#define IMG_H_M3X 30000
 
 #define IMG_W_M2X 60000
-#define IMAGE_H_M2X 35000
+#define IMG_H_M2X 35000
+
+#define IMG_W_M1X 60000
+#define IMG_H_M1X 35000
+
+#define IMG_W_M0p5X 60000
+#define IMG_H_M0p5X 35000
 
 //STAGE
 

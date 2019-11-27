@@ -51,8 +51,10 @@ void arduinopressurecontroller::checkAckOrSetError(
         }
     }
 }
+/*!
+ * returns with the pipette pressure as a floating point value
+ */
 
-// returns with the pipette pressure value
 float arduinopressurecontroller::getPipettePressure(){
     using namespace  std;
     float pressureValue = 0.0f;
@@ -97,7 +99,11 @@ float arduinopressurecontroller::getPipettePressure(){
     return pressureValue;
 }
 
-//creates a vaacum pulse for the requested time, and sends it to the pipette
+/*!
+ *creates a vaacum pulse for the requested time,
+ *and sends it to the pipette
+ *
+ */
 
 void arduinopressurecontroller::breakIn(const float vacuumValue,const float delaySeconds){
     using namespace  std;

@@ -661,6 +661,20 @@ void MainWindow::on_found_objects_highlighted(int index)
     m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
 }
 
+
+void MainWindow::on_magnification_currentIndexChanged(int index)
+{
+    switch (index) {
+    case 0 : m_img_width=IMG_W_M0p5X; m_img_height=IMG_H_M0p5X;break;  break;
+    case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
+    case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
+    case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
+    case 4 : m_img_width=IMG_W_M4X; m_img_height=IMG_H_M4X;break;
+    case 5 : m_img_width=IMG_W_M5X; m_img_height= IMG_H_M5X;break;
+    case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
+    }
+}
+
 //Auto pickup,scanning methods and helpers
 
 //Lock the control panels of the ui
@@ -696,8 +710,8 @@ std::vector<float> MainWindow::get_centered_coordinates(std::vector<float>& sph_
     std:: vector<float> center_coordinates;
     // const float  img_w_5p5x = 27426; //    100nm
     //  const float  img_h_5p5x = 15421;
-    const float x_conv =  IMG_W_M5p5x/FULL_HD_IMAGE_WIDTH;
-    const float y_conv = IMG_H_M5p5x/FULL_HD_IMAGE_HEIGHT;
+    const float x_conv =  m_img_width/FULL_HD_IMAGE_WIDTH;
+    const float y_conv = m_img_height/FULL_HD_IMAGE_HEIGHT;
     float mid_obj_pxl_x =  960 - sph_coors.at(0);
     float mid_obj_pxl_y =  540 - sph_coors.at(1);
     float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
@@ -824,10 +838,12 @@ std::string MainWindow::get_date_time_str()
     return datetime;
 }
 
-// screening a given squard area at 5X magnification
-// predicting every scan
-// calculating every spheroids coordinates to make it middle of screen
-//saving every image, to scanning folder with date, time, size stamp
+/*!
+ *screening a given rectangle area at 5X magnification
+ *predicting every scan
+ *calculating every spheroids coordinates to make it middle of screen
+ *saving every image, to scanning folder with date, time, size stamp
+ */
 void MainWindow::screensample()
 {
     using namespace  cv;
@@ -847,18 +863,20 @@ void MainWindow::screensample()
     std::string plate_size_mm = ss.str();
     folder.append(plate_size_mm).append("mm_");
     folder.append(get_date_time_str()+"/");
-    if (QDir().exists(folder.c_str())){
+    if (QDir().exists(folder.c_str()))
+    {
         QTextStream(stdout) << "this folder already folder exists"<< endl;
     }
-    else{
+    else
+    {
         QTextStream(stdout)<< folder.c_str()<< "created" << endl;
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
-    const int wmax = static_cast<int>(platesize_x/IMG_W_M5p5x); // um
-    const int hmax = static_cast<int>(platesize_y/IMG_H_M5p5x); // um
+    const int wmax = static_cast<int>(platesize_x/m_img_width); // um
+    const int hmax = static_cast<int>(platesize_y/m_img_height); // um
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 0;
     float p_v=0.0f;
@@ -868,13 +886,13 @@ void MainWindow::screensample()
     for (int j = 0; j < hmax; ++j )
     {
         ctrl->stage_set_speed(7000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+IMG_W_M5p5x*j));
+        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+m_img_height*j));
         ctrl->stage_set_speed(5000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
             {
-                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+IMG_W_M5p5x*i));
+                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+m_img_width*i));
                 p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
                 QTextStream(stdout)<<"progvalue"<< p_v<< endl;
                 prog_changed(static_cast<int>(p_v));
@@ -941,8 +959,8 @@ void MainWindow::create_mosaic(){
     if (scanvector.size()>0){
     const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
     const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
-    int wmax = static_cast<int>(platesize_x / IMG_W_M5p5x); // um
-    int hmax = static_cast<int>(platesize_y / IMG_H_M5p5x); // um
+    int wmax = static_cast<int>(platesize_x / m_img_width); // um
+    int hmax = static_cast<int>(platesize_y / m_img_height); // um
 
     cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
     delete m_stich_prog;

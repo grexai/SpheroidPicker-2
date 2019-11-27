@@ -1439,7 +1439,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>660</y>
+      <y>680</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -1452,7 +1452,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>690</y>
+      <y>710</y>
       <width>161</width>
       <height>23</height>
      </rect>
@@ -1465,7 +1465,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>640</y>
+      <y>650</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -1576,7 +1576,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>560</y>
+      <y>590</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1589,7 +1589,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1770</x>
-      <y>540</y>
+      <y>560</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -1602,7 +1602,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>610</y>
+      <y>620</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -1615,8 +1615,8 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>470</y>
-      <width>141</width>
+      <y>430</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -1628,8 +1628,8 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>510</y>
-      <width>141</width>
+      <y>460</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -1712,7 +1712,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1820</x>
-      <y>560</y>
+      <y>590</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1728,8 +1728,8 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>440</y>
-      <width>141</width>
+      <y>370</y>
+      <width>151</width>
       <height>22</height>
      </rect>
     </property>
@@ -1751,14 +1751,59 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>360</y>
-      <width>131</width>
+      <y>400</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Pick up selected</string>
     </property>
+   </widget>
+   <widget class="QComboBox" name="magnification">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>520</y>
+      <width>51</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>0.5X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>4X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>5X</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>5.5X</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

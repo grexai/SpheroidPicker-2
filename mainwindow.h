@@ -183,6 +183,10 @@ private slots:
 
      void on_view_scan_clicked();
 
+     void on_found_objects_highlighted(int index);
+
+     void on_magnification_currentIndexChanged(int index);
+
      //auto pickup,scanning methods and helpers
 
      void lock_ui();
@@ -213,7 +217,7 @@ private slots:
 
      void create_mosaic();
 
-     void on_found_objects_highlighted(int index);
+
 
 private:
     QTimer *timer= nullptr;
@@ -225,11 +229,10 @@ private:
     QImage* qfrm_t2= nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-
+    int m_img_width;
+    int m_img_height;
     std::vector<cv::Mat> scanvector;
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
-
-
     std::atomic_bool m_s_t_acitive;
 
     //threads
