@@ -47,6 +47,8 @@ public slots:
     void set_h4(int value);
     void set_pip_man(int value);
 protected:
+
+
     QProgressDialog* m_stich_prog= nullptr;
     int m_progvalue=0;
     int m_stich_progvalue=0;
@@ -187,6 +189,10 @@ private slots:
 
      void on_magnification_currentIndexChanged(int index);
 
+     void on_magnification_highlighted(int index);
+
+     void on_magnification_activated(int index);
+
      //auto pickup,scanning methods and helpers
 
      void lock_ui();
@@ -213,9 +219,11 @@ private slots:
 
      std::string get_date_time_str();
 
-     void screensample();
+     void screen_area(float plate_w_mm,float plate_h_mm);
 
      void create_mosaic();
+
+
 
 
 
@@ -229,8 +237,8 @@ private:
     QImage* qfrm_t2= nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
-    int m_img_width;
-    int m_img_height;
+    float m_img_width;
+    float m_img_height;
     std::vector<cv::Mat> scanvector;
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     std::atomic_bool m_s_t_acitive;

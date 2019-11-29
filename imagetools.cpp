@@ -28,9 +28,9 @@ cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> p_input){
     return rgb;
 }
 
-int2coors imagetools::getSphCoors(cv::Mat &img){
+int2coords imagetools::getSphCoors(cv::Mat &img){
     using namespace   std;
-    int2coors sphcoors;
+    int2coords sphcoors;
     cv::Mat gray;
     cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
     cv::Mat out,out2;
@@ -76,7 +76,7 @@ int2coors imagetools::getSphCoors(cv::Mat &img){
 
 /*!
  * Returns a feature vector in the following order
- * contour length,area, and circularity
+ * contour length,area, circularity , masscenters: mx,my
  * Handles only one object
  */
 
@@ -85,7 +85,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         using namespace std;
         input.convertTo(input,CV_8UC1);
     //	waitKey(0);
-        std::vector<float> object_features(3,0.0f);
+        std::vector<float> object_features(5,0.0f);
         Mat canny_output;
         RNG rng(12345);
         vector<vector<Point> > contours;
@@ -112,7 +112,6 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         {
             mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
         }
-
         // Draw contours
         Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
         for (int i = 0; i< 1; ++i)
@@ -123,12 +122,16 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
             object_features.at(0) = (static_cast <float>(arclength));
             object_features.at(1) =  static_cast <float>(area);
             object_features.at(2)= static_cast <float>( circularity);
-            std::cout<<"es itt megvan" << area << std::endl;
-             cout << i << "object circularity " << object_features.at(0) << std::endl;
+
+            cout << i << "object circularity " << object_features.at(0) << std::endl;
             Scalar color = Scalar(255,  255, 255);
             drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
-       //     circle(drawing, mc[i], 4, color, -1, 8, 0);
+          //  circle(drawing, mc[i], 4, color, -1, 8, 0);
         }
+        object_features.at(3) = mc[0].x;
+        object_features.at(4) = mc[0].y;
+        //std::cout<< "msctr x" << mc[0].x << " : y" << mc[0].y<<std::endl;
+
 
         input = drawing;
         return object_features;

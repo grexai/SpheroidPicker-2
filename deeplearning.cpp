@@ -672,10 +672,12 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             outcoors.push_back(features.at(0));
             outcoors.push_back(features.at(1));
             outcoors.push_back(features.at(2));
-            std::cout<< "es itt? megvanemore" << outcoors.at(2) << std::endl;
+            outcoors.push_back((features.at(3)*nx) + bx); //mx
+            outcoors.push_back((features.at(4)*nx) + by); //my
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);
+
 
         }
         const int64_t total = labels.total();

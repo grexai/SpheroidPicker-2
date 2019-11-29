@@ -1466,7 +1466,7 @@ Stage</string>
      <rect>
       <x>1730</x>
       <y>650</y>
-      <width>161</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1733,6 +1733,12 @@ Stage</string>
       <height>22</height>
      </rect>
     </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
    </widget>
    <widget class="QPushButton" name="predict_sph">
     <property name="geometry">
@@ -1763,11 +1769,20 @@ Stage</string>
    <widget class="QComboBox" name="magnification">
     <property name="geometry">
      <rect>
-      <x>1740</x>
-      <y>520</y>
+      <x>1830</x>
+      <y>530</y>
       <width>51</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="currentText">
+     <string>5.5X</string>
+    </property>
+    <property name="currentIndex">
+     <number>6</number>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
     </property>
     <item>
      <property name="text">
@@ -1804,6 +1819,19 @@ Stage</string>
       <string>5.5X</string>
      </property>
     </item>
+   </widget>
+   <widget class="QCheckBox" name="check_text">
+    <property name="geometry">
+     <rect>
+      <x>1840</x>
+      <y>650</y>
+      <width>72</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Text</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

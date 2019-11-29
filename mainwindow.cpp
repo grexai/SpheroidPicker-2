@@ -46,8 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes) {
-            ctrl->stage_set_speed(30000);
             progress.setLabelText("Stage inicialization, may take about 1 min");
+            ctrl->stage_set_speed(30000);
             ctrl->stage_autocalibrate();
             /// basic setup
             ctrl->stage_set_speed(ui->s_speed_spinbox->value());
@@ -80,8 +80,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
+    connect(this, SIGNAL(prog_changed(int)),
+        this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
+
     connect(this, SIGNAL(stich_prog_changed(int)),
         this, SLOT(set_stich_progressbar(int)),Qt::QueuedConnection);
+    ui->magnification->activated(6);
     progress.setLabelText("Done");
     progress.setValue(100);
     progress.setAutoClose(true);
@@ -272,6 +276,7 @@ void MainWindow::update_window()
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
+
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
 
@@ -517,9 +522,10 @@ void MainWindow::on_start_screening_clicked()
     if(!m_s_t_acitive)
     {
         m_s_t_acitive = true;
-        connect(this, SIGNAL(prog_changed(int)),
-            this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
-        m_screening_thread = new std::thread(&MainWindow::screensample,this);
+
+        float p_x= static_cast<float>(ui->set_plate_size_spinbox->value());
+        float p_y =static_cast<float>(ui->set_plate_size_spinbox_2->value());
+        m_screening_thread = new std::thread(&MainWindow::screen_area,this,p_x,p_y);
         ui->start_screening->setText("Stop Screening");
     }
     else
@@ -534,7 +540,6 @@ void MainWindow::on_start_screening_clicked()
             scanvector.clear();
             global_obj_im_coordinates->clear();
         }
-        scanvector.clear();
         QMessageBox::warning(this,"Scanning canceled",
                              "Scanning of the plate is canceled,pipette and stage controller unlocked");
     }
@@ -664,8 +669,20 @@ void MainWindow::on_found_objects_highlighted(int index)
 
 void MainWindow::on_magnification_currentIndexChanged(int index)
 {
-    switch (index) {
-    case 0 : m_img_width=IMG_W_M0p5X; m_img_height=IMG_H_M0p5X;break;  break;
+
+}
+
+void MainWindow::on_magnification_highlighted(int index)
+{
+
+}
+
+
+void MainWindow::on_magnification_activated(int index)
+{
+    switch (index)
+    {
+    case 0 : m_img_width=IMG_W_M0p5X; m_img_height=IMG_H_M0p5X;break;
     case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
     case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
     case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
@@ -674,6 +691,7 @@ void MainWindow::on_magnification_currentIndexChanged(int index)
     case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
     }
 }
+
 
 //Auto pickup,scanning methods and helpers
 
@@ -716,8 +734,8 @@ std::vector<float> MainWindow::get_centered_coordinates(std::vector<float>& sph_
     float mid_obj_pxl_y =  540 - sph_coors.at(1);
     float obj_pos_um_x = ( mid_obj_pxl_x *x_conv);
     float obj_pos_um_y = (  mid_obj_pxl_y *y_conv);
-    center_coordinates.push_back( ctrl->stage_get_x_coords()-(obj_pos_um_x));
-    center_coordinates.push_back(  ctrl->stage_get_y_coords()-(obj_pos_um_y));
+    center_coordinates.push_back(ctrl->stage_get_x_coords()-(obj_pos_um_x));
+    center_coordinates.push_back(ctrl->stage_get_y_coords()-(obj_pos_um_y));
     return center_coordinates;
 }
 
@@ -741,9 +759,11 @@ void MainWindow::center_selected_sph(int index)
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(index).at(1)));
     ctrl->stage_set_speed(ui->s_speed_spinbox->value());
 }
+/*!
+  *MOVE to the petri "B" 35mm petri
+  *if the Petri "A" is centered MID (stage 751431,501665)
+  */
 
-//MOVE to the petri "B" 35mm petri
-//if the Petri "A" is centered MID (stage 751431,501665)
 void MainWindow::move_to_petri_B()
 {
     ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
@@ -820,6 +840,7 @@ void MainWindow::predict_sph(){
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
+    im_view_pxmi.setTransformationMode(Qt::SmoothTransformation);
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
@@ -844,7 +865,8 @@ std::string MainWindow::get_date_time_str()
  *calculating every spheroids coordinates to make it middle of screen
  *saving every image, to scanning folder with date, time, size stamp
  */
-void MainWindow::screensample()
+
+void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
 {
     using namespace  cv;
     auto start = std::chrono::system_clock::now();
@@ -853,8 +875,10 @@ void MainWindow::screensample()
     this->lock_ui();
     //TODO
     //MOVE the pipette OUT
-    const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
-    const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
+    //const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
+    //const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
+    const float platesize_x= plate_w_mm*10000;
+    const float platesize_y = plate_h_mm*10000;
     int object_counter = 0;
     std::string folder = "Scandata_";
     std::string datetime = "_";
@@ -879,11 +903,12 @@ void MainWindow::screensample()
     const int hmax = static_cast<int>(platesize_y/m_img_height); // um
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
     int counter = 0;
+    if(scanvector.size()!=0){scanvector.clear();}
     float p_v=0.0f;
     folder.append("s_"+datetime);
-    if (global_obj_im_coordinates != nullptr) {delete global_obj_im_coordinates;}
+    if (global_obj_im_coordinates != nullptr){delete global_obj_im_coordinates;}
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
-    for (int j = 0; j < hmax; ++j )
+    for (int j = 0; j < hmax; ++j)
     {
         ctrl->stage_set_speed(7000.0f);
         ctrl->stage_move_to_y_sync(static_cast<int>(ypos+m_img_height*j));
@@ -902,24 +927,28 @@ void MainWindow::screensample()
                 std::string posy = std::to_string(j+1)+ "/" + std::to_string(hmax);
                 std::string posx = std::to_string(i+1)+ "/" + std::to_string(wmax);
                 ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 auto tmp = cameracv->get_current_frm();
                 cv::Mat displayfrm = imtools->convert_bgr_to_rgb(tmp);
                 scanvector.push_back(displayfrm);
                 imtools->saveImg(tmp.get(),num2str.c_str());
+
+                // INFERENCE AND FEATURE EXTRACTION
                 std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter));
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                   for (int idx = 2;idx<5;++idx)
+                   for (int idx = 2;idx<7;++idx)
                    {
                        global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
                    }
+              //     std::cout <<"sizeofimageobjat"<< im_objects.at(object_counter).size() << std::endl;
                    // put text TEXT
-                //   int baseLine ;
-                //   std::string label_txt = std::to_string(object_counter) +  " sph";//,conf: <" + std::to_string(score) + ">";
-                //   cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 3,5, &baseLine);
-                //   rectangle(scanvector.at(counter), cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1) - round(labelSize.height*1.5)), cv::Point(im_objects.at(object_counter).at(0) + round(labelSize.width), im_objects.at(object_counter).at(1) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
-                //   putText(scanvector.at(counter), label_txt,cv::Point((std::max)(im_objects.at(object_counter).at(0),0.0f), im_objects.at(object_counter).at(1)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),5);
+             //      int baseLine ;
+            //       std::string label_txt = std::to_string(object_counter);//,conf: <" + std::to_string(score) + ">";
+           //        cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 1,2, &baseLine);
+          //         rectangle(scanvector.at(counter), cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6) - round(labelSize.height)), cv::Point(im_objects.at(object_counter).at(5) + round(labelSize.width), im_objects.at(object_counter).at(6) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+         //          putText(scanvector.at(counter), label_txt,cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),1);
                    object_counter++;
                 }
                 counter++;
@@ -930,6 +959,7 @@ void MainWindow::screensample()
         }
 
     }
+
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
@@ -942,8 +972,6 @@ void MainWindow::screensample()
     std::cout<< global_obj_im_coordinates->at(0).size() << std::endl;
     for (int i=0 ;i<global_obj_im_coordinates->size();++i )
     {
-       // ui->found_objects->addItem(QString::number(i));
-
        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
     }
 
@@ -951,58 +979,66 @@ void MainWindow::screensample()
     ui->start_screening->setText("Start Screening");
     scan_finished();
 }
+
 /*!
  * CREATING the mosaic of analyzed images
  */
+
 void MainWindow::create_mosaic(){
     using namespace  cv;
-    if (scanvector.size()>0){
-    const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
-    const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
-    int wmax = static_cast<int>(platesize_x / m_img_width); // um
-    int hmax = static_cast<int>(platesize_y / m_img_height); // um
-
-    cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
-    delete m_stich_prog;
-    m_stich_prog  =  new QProgressDialog("Stiching", nullptr, 0, 0);
-    m_stich_prog->setRange(0,100);
-    m_stich_prog->setWindowModality(Qt::WindowModal);
-    m_stich_prog->setMinimumDuration(0);
-    m_stich_prog->setValue(0);
-    float p_v=0.0f;
-    for (int i = 0; i < hmax; ++i)
+    if (scanvector.size()>0)
     {
-        for (int j = 0; j < wmax; ++j)
+        const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
+        int wmax = static_cast<int>(platesize_x / m_img_width); // um
+        int hmax = static_cast<int>(platesize_y / m_img_height); // um
+
+        cv::Mat* Mimage = new cv::Mat(cv::Mat::zeros((hmax * 1080), (wmax * 1920), CV_8UC3));
+        delete m_stich_prog;
+        m_stich_prog  =  new QProgressDialog("Stiching", nullptr, 0, 0);
+        m_stich_prog->setRange(0,100);
+        m_stich_prog->setWindowModality(Qt::WindowModal);
+        m_stich_prog->setMinimumDuration(0);
+        m_stich_prog->setValue(0);
+
+        float p_v=0.0f;
+
+        for (int i = 0; i < hmax; ++i)
         {
+            for (int j = 0; j < wmax; ++j)
+            {
             p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
             QTextStream(stdout)<<"progvalue"<< p_v<< endl;
             stich_prog_changed(static_cast<int>(p_v));
-            for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
-            {
-                for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
+                for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
                 {
+                    for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
+                    {
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
                     Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
+                    }
                 }
             }
         }
-    }
-    m_stich_prog->setLabelText("Done");
-    m_stich_prog->setValue(100);
-    m_stich_prog->setAutoClose(true);
-    m_stich_prog = nullptr;
+        m_stich_prog->setLabelText("Done");
+        m_stich_prog->setValue(100);
+        m_stich_prog->setAutoClose(true);
+        m_stich_prog = nullptr;
     // CV cell label txt
 
-    imtools->saveImg(Mimage,"mozaic");
-    scanvector.clear();
-    delete qfrm_t2;
-    qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
-    ui->tabWidget->setCurrentWidget(ui->tab2);
-   // prog_changed(0);
+        imtools->saveImg(Mimage,"mozaic");
+       // scanvector.clear();
+        delete qfrm_t2;
+        qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
+        //delete Mimage;
+        im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
+        ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
+        ui->tabWidget->setCurrentWidget(ui->tab2);
+    // prog_changed(0);
     }
 
 }
+
+
 

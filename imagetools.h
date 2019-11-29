@@ -23,7 +23,7 @@ public:
 
     void addPointToImage(cv::Mat& img,cv::Point point);
 
-    int2coors getSphCoors(cv::Mat &img);
+    int2coords getSphCoors(cv::Mat &img);
 
     void saveImg(cv::Mat* outimg, std::string outname);
 
