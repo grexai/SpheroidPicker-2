@@ -16,6 +16,7 @@
 #include <deeplearning.h>
 #include <propertyreader.h>
 #include <auto_methods.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -39,6 +40,7 @@ signals:
     void stich_prog_changed(int progress);
     void scan_finished();
     void close_and_return_hw();
+    void stiched_img_rdy();
 public slots:
    // void show_hw_selector();
     void scan_stopped();
@@ -46,6 +48,7 @@ public slots:
     void set_stich_progressbar( int value );
     void set_h4(int value);
     void set_pip_man(int value);
+    void show_on_view_2();
 protected:
 
 
@@ -223,11 +226,8 @@ private slots:
 
      void create_mosaic();
 
-
-
-
-
 private:
+
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
     QGraphicsScene* scene= nullptr;
@@ -239,10 +239,18 @@ private:
     calibratedialog *calib= nullptr;
     float m_img_width;
     float m_img_height;
+
     std::vector<cv::Mat> scanvector;
+
+    float m_status = 0;
+    float mid_s_x_p=0.0f;
+    int m_stage_abs_starter_x = 0;
+    int m_stage_abs_starter_y = 0;
+
+
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     std::atomic_bool m_s_t_acitive;
-
+    cv::Mat* Mimage = nullptr;
     //threads
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
@@ -251,11 +259,12 @@ private:
     std::thread* m_put_and_pick_thread = nullptr;
     std::thread* m_create_mosaic_thread = nullptr;
     std::thread* m_center_selected_sph_thread = nullptr;
+
     //TEST
-    float m_status = 0;
     QTimer *timer1= nullptr ;
     QThread *thread1= nullptr;
-    float mid_s_x_p=0.0f;
+
+
 };
 
 #endif // MAINWINDOW_H

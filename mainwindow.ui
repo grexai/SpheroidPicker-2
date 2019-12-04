@@ -1387,9 +1387,9 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>210</y>
+      <y>200</y>
       <width>171</width>
-      <height>101</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
@@ -1399,7 +1399,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>60</y>
        <width>131</width>
        <height>21</height>
       </rect>
@@ -1412,7 +1412,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>30</y>
        <width>131</width>
        <height>21</height>
       </rect>
@@ -1439,7 +1439,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>680</y>
+      <y>700</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -1452,7 +1452,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>710</y>
+      <y>730</y>
       <width>161</width>
       <height>23</height>
      </rect>
@@ -1465,7 +1465,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>650</y>
+      <y>670</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -1575,21 +1575,27 @@ Stage</string>
    <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">
     <property name="geometry">
      <rect>
-      <x>1740</x>
-      <y>590</y>
-      <width>62</width>
+      <x>1730</x>
+      <y>610</y>
+      <width>51</width>
       <height>22</height>
      </rect>
     </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
     <property name="minimum">
      <double>3.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>150.000000000000000</double>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>1770</x>
-      <y>560</y>
+      <x>1730</x>
+      <y>580</y>
       <width>81</width>
       <height>16</height>
      </rect>
@@ -1602,7 +1608,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>620</y>
+      <y>640</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -1615,7 +1621,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>430</y>
+      <y>390</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -1628,7 +1634,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>460</y>
+      <y>420</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -1654,7 +1660,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1790</x>
-      <y>170</y>
+      <y>160</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -1711,11 +1717,14 @@ Stage</string>
    <widget class="QDoubleSpinBox" name="set_plate_size_spinbox_2">
     <property name="geometry">
      <rect>
-      <x>1820</x>
-      <y>590</y>
-      <width>62</width>
+      <x>1790</x>
+      <y>610</y>
+      <width>51</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="decimals">
+     <number>1</number>
     </property>
     <property name="minimum">
      <double>2.000000000000000</double>
@@ -1728,7 +1737,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>370</y>
+      <y>330</y>
       <width>151</width>
       <height>22</height>
      </rect>
@@ -1744,7 +1753,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>330</y>
+      <y>300</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -1757,7 +1766,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>400</y>
+      <y>360</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -1769,8 +1778,8 @@ Stage</string>
    <widget class="QComboBox" name="magnification">
     <property name="geometry">
      <rect>
-      <x>1830</x>
-      <y>530</y>
+      <x>1850</x>
+      <y>610</y>
       <width>51</width>
       <height>22</height>
      </rect>
@@ -1824,13 +1833,171 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1840</x>
-      <y>650</y>
+      <y>670</y>
       <width>72</width>
       <height>19</height>
      </rect>
     </property>
     <property name="text">
      <string>Text</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>460</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>C</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>F</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>G</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>H</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QSpinBox" name="spinBox">
+    <property name="geometry">
+     <rect>
+      <x>1790</x>
+      <y>460</y>
+      <width>43</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>12</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_5">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>490</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Move to S Plate</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_2">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>520</y>
+      <width>41</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>C</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>F</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>G</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>H</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QSpinBox" name="spinBox_2">
+    <property name="geometry">
+     <rect>
+      <x>1790</x>
+      <y>520</y>
+      <width>43</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>12</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_6">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>550</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Move to T Plate</string>
     </property>
    </widget>
   </widget>

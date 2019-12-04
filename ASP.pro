@@ -42,7 +42,8 @@ SOURCES += \
     deeplearning.cpp \
     cameracv.cpp \
     auto_methods.cpp \
-    hardwareselector.cpp
+    hardwareselector.cpp \
+    plateselector.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -61,12 +62,14 @@ HEADERS += \
     marcros.h \
     auto_methods.h \
     counter.h \
-    hardwareselector.h
+    hardwareselector.h \
+    plateselector.h
 
 FORMS += \
         mainwindow.ui \
     calibratedialog.ui \
-    hardwareselector.ui
+    hardwareselector.ui \
+    plateselector.ui
 
 
 # Default rules for deployment.
