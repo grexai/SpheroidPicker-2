@@ -1,6 +1,6 @@
 #include "auto_methods.h"
 
-auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera)
+auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera,i_deeplearning* p_dl)
 {
     if(p_ctrl!=nullptr){
         this->m_controller = p_ctrl;
@@ -18,6 +18,10 @@ auto_methods::auto_methods(controller* p_ctrl,CameraCV* p_camera)
     {
         std::cerr << "camera not incialiazed" << std::endl;
     }
+    if(p_dl!=nullptr){
+        this->m_dl = p_dl;
+        //this = p_ctrl;
+    }
 
 }
 auto_methods::~auto_methods(){}
@@ -32,7 +36,7 @@ void auto_methods::pickup_sph(float pulse_value,float pulse_time,std::vector<flo
        m_controller->pipette_home_z();
 }
 
-void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
+void auto_methods::scan_sample(std::atomic_bool &p_s_t_acitive){
     using namespace  cv;
     int platesize= 350000;      //    100nm
     float  img_w_5p5x = 27426;  //    100nm
@@ -73,7 +77,7 @@ void auto_methods::scan_sample(std::atomic_bool &m_s_t_acitive){
     {
         for (int  i = 0; i< wmax; ++i)
         {
-            if(m_s_t_acitive)
+            if(p_s_t_acitive)
             {
                 m_controller->stage_move_to_x_sync(static_cast<int>(xpos+img_w_5p5x*i));
                 p_v= static_cast<float>((wmax+1)*j+i)/static_cast<float>((hmax+1)*(wmax+1))*100;

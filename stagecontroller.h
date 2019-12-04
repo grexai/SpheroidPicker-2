@@ -144,8 +144,6 @@ public:
 
     iop::int32 getCurrentAcceleration();
 
-
-
     // what is supported
     bool isAsyncSupported() const ;
 

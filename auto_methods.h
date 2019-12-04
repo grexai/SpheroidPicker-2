@@ -10,12 +10,15 @@ class auto_methods
 protected:
     controller *m_controller;
     CameraCV *m_camera;
-    i_deeplearning* dl;
+    i_deeplearning* m_dl;
 public:
-    auto_methods(controller *p_ctrl,CameraCV *p_camera);
+    auto_methods(controller* p_ctrl,CameraCV* p_camera,i_deeplearning* p_dl);
     ~auto_methods();
     void pickup_sph(float pulse_value,float pulse_time,std::vector<float> objpos);
     void scan_sample(std::atomic_bool &m_s_t_acitive);
+
+
+
 };
 
 #endif // AUTO_METHODS_H

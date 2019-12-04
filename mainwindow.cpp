@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader->apply_settings(settings);
 
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
-    automethods = new auto_methods(ctrl,cameracv);
+
     progress.setValue(50);
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
                           propreader->cfg.textGraph.c_str());
     }
 
+    automethods = new auto_methods(ctrl,cameracv,dl);
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
     connect(this, SIGNAL(stiched_img_rdy()),this,SLOT(show_on_view_2()));
@@ -619,6 +620,7 @@ void MainWindow::on_view_scan_clicked()
    m_stich_prog->setWindowModality(Qt::WindowModal);
    m_stich_prog->setMinimumDuration(0);
    m_stich_prog->setValue(0);
+   m_stich_prog->setAutoClose(true);
    m_create_mosaic_thread = new std::thread(&MainWindow::create_mosaic,this);
 }
 
@@ -978,7 +980,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
 }
 
 /*!
- * CREATING the mosaic of analyzed images
+ * creating a stiched image sequence of analyzed images
  */
 
 void MainWindow::create_mosaic(){
@@ -1001,8 +1003,8 @@ void MainWindow::create_mosaic(){
             {
                 QTextStream(stdout) << i <<" : "<<j<< endl;
                 p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
-                QTextStream(stdout)<<"progvalue"<< p_v<< endl;
-             //   stich_prog_changed(static_cast<int>(p_v));
+              //  QTextStream(stdout)<<"progvalue"<< p_v<< endl;
+                stich_prog_changed(static_cast<int>(p_v));
                 for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
                 {
                     for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
@@ -1017,21 +1019,10 @@ void MainWindow::create_mosaic(){
 
         m_stich_prog->setLabelText("Done");
         m_stich_prog->setValue(100);
-        m_stich_prog->setAutoClose(true);
         m_stich_prog = nullptr;
         // CV cell label txt
-
         imtools->saveImg(Mimage,"mozaic");
         scanvector.clear();
-     //   delete qfrm_t2;
-       // cv::imshow("asd",*Mimage);
-        //cv::waitKey(0);
-    //    qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
-   //     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
-    //
-        //ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::);
-  //      ui->tabWidget->setCurrentWidget(ui->tab2);
-    // prog_changed(0);
         stiched_img_rdy();
     }
 
@@ -1040,12 +1031,10 @@ void MainWindow::create_mosaic(){
 void MainWindow::show_on_view_2()
 {
     delete qfrm_t2;
-   // cv::imshow("asd",*Mimage);
-    //cv::waitKey(0);
     qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
-//
-    //ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::);
+
+    //ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 }
 
