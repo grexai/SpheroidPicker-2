@@ -6,31 +6,36 @@
 #define  FULL_HD_IMAGE_HEIGHT 1080
 
 //LEICA STEREO MIC IMAGE SIZES BY MAGNIFICATION
+//  um-1
 #define  IMG_W_M5p5x 27426
 #define  IMG_H_M5p5x 15421
 
-#define IMG_W_M5X 30000
-#define IMG_H_M5X 20000
+#define IMG_W_M5X 30162
+#define IMG_H_M5X 16959
 
-#define IMG_W_M4X 40000
-#define IMG_H_M4X 25000
+#define IMG_W_M4X 37703
+#define IMG_H_M4X 21199
 
-#define IMG_W_M3X 50000
-#define IMG_H_M3X 30000
+#define IMG_W_M3X 50270
+#define IMG_H_M3X 28266
 
-#define IMG_W_M2X 60000
-#define IMG_H_M2X 35000
+#define IMG_W_M2X 75405
+#define IMG_H_M2X 42398
 
-#define IMG_W_M1X 60000
-#define IMG_H_M1X 35000
+#define IMG_W_M1X 150819
+#define IMG_H_M1X 84797
 
-#define IMG_W_M0p5X 60000
-#define IMG_H_M0p5X 35000
+#define IMG_W_M0p61X 247469
+#define IMG_H_M0p61X 139145
 
 //STAGE
 
 #define STAGE_CENTER_X 751431
 #define STAGE_CENTER_Y 501665
+
+#define STAGE_FIRST_WELL_LEFT_X 0
+#define STAGE_FIRST_WELL_TOP_Y 0
+
 
 //PLATE DISTANCES
 
