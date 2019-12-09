@@ -5,8 +5,12 @@
 #define  FULL_HD_IMAGE_WIDTH 1920
 #define  FULL_HD_IMAGE_HEIGHT 1080
 
+//DISTANCES
+//convert um-1 to mm constant
+#define C_MM_TO_UMx0p1 10000;
+
 //LEICA STEREO MIC IMAGE SIZES BY MAGNIFICATION
-//  um-1
+//um-1
 #define  IMG_W_M5p5x 27426
 #define  IMG_H_M5p5x 15421
 
@@ -39,7 +43,7 @@
 
 //PLATE DISTANCES
 
-#define DIA_96_WELLPLATE 6.4f //mm
+#define DIA_96_WELLPLATE 85000 //um-1
 #define DX_96_WELLPLATE 0
 #define DY_96_WELLPLATE 0
 

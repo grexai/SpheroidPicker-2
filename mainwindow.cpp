@@ -881,8 +881,8 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     //MOVE the pipette OUT
     //const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
     //const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
-    const float platesize_x= plate_w_mm*10000;
-    const float platesize_y = plate_h_mm*10000;
+    const float platesize_x= plate_w_mm*C_MM_TO_UMx0p1;
+    const float platesize_y = plate_h_mm*C_MM_TO_UMx0p1;
     int object_counter = 0;
     std::string folder = "Scandata_";
     std::string datetime = "_";
@@ -991,10 +991,10 @@ void MainWindow::create_mosaic(){
     using namespace  cv;
     if (scanvector.size()>0 && !m_s_t_acitive)
     {
-        const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
-        const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
-        int wmax = static_cast<int>(platesize_x / m_img_width); // um
-        int hmax = static_cast<int>(platesize_y / m_img_height); // um
+        const float platesize_x = ui->set_plate_size_spinbox->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        int wmax = static_cast<int>(platesize_x / m_img_width);
+        int hmax = static_cast<int>(platesize_y / m_img_height);
         QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
         if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
         Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT), (wmax * FULL_HD_IMAGE_WIDTH), CV_8UC3));
@@ -1012,9 +1012,9 @@ void MainWindow::create_mosaic(){
                 {
                     for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
                     {
-                        Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
-                        Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
-                        Mimage->at<Vec3b>((jj + (i * 1080)), (ii + (j * 1920)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
+                        Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
+                        Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
+                        Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
                     }
                 }
             }
@@ -1043,15 +1043,15 @@ void MainWindow::show_on_view_2()
 
 void MainWindow::on_move_to_s_plate_clicked()
 {
-    int s_x = STAGE_FIRST_WELL_LEFT_X+ui->s_well_x_combobox->currentIndex()*static_cast<int>(m_img_width);
-    int s_y = STAGE_FIRST_WELL_LEFT_X+ui->s_well_y_spinbox->value()*static_cast<int>(m_img_height);
-    ctrl->stage_move_x_async(s_x);
-    ctrl->stage_move_y_async(s_y);
+    int s_x = STAGE_FIRST_WELL_LEFT_X+ui->s_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_WELL_TOP_Y+ui->s_well_y_spinbox->value()*DIA_96_WELLPLATE;
+    ctrl->stage_move_to_x_async(s_x);
+    ctrl->stage_move_to_y_sync(s_y);
 }
 
 void MainWindow::on_s_getmin_clicked()
 {
    int x = ctrl->stage_get_x_min_pos();
    int y = ctrl->stage_get_y_min_pos();
-   QTextStream(stdout)<<"stage min x,y " <<x << " : " <<y << endl;
+   QTextStream(stdout)<<"stage min x,y (" <<x << " , " <<y <<")"<<endl;
 }
