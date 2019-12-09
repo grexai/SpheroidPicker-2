@@ -876,6 +876,19 @@ Stage</string>
       <number>10000</number>
      </property>
     </widget>
+    <widget class="QPushButton" name="s_getmin">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>300</y>
+       <width>61</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Getmin</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="pip_c_box">
     <property name="geometry">
@@ -1842,7 +1855,7 @@ Stage</string>
      <string>Text</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="s_well_x_combobox">
     <property name="geometry">
      <rect>
       <x>1740</x>
@@ -1892,7 +1905,7 @@ Stage</string>
      </property>
     </item>
    </widget>
-   <widget class="QSpinBox" name="spinBox">
+   <widget class="QSpinBox" name="s_well_y_spinbox">
     <property name="geometry">
      <rect>
       <x>1790</x>
@@ -1908,7 +1921,7 @@ Stage</string>
      <number>12</number>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_5">
+   <widget class="QPushButton" name="move_to_s_plate">
     <property name="geometry">
      <rect>
       <x>1740</x>
@@ -1987,7 +2000,7 @@ Stage</string>
      <number>12</number>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="move_to_t_plate">
     <property name="geometry">
      <rect>
       <x>1740</x>

@@ -226,6 +226,10 @@ private slots:
 
      void create_mosaic();
 
+     void on_move_to_s_plate_clicked();
+
+     void on_s_getmin_clicked();
+
 private:
 
     QTimer *timer= nullptr;

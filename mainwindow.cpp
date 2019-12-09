@@ -125,7 +125,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::update_currentpressure(){
+void MainWindow::update_currentpressure()
+{
   //  float cp = (QRandomGenerator::global()->generate());
   /*  if (ctrl->get_current_pressure()==nullptr){
         return;
@@ -137,7 +138,8 @@ void MainWindow::update_currentpressure(){
     //}
 }
 
-void MainWindow::show_currentpressure(){
+void MainWindow::show_currentpressure()
+{
    // ctrl->spawn_pressure_thread();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
     disp_pressure->start(500);
@@ -682,7 +684,7 @@ void MainWindow::on_magnification_activated(int index)
 {
     switch (index)
     {
-    case 0 : m_img_width=IMG_W_M0p5X; m_img_height=IMG_H_M0p5X;break;
+    case 0 : m_img_width=IMG_W_M0p61X; m_img_height=IMG_H_M0p61X;break;
     case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
     case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
     case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
@@ -835,7 +837,9 @@ void MainWindow::predict_sph(){
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)+" A:" + QString::number(im_obj.at(idx).at(3),'f',1)+ " C:" + QString::number(im_obj.at(idx).at(4),'f',3));
+       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)
+                                                      +" A:" + QString::number(im_obj.at(idx).at(3),'f',1)
+                                                      +" C:" + QString::number(im_obj.at(idx).at(4),'f',3));
     }
 
     delete qfrm_t2;
@@ -985,8 +989,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
 
 void MainWindow::create_mosaic(){
     using namespace  cv;
-    QTextStream(stdout) << scanvector.size() << "wtf" << endl;
-    if (scanvector.size()>0)
+    if (scanvector.size()>0 && !m_s_t_acitive)
     {
         const float platesize_x = ui->set_plate_size_spinbox->value()*10000; // convert mm to STAGE 0.1um unit
         const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000; // convert mm to STAGE 0.1um unit
@@ -1038,5 +1041,17 @@ void MainWindow::show_on_view_2()
     ui->tabWidget->setCurrentWidget(ui->tab2);
 }
 
+void MainWindow::on_move_to_s_plate_clicked()
+{
+    int s_x = STAGE_FIRST_WELL_LEFT_X+ui->s_well_x_combobox->currentIndex()*static_cast<int>(m_img_width);
+    int s_y = STAGE_FIRST_WELL_LEFT_X+ui->s_well_y_spinbox->value()*static_cast<int>(m_img_height);
+    ctrl->stage_move_x_async(s_x);
+    ctrl->stage_move_y_async(s_y);
+}
 
-
+void MainWindow::on_s_getmin_clicked()
+{
+   int x = ctrl->stage_get_x_min_pos();
+   int y = ctrl->stage_get_y_min_pos();
+   QTextStream(stdout)<<"stage min x,y " <<x << " : " <<y << endl;
+}
