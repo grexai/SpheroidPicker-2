@@ -771,6 +771,7 @@ void MainWindow::move_to_petri_B()
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
     ctrl->pipette_home_z();
 }
@@ -797,6 +798,7 @@ void MainWindow::xz_stage_pickup_sph(){
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ctrl->pipette_home_z();
     // MOVE x axis out of image
+
     ctrl->pipette_movex_sync(-2.6f);
     ctrl->stage_set_speed(original_stage_speed);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -901,6 +903,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";
+
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
     const int wmax = static_cast<int>(platesize_x/m_img_width); // um
@@ -1044,7 +1047,7 @@ void MainWindow::show_on_view_2()
 void MainWindow::on_move_to_s_plate_clicked()
 {
     int s_x = STAGE_FIRST_WELL_LEFT_X+ui->s_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_WELL_TOP_Y+ui->s_well_y_spinbox->value()*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_WELL_TOP_Y+(ui->s_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x);
     ctrl->stage_move_to_y_sync(s_y);
 }
