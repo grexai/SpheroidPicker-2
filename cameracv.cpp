@@ -4,8 +4,8 @@ CameraCV::CameraCV(int devid):
 mActive(true)
 {
     {
-        this->setvideodevice(devid+ cv::CAP_DSHOW);
-        this->camera->open(devid+ cv::CAP_DSHOW);
+        this->setvideodevice(devid);
+        this->camera->open(devid);
 
         //+ cv::CAP_DSHOW);
     }

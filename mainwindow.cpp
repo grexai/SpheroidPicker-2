@@ -667,6 +667,12 @@ void MainWindow::on_pick_and_put_clicked()
 
 void MainWindow::on_found_objects_highlighted(int index)
 {
+
+}
+
+
+void MainWindow::on_found_objects_activated(int index)
+{
     m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
 }
 
@@ -767,13 +773,20 @@ void MainWindow::center_selected_sph(int index)
 
 void MainWindow::move_to_petri_B()
 {
-    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
+    ctrl->stage_set_speed(50000);// akos changed the speed
+   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
+    */
+    ctrl->stage_move_to_x_sync(877396+27000); //Akos
+    ctrl->stage_move_to_y_sync(1820+18000);  // Akos
+    ctrl->pipette_move_to_x_sync(mid_s_x_p);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
-    ctrl->pipette_home_z();
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
+    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
 }
 
 void MainWindow::xz_stage_pickup_sph(){
@@ -796,15 +809,14 @@ void MainWindow::xz_stage_pickup_sph(){
     // PICK UP WITH SYRINGE
     ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ctrl->pipette_home_z();
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
     // MOVE x axis out of image
 
     ctrl->pipette_movex_sync(-2.6f);
     ctrl->stage_set_speed(original_stage_speed);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     //TODO
     // this point CHECK if the spheroid picked up!
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(4500));
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
@@ -1058,3 +1070,4 @@ void MainWindow::on_s_getmin_clicked()
    int y = ctrl->stage_get_y_min_pos();
    QTextStream(stdout)<<"stage min x,y (" <<x << " , " <<y <<")"<<endl;
 }
+

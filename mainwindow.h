@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
 
 public:
     bool Iscameraopen= false;
-    int cameraIndex=0;
+    int cameraIndex=1;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setdarkstyle();
@@ -229,6 +229,8 @@ private slots:
      void on_move_to_s_plate_clicked();
 
      void on_s_getmin_clicked();
+
+     void on_found_objects_activated(int index);
 
 private:
 
