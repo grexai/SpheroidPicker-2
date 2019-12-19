@@ -4,7 +4,7 @@
 	<config id="0" name="NewSetup" users="*" applications="SMApplications">
 	<ignore>%{
 		CONFIGFOLDER = "C:\ProgramData\Leica Microsystems\Leica Hardware Configurator\"
-		LOGFOLDER =  "C:\ASP\"
+		LOGFOLDER =  "d:\dev\Libraries\Leica sdk\bin64\"
 		include wrap CONFIGFOLDER "ahmconfig.xml.predefines" endwrap
 	}%</ignore>
 		<unit name="STEREO_MICROSCOPE" id="MICROSCOPE" detect="*" driver="smAutomation.dll">
@@ -19,7 +19,7 @@
 			</parameters>
 		<unit name="tango-stage" id="MICROSCOPE-STAGE" detect="*" driver="cms_tango.dll" >
 			<parameters>
-				<driver-config protocol-window="false" comport="COM3">
+				<driver-config protocol-window="false" comport="COM17">
 					<TANGO-X-AXIS reverse="true" />
 					<TANGO-Y-AXIS reverse="true" />
 				</driver-config>

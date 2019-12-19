@@ -47,6 +47,13 @@
 #define DX_96_WELLPLATE 0
 #define DY_96_WELLPLATE 0
 
+// Target PLATE
+
+#define STAGE_FIRST_T_WELL_LEFT_X 877396
+#define STAGE_FIRST_T_WELL_TOP_Y 1820
+
+
+
 //
 
 #endif // MACROS_H

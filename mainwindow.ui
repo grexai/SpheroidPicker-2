@@ -1934,7 +1934,7 @@ Stage</string>
      <string>Move to S Plate</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox_2">
+   <widget class="QComboBox" name="t_well_x_combobox">
     <property name="geometry">
      <rect>
       <x>1740</x>
@@ -1984,7 +1984,7 @@ Stage</string>
      </property>
     </item>
    </widget>
-   <widget class="QSpinBox" name="spinBox_2">
+   <widget class="QSpinBox" name="t_well_y_spinbox">
     <property name="geometry">
      <rect>
       <x>1790</x>

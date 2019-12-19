@@ -228,6 +228,8 @@ private slots:
 
      void on_move_to_s_plate_clicked();
 
+     void on_move_to_t_plate_clicked();
+
      void on_s_getmin_clicked();
 
      void on_found_objects_activated(int index);

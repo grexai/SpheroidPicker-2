@@ -1064,6 +1064,16 @@ void MainWindow::on_move_to_s_plate_clicked()
     ctrl->stage_move_to_y_sync(s_y);
 }
 
+void MainWindow::on_move_to_t_plate_clicked()
+{
+    int s_x = STAGE_FIRST_T_WELL_LEFT_X+ui->t_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(ui->t_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
+    ctrl->stage_move_to_x_async(s_x+27000);
+    ctrl->stage_move_to_y_sync(s_y+18000);
+}
+
+
+
 void MainWindow::on_s_getmin_clicked()
 {
    int x = ctrl->stage_get_x_min_pos();

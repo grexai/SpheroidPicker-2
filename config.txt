@@ -1,14 +1,6 @@
-#Configuration file for Autamtic Spheroid Picker
-#sad comment
+#Configuration file for spheroid picker
+#sad
 
-
-ports.pipette=COM4
-ports.pressurecontroller=COM5
-dl.modelweights=d:/dev/cpp/model.pb
-dl.textgraph=d:/dev/cpp/model.pbtxt
-dl.classes=d:/dev/cpp/mscoco_labels.names
-matterport.graph=C:/ASP/model/matterport_mrcnn/mrcnn_sph_def0709/mrcnn_sph_def0709.pb
-matterport.folder=C:/ASP/model/matterport_mrcnn/mrcnn_sph_def0709/
-
-
+ports.pressurecontroller="COM26"
+ports.pipette="COM6"
 
