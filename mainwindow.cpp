@@ -774,11 +774,11 @@ void MainWindow::center_selected_sph(int index)
 void MainWindow::move_to_petri_B()
 {
     ctrl->stage_set_speed(50000);// akos changed the speed
-   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
+    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-    */
-    ctrl->stage_move_to_x_sync(877396+27000); //Akos
-    ctrl->stage_move_to_y_sync(1820+18000);  // Akos
+
+    //ctrl->stage_move_to_x_sync(877396+27000); //Akos
+    //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
