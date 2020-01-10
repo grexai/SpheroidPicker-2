@@ -114,8 +114,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         }
         // Draw contours
         Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
-        for (int i = 0; i< 1; ++i)
-        {
+       int i =0;
             double area = contourArea(contours[i]);
             double arclength = arcLength(contours[i], true);
             double circularity = (4 * CV_PI * area / (arclength * arclength));
@@ -127,7 +126,6 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
             Scalar color = Scalar(255,  255, 255);
             drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
           //  circle(drawing, mc[i], 4, color, -1, 8, 0);
-        }
         object_features.at(3) = mc[0].x;
         object_features.at(4) = mc[0].y;
         //std::cout<< "msctr x" << mc[0].x << " : y" << mc[0].y<<std::endl;

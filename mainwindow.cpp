@@ -609,11 +609,6 @@ void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
      ctrl->stage_set_speed(static_cast<int>(arg1));
 }
 
-void MainWindow::on_pickup_sph_clicked()
-{
-   m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this);
-}
-
 void MainWindow::on_view_scan_clicked()
 {
    delete m_stich_prog;
@@ -670,11 +665,16 @@ void MainWindow::on_found_objects_highlighted(int index)
 
 }
 
-
 void MainWindow::on_found_objects_activated(int index)
 {
     m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
 }
+
+void MainWindow::on_pickup_sph_clicked()
+{
+   m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this,ui->found_objects->currentIndex());
+}
+
 
 void MainWindow::on_magnification_currentIndexChanged(int index)
 {
@@ -690,13 +690,13 @@ void MainWindow::on_magnification_activated(int index)
 {
     switch (index)
     {
-    case 0 : m_img_width=IMG_W_M0p61X; m_img_height=IMG_H_M0p61X;break;
-    case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
-    case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
-    case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
-    case 4 : m_img_width=IMG_W_M4X; m_img_height=IMG_H_M4X;break;
-    case 5 : m_img_width=IMG_W_M5X; m_img_height= IMG_H_M5X;break;
-    case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
+        case 0 : m_img_width=IMG_W_M0p61X; m_img_height=IMG_H_M0p61X;break;
+        case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
+        case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
+        case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
+        case 4 : m_img_width=IMG_W_M4X; m_img_height=IMG_H_M4X;break;
+        case 5 : m_img_width=IMG_W_M5X; m_img_height= IMG_H_M5X;break;
+        case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
     }
 }
 
@@ -789,16 +789,17 @@ void MainWindow::move_to_petri_B()
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
 }
 
-void MainWindow::xz_stage_pickup_sph(){
+void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
     auto start = std::chrono::system_clock::now();
     //set Pickup speeds
+    //ui->found_objects->currentIndex()
     int original_stage_speed = ctrl->stage_get_x_speed();
     ctrl->stage_set_speed(3000);
     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
-    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(ui->found_objects->currentIndex()).at(1)));
+    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
     //
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //move to the middle of image with the pipette
@@ -830,7 +831,7 @@ void MainWindow::pick_and_put()
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
-    this->xz_stage_pickup_sph();
+    this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
     this->move_to_petri_B();
 }
 
@@ -1068,10 +1069,16 @@ void MainWindow::on_move_to_t_plate_clicked()
 {
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+ui->t_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
     int s_y = STAGE_FIRST_T_WELL_TOP_Y+(ui->t_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
-    ctrl->stage_move_to_x_async(s_x+27000);
+    ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
     ctrl->stage_move_to_y_sync(s_y+18000);
 }
 
+
+void MainWindow::collect_selected_obj(){
+
+
+
+};
 
 
 void MainWindow::on_s_getmin_clicked()

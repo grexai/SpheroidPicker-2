@@ -669,10 +669,10 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             outcoors.push_back(by);
             imagetools asd;
             std::vector<float> features = asd.getobjectprops(label);
-            outcoors.push_back(features.at(0));
-            outcoors.push_back(features.at(1));
-            outcoors.push_back(features.at(2));
-            outcoors.push_back((features.at(3)*nx) + bx); //mx
+            outcoors.push_back(features.at(0)*nx);//length
+            outcoors.push_back(features.at(1)*nx*nx);//area
+            outcoors.push_back(features.at(2));//circularity
+            outcoors.push_back((features.at(3)*nx) + bx); //mx // resize and recoordinate
             outcoors.push_back((features.at(4)*nx) + by); //my
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);

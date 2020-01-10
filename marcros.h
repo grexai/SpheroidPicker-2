@@ -47,6 +47,8 @@
 #define DX_96_WELLPLATE 0
 #define DY_96_WELLPLATE 0
 
+#define DIA_384_WELLPLATE 45000 //um-1 test value
+
 // Target PLATE
 
 #define STAGE_FIRST_T_WELL_LEFT_X 877396

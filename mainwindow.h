@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
 
 public:
     bool Iscameraopen= false;
-    int cameraIndex=1;
+    int cameraIndex=0;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setdarkstyle();
@@ -190,6 +190,8 @@ private slots:
 
      void on_found_objects_highlighted(int index);
 
+     void on_found_objects_activated(int index);
+
      void on_magnification_currentIndexChanged(int index);
 
      void on_magnification_highlighted(int index);
@@ -212,7 +214,7 @@ private slots:
 
      void move_to_petri_B();
 
-     void xz_stage_pickup_sph();
+     void xz_stage_pickup_sph(int obj_idx);
 
      void pick_and_put();
 
@@ -230,9 +232,9 @@ private slots:
 
      void on_move_to_t_plate_clicked();
 
-     void on_s_getmin_clicked();
+     void collect_selected_obj();
 
-     void on_found_objects_activated(int index);
+     void on_s_getmin_clicked();
 
 private:
 

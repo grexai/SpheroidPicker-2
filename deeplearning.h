@@ -66,8 +66,6 @@ protected:
 class matterport_mrcnn : public virtual i_deeplearning
 {
 
-
-
     static void DontDeleteTensor(void*, size_t, void*)
     {
     }
