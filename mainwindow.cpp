@@ -774,9 +774,9 @@ void MainWindow::center_selected_sph(int index)
 void MainWindow::move_to_petri_B()
 {
     ctrl->stage_set_speed(50000);// akos changed the speed
-    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
-    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-
+//    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
+//    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
+    move_to_t_plate();
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
@@ -1065,7 +1065,7 @@ void MainWindow::on_move_to_s_plate_clicked()
     ctrl->stage_move_to_y_sync(s_y);
 }
 
-void MainWindow::on_move_to_t_plate_clicked()
+void MainWindow::move_to_t_plate()
 {
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+ui->t_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
     int s_y = STAGE_FIRST_T_WELL_TOP_Y+(ui->t_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
@@ -1074,12 +1074,17 @@ void MainWindow::on_move_to_t_plate_clicked()
 }
 
 
-void MainWindow::collect_selected_obj(){
+void MainWindow::on_move_to_t_plate_clicked()
+{
+    m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this);
+}
+
+void MainWindow::collect_selected_obj()
+{
 
 
 
 };
-
 
 void MainWindow::on_s_getmin_clicked()
 {

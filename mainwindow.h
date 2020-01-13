@@ -228,6 +228,8 @@ private slots:
 
      void create_mosaic();
 
+     void move_to_t_plate();
+
      void on_move_to_s_plate_clicked();
 
      void on_move_to_t_plate_clicked();
@@ -265,6 +267,7 @@ private:
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
     std::thread* m_predict_thread = nullptr;
+    std::thread* m_move_t_plate_thread = nullptr;
     std::thread* m_move_petri_b_thread = nullptr;
     std::thread* m_put_and_pick_thread = nullptr;
     std::thread* m_create_mosaic_thread = nullptr;
