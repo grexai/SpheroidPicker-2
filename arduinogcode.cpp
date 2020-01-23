@@ -123,39 +123,50 @@ std::vector<float> arduinogcode::getcurrentpos()
         // experiment to find echo...
         // tries to get the coordinates
         //recall the function if echo thrown, else error
-        QRegExp findecho("(echo)");
-      //  QString asd("echo: asdasdsad");
-        findecho.indexIn(answer);
-        QStringList test = findecho.capturedTexts();
+        QRegExp findok("(ok)");
+        findok.indexIn(answer);
+        QStringList oks = findok.capturedTexts();
+        if(!(oks.size()>3)){
+            QRegExp findecho("(echo)");
+
+            findecho.indexIn(answer);
+            QStringList test = findecho.capturedTexts();
     // auto t21= ;
-        std::cout << "find " <<test.begin()->toStdString()<<   "asdsad"<<test.at(0).isEmpty()<< std::endl;
-        if(test.at(0).isEmpty()==true)
-        {
-            for (int i=1;i<4;i++)
+            std::cout << "find " <<test.begin()->toStdString()<<   "asdsad"<<test.at(0).isEmpty()<< std::endl;
+            if(test.at(0).isEmpty()&& resultStrings.size()>2)
             {
-            xRegExp.indexIn( resultStrings.at(i));
-            QStringList xList = xRegExp.capturedTexts();
-            try
-            {
-            coors[i-1]=( static_cast<float>(xList.begin()->toFloat()));
+                std::cout<< "idejon-e"<< std::endl;
+                for (int i=1;i<4;i++)
+                {
+                    xRegExp.indexIn( resultStrings.at(i));
+                    QStringList xList = xRegExp.capturedTexts();
+                    try
+                    {
+                    coors[i-1]=( static_cast<float>(xList.begin()->toFloat()));
+                    }
+                    catch (...)
+                    {
+                    std::cout << "extractiing cooordinates error1" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                    return this->getcurrentpos();
+                    }
+                }
             }
-            catch (...)
+            else if(!test.at(0).isEmpty() && m_counter < 2 )
             {
-            std::cout << "extractiing cooordinates error" << std::endl;
+                m_counter ++;
+                std::cout << "extractiing cooordinates error retrial..." << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                return this->getcurrentpos();
             }
         }
-        return coors;
-    }
-    else if(test.at(0).isEmpty()==false && m_counter < 2 )
-    {
-        m_counter ++;
-        std::cout << "extractiing cooordinates error retrial..." << std::endl;
-        return this->getcurrentpos();
-    }
-    else
-    {
-        throw ardinogcodeexeption;
-    }
+        else
+        {
+            m_counter ++;
+            std::cout << "extractiing cooordinates error retrial..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            return this->getcurrentpos();
+        }
     }
     catch (std::exception& e)
     {
@@ -163,6 +174,7 @@ std::vector<float> arduinogcode::getcurrentpos()
         m_counter = 0;
         return coors;
     }
+    return coors;
 }
 
 

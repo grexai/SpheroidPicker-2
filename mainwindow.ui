@@ -1672,9 +1672,9 @@ Stage</string>
    <widget class="QPushButton" name="save_m_p_button">
     <property name="geometry">
      <rect>
-      <x>1790</x>
+      <x>1810</x>
       <y>160</y>
-      <width>91</width>
+      <width>81</width>
       <height>31</height>
      </rect>
     </property>
@@ -1866,32 +1866,7 @@ Stage</string>
     </property>
     <item>
      <property name="text">
-      <string>H</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>G</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>F</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>E</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>D</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
+      <string>A</string>
      </property>
     </item>
     <item>
@@ -1901,7 +1876,32 @@ Stage</string>
     </item>
     <item>
      <property name="text">
-      <string>A</string>
+      <string>C</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>F</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>G</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>H</string>
      </property>
     </item>
    </widget>
@@ -1945,32 +1945,7 @@ Stage</string>
     </property>
     <item>
      <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>D</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>E</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>F</string>
+      <string>H</string>
      </property>
     </item>
     <item>
@@ -1980,7 +1955,32 @@ Stage</string>
     </item>
     <item>
      <property name="text">
-      <string>H</string>
+      <string>F</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>E</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>D</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>C</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A</string>
      </property>
     </item>
    </widget>

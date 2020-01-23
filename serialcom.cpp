@@ -50,11 +50,12 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
     QString cmd = msg.append(ansEnd);
     QByteArray byte_command = msg.toLocal8Bit();
     auto start = std::chrono::system_clock::now();
-    sp.waitForReadyRead(30);
+//    sp.waitForReadyRead(30);
+ //   sp.readAll();
     sp.write(byte_command);
     sp.waitForBytesWritten(30);
     QByteArray answer = sp.readAll();
-    while ( sp.waitForReadyRead(50)){
+    if (!sp.waitForReadyRead(30)){
         answer.append(sp.readAll());
     }
     auto end = std::chrono::system_clock::now();
