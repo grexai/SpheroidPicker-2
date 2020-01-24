@@ -529,6 +529,10 @@ int controller::stage_get_y_max_pos()
     }
 }
 
+
+
+
+
 void controller::stage_go_center()
 {
     if (stage != nullptr)

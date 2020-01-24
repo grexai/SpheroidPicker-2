@@ -164,6 +164,8 @@ private slots:
 
      void on_s_get_coors_pushButton_clicked();
 
+     void on_changeplate_button_clicked();
+
      void on_start_screening_clicked();
 
      void on_p_set_speed_spinbox_valueChanged(int arg1);
@@ -234,9 +236,13 @@ private slots:
 
      void on_move_to_t_plate_clicked();
 
+     void change_plate();
+
      void collect_selected_obj();
 
      void on_s_getmin_clicked();
+
+
 
 private:
 
@@ -272,7 +278,7 @@ private:
     std::thread* m_put_and_pick_thread = nullptr;
     std::thread* m_create_mosaic_thread = nullptr;
     std::thread* m_center_selected_sph_thread = nullptr;
-
+    std::thread* m_stage_plate_thread = nullptr;
     //TEST
     QTimer *timer1= nullptr ;
     QThread *thread1= nullptr;

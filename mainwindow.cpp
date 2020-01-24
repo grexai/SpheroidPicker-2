@@ -514,6 +514,14 @@ void MainWindow::on_s_get_coors_pushButton_clicked()
     ui->s_ypos_label->setText("Y: " + QString::number(coords.at(1),'f',2));
 }
 
+
+void MainWindow::on_changeplate_button_clicked()
+{
+    m_stage_plate_thread= new std::thread(&MainWindow::change_plate,this);
+}
+
+
+
 void MainWindow::on_start_screening_clicked()
 {
 
@@ -1073,18 +1081,26 @@ void MainWindow::move_to_t_plate()
     ctrl->stage_move_to_y_sync(s_y+18000);
 }
 
-
 void MainWindow::on_move_to_t_plate_clicked()
 {
     m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this);
 }
 
+void MainWindow::change_plate()
+{
+    int ymin = ctrl->stage_get_y_min_pos();
+    int xmax = ctrl->stage_get_x_max_pos();
+    ctrl->pipette_home_z();
+    std::this_thread::sleep_for(std::chrono::microseconds(3000));
+    ctrl->pipette_home_x();
+    ctrl->stage_move_to_x_async(xmax);
+    ctrl->stage_move_to_y_sync(ymin);
+}
+
 void MainWindow::collect_selected_obj()
 {
 
-
-
-};
+}
 
 void MainWindow::on_s_getmin_clicked()
 {

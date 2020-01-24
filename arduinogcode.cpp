@@ -156,7 +156,7 @@ std::vector<float> arduinogcode::getcurrentpos()
             {
                 m_counter ++;
                 std::cout << "extractiing cooordinates error retrial..." << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
                 return this->getcurrentpos();
             }
         }
@@ -164,7 +164,7 @@ std::vector<float> arduinogcode::getcurrentpos()
         {
             m_counter ++;
             std::cout << "extractiing cooordinates error retrial..." << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             return this->getcurrentpos();
         }
     }

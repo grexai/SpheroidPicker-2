@@ -657,7 +657,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>20</y>
       <width>171</width>
       <height>371</height>
      </rect>
@@ -894,7 +894,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>30</y>
+      <y>20</y>
       <width>211</width>
       <height>371</height>
      </rect>
@@ -1252,7 +1252,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>30</y>
+      <y>10</y>
       <width>171</width>
       <height>61</height>
      </rect>
@@ -1660,7 +1660,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>130</y>
+      <y>110</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -1673,7 +1673,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1810</x>
-      <y>160</y>
+      <y>140</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -1686,7 +1686,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1820</x>
-      <y>130</y>
+      <y>110</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1702,7 +1702,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1820</x>
-      <y>110</y>
+      <y>80</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1718,7 +1718,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>110</y>
+      <y>80</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -1767,7 +1767,7 @@ Stage</string>
      <rect>
       <x>1740</x>
       <y>300</y>
-      <width>131</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -2011,6 +2011,32 @@ Stage</string>
     </property>
     <property name="text">
      <string>Move to T Plate</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_5">
+    <property name="geometry">
+     <rect>
+      <x>1730</x>
+      <y>140</y>
+      <width>80</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Z height</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="changeplate_button">
+    <property name="geometry">
+     <rect>
+      <x>1830</x>
+      <y>460</y>
+      <width>80</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Change plate</string>
     </property>
    </widget>
   </widget>
