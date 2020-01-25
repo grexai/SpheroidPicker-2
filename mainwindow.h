@@ -216,6 +216,8 @@ private slots:
 
      void move_to_petri_B();
 
+     void put_to_target_plate(int x,int y,int type=0);
+
      void xz_stage_pickup_sph(int obj_idx);
 
      void pick_and_put();
@@ -230,7 +232,7 @@ private slots:
 
      void create_mosaic();
 
-     void move_to_t_plate();
+     void move_to_t_plate(int x_idx,int y_idx);
 
      void on_move_to_s_plate_clicked();
 

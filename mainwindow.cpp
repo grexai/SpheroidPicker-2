@@ -781,10 +781,11 @@ void MainWindow::center_selected_sph(int index)
 
 void MainWindow::move_to_petri_B()
 {
+
     ctrl->stage_set_speed(50000);// akos changed the speed
 //    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
 //    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-    move_to_t_plate();
+    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
@@ -796,6 +797,9 @@ void MainWindow::move_to_petri_B()
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
 }
+
+
+
 
 void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
@@ -834,13 +838,30 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
 }
 
+void MainWindow::put_to_target_plate(int x,int y, int type)
+{
+    ctrl->stage_set_speed(50000);// akos changed the speed
+    move_to_t_plate(x,y);
+
+    ctrl->pipette_move_to_x_sync(mid_s_x_p);
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
+    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
+
+}
+
+
 void MainWindow::pick_and_put()
 {
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
     this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
-    this->move_to_petri_B();
+    this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
 }
 
 void MainWindow::predict_sph(){
@@ -1073,17 +1094,19 @@ void MainWindow::on_move_to_s_plate_clicked()
     ctrl->stage_move_to_y_sync(s_y);
 }
 
-void MainWindow::move_to_t_plate()
+void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
-    int s_x = STAGE_FIRST_T_WELL_LEFT_X+ui->t_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(ui->t_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
+
+    int s_x = STAGE_FIRST_T_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_T_WELL_TOP_Y+y_idx*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
     ctrl->stage_move_to_y_sync(s_y+18000);
 }
 
 void MainWindow::on_move_to_t_plate_clicked()
 {
-    m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this);
+    m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this
+                                            ,ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
 }
 
 void MainWindow::change_plate()
@@ -1099,6 +1122,18 @@ void MainWindow::change_plate()
 
 void MainWindow::collect_selected_obj()
 {
+    auto start = std::chrono::system_clock::now();
+    int s_idx=0;
+    int t_idx=0;
+    this->xz_stage_pickup_sph(s_idx);
+    this->put_to_target_plate(1,1);
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+
+        // CHRONO END
+    std::cout << "[SCANNING] elapsed time: " << elapsed_seconds.count() << "s\n";
+
+
 
 }
 
