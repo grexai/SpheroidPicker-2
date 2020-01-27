@@ -2039,6 +2039,19 @@ Stage</string>
      <string>Change plate</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_6">
+    <property name="geometry">
+     <rect>
+      <x>1830</x>
+      <y>570</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>collect TEST</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -2071,6 +2084,9 @@ Stage</string>
      <string>Tools</string>
     </property>
     <addaction name="actionCalibrate_Pipette"/>
+    <addaction name="separator"/>
+    <addaction name="actionSpheroid_selector"/>
+    <addaction name="actionPlate_selector"/>
    </widget>
    <addaction name="menuFIle"/>
    <addaction name="menuTheme"/>
@@ -2108,6 +2124,16 @@ Stage</string>
   <action name="actionHW_selector">
    <property name="text">
     <string>Hardware selector</string>
+   </property>
+  </action>
+  <action name="actionSpheroid_selector">
+   <property name="text">
+    <string>Spheroid selector</string>
+   </property>
+  </action>
+  <action name="actionPlate_selector">
+   <property name="text">
+    <string>Plate selector</string>
    </property>
   </action>
  </widget>

@@ -15,6 +15,8 @@ public:
     explicit Plateselector(QWidget *parent = nullptr);
     ~Plateselector();
 
+
+
 private:
     Ui::Plateselector *ui;
 };

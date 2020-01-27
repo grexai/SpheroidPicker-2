@@ -12,3 +12,5 @@ Plateselector::~Plateselector()
 {
     delete ui;
 }
+
+

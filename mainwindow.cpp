@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
-
+    sph_s = new spheroid_selector;
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
 
     progress.setValue(50);
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
                           propreader->cfg.model_weights.c_str(),
                           propreader->cfg.textGraph.c_str());
     }
-
+    p_s = new Plateselector;
     automethods = new auto_methods(ctrl,cameracv,dl);
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
@@ -807,7 +807,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     //set Pickup speeds
     //ui->found_objects->currentIndex()
     int original_stage_speed = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(3000);
+    ctrl->stage_set_speed(15000);
     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
     ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
@@ -851,6 +851,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
+    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
 
 }
 
@@ -884,8 +885,13 @@ void MainWindow::predict_sph(){
        ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)
                                                       +" A:" + QString::number(im_obj.at(idx).at(3),'f',1)
                                                       +" C:" + QString::number(im_obj.at(idx).at(4),'f',3));
+        sph_s->set_list(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)
+                    +" A:" + QString::number(im_obj.at(idx).at(3),'f',1)
+                    +" C:" + QString::number(im_obj.at(idx).at(4),'f',3));
+
     }
 
+    sph_s->list_props();
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
@@ -924,7 +930,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     //TODO
     //MOVE the pipette OUT
     //const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
-    //const float platesize_y = ui->set_plate_size_spinbox_2->value()*10000;
+    //const float pla2tesize_y = ui->set_plate_size_spinbox_2->value()*10000;
     const float platesize_x= plate_w_mm*C_MM_TO_UMx0p1;
     const float platesize_y = plate_h_mm*C_MM_TO_UMx0p1;
     int object_counter = 0;
@@ -1120,20 +1126,22 @@ void MainWindow::change_plate()
     ctrl->stage_move_to_y_sync(ymin);
 }
 
-void MainWindow::collect_selected_obj()
+void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
-    int s_idx=0;
-    int t_idx=0;
-    this->xz_stage_pickup_sph(s_idx);
-    this->put_to_target_plate(1,1);
+
+    int y_idx=0,x_idx=0;
+    for (int idx = 0; idx<selected_obj.size();++idx)
+    {
+        this->xz_stage_pickup_sph(selected_obj.at(idx));
+        this->put_to_target_plate(x_idx,y_idx);
+        if(x_idx>8){x_idx=0;y_idx++; }
+        x_idx++;
+    }
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-
-        // CHRONO END
-    std::cout << "[SCANNING] elapsed time: " << elapsed_seconds.count() << "s\n";
-
-
+    std::cout << "[SPHEROID COLLECTING] elapsed time: " <<
+                 elapsed_seconds.count() << "s\n";
 
 }
 
@@ -1144,3 +1152,21 @@ void MainWindow::on_s_getmin_clicked()
    QTextStream(stdout)<<"stage min x,y (" <<x << " , " <<y <<")"<<endl;
 }
 
+
+void MainWindow::on_actionSpheroid_selector_triggered()
+{
+
+    sph_s->show();
+}
+
+void MainWindow::on_actionPlate_selector_triggered()
+{
+    p_s = new Plateselector;
+    p_s->show();
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    std::vector<int> selected_obj = {0,1};
+    m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
+}

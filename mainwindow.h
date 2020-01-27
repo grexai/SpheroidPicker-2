@@ -10,6 +10,8 @@
 #include <imagetools.h>
 #include <stagecontroller.h>
 #include <calibratedialog.h>
+#include <spheroid_selector.h>
+#include <plateselector.h>
 #include <comps.h>
 #include <controller.h>
 #include <cameracv.h>
@@ -32,6 +34,7 @@ public:
     ~MainWindow();
     void setdarkstyle();
     void setdefault();
+
     cv::Mat TM;
 signals:
     // The signal of transmit the coordinates of the mouse position
@@ -51,7 +54,7 @@ public slots:
     void show_on_view_2();
 protected:
 
-
+    std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
     QProgressDialog* m_stich_prog= nullptr;
     int m_progvalue=0;
     int m_stich_progvalue=0;
@@ -240,10 +243,16 @@ private slots:
 
      void change_plate();
 
-     void collect_selected_obj();
+     void collect_selected_obj(std::vector<int> selected_obj);
 
      void on_s_getmin_clicked();
 
+
+     void on_actionSpheroid_selector_triggered();
+
+     void on_actionPlate_selector_triggered();
+
+     void on_pushButton_6_clicked();
 
 
 private:
@@ -257,6 +266,8 @@ private:
     QImage* qfrm_t2= nullptr;
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
+    spheroid_selector *sph_s= nullptr;
+    Plateselector *p_s= nullptr;
     float m_img_width;
     float m_img_height;
 
@@ -268,9 +279,10 @@ private:
     int m_stage_abs_starter_y = 0;
 
 
-    std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
+
     std::atomic_bool m_s_t_acitive;
     cv::Mat* Mimage = nullptr;
+
     //threads
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
@@ -281,11 +293,14 @@ private:
     std::thread* m_create_mosaic_thread = nullptr;
     std::thread* m_center_selected_sph_thread = nullptr;
     std::thread* m_stage_plate_thread = nullptr;
+     std::thread* m_collect_thread = nullptr;
     //TEST
     QTimer *timer1= nullptr ;
     QThread *thread1= nullptr;
 
 
 };
+
+
 
 #endif // MAINWINDOW_H

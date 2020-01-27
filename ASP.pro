@@ -43,7 +43,8 @@ SOURCES += \
     cameracv.cpp \
     auto_methods.cpp \
     hardwareselector.cpp \
-    plateselector.cpp
+    plateselector.cpp \
+    spheroid_selector.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -63,13 +64,15 @@ HEADERS += \
     auto_methods.h \
     counter.h \
     hardwareselector.h \
-    plateselector.h
+    plateselector.h \
+    spheroid_selector.h
 
 FORMS += \
         mainwindow.ui \
     calibratedialog.ui \
     hardwareselector.ui \
-    plateselector.ui
+    plateselector.ui \
+    spheroid_selector.ui
 
 
 # Default rules for deployment.
