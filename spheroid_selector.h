@@ -20,6 +20,7 @@ public slots:
     void set_list(QString data);
     void list_props();
     std::vector<int> list_checked();
+    void clear_list();
 private slots:
     void on_pushButton_clicked();
 

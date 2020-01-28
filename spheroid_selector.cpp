@@ -14,7 +14,8 @@ spheroid_selector::~spheroid_selector()
 }
 
 void spheroid_selector::on_pushButton_clicked()
-{   this->list_checked();
+{
+    this->list_checked();
 }
 
 void spheroid_selector::set_list(QString data)
@@ -26,6 +27,7 @@ void spheroid_selector::set_list(QString data)
 
 void spheroid_selector::list_props()
 {
+
     std::cout<< ui->Object_list->count() <<  std::endl;
     for (int idx=0; idx<ui->Object_list->count();++idx )
     {
@@ -40,12 +42,10 @@ void spheroid_selector::list_props()
 
 std::vector<int> spheroid_selector::list_checked()
 {
-    std::vector<int> checked = {0};
+    std::vector<int> checked ;
     for (int idx=0; idx<ui->Object_list->count();++idx )
     {
        auto item = ui->Object_list->item(idx);
-
-        std::cout<<item->checkState()<< std::endl;
         if(item->checkState()==2)
         {
             checked.push_back(idx);
@@ -54,5 +54,8 @@ std::vector<int> spheroid_selector::list_checked()
     return checked;
 }
 
-
+void spheroid_selector::clear_list()
+{
+    ui->Object_list->clear();
+}
 
