@@ -1584,6 +1584,16 @@ Stage</string>
       <number>4</number>
      </property>
     </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>70</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">
     <property name="geometry">

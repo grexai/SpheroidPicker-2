@@ -888,19 +888,19 @@ void MainWindow::predict_sph(){
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     QPainter p(qfrm_t2);
-    p.setPen(Qt::green);
+    p.setPen(Qt::black);
     p.setFont(QFont("Arial", 20));
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
-        QString text(QString::number(idx) );
+       QString text(QString::number(idx) );
        global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(2),'f',1)
-                                                      +" A:" + QString::number(im_obj.at(idx).at(3),'f',1)
-                                                      +" C:" + QString::number(im_obj.at(idx).at(4),'f',3));
+       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(4),'f',1)
+                                                      +" A:" + QString::number(im_obj.at(idx).at(5),'f',1)
+                                                      +" C:" + QString::number(im_obj.at(idx).at(6),'f',3));
         sph_s->set_list(text+". Spheroid"
-                    +" Perimeter: " + QString::number(im_obj.at(idx).at(2),'f',1)
-                    +" Aera: " + QString::number(im_obj.at(idx).at(3),'f',1)
-                    +" Circularity: " + QString::number(im_obj.at(idx).at(4),'f',3));
+                    +" Perimeter: " + QString::number(im_obj.at(idx).at(4),'f',1)
+                    +" Aera: " + QString::number(im_obj.at(idx).at(5),'f',1)
+                    +" Circularity: " + QString::number(im_obj.at(idx).at(6),'f',3));
         const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
 
         p.drawText(rectangle,Qt::TextSingleLine,text);
@@ -1047,9 +1047,9 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     {
        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
        sph_s->set_list(QString::number(i) + ". Spheroid"
-                   +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)
-                   +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)
-                   +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
+                   +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
+                   +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
+                   +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
 
     }
     sph_s->list_props();

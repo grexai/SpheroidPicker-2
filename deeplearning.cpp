@@ -669,6 +669,8 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             std::vector <float> outcoors;
             outcoors.push_back( bx);
             outcoors.push_back(by);
+            outcoors.push_back(bb_x);
+            outcoors.push_back(bb_y);
             imagetools asd;
             std::vector<float> features = asd.getobjectprops(label);
             outcoors.push_back(features.at(0)*nx);//length
