@@ -792,9 +792,9 @@ void MainWindow::move_to_petri_B()
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
@@ -809,21 +809,21 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     //set Pickup speeds
     //ui->found_objects->currentIndex()
     int original_stage_speed = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(15000);
+    ctrl->stage_set_speed(30000);
     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
-    ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+    ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
     //
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //move to the middle of image with the pipette
     ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
     //move Z axis down to the petri (auto Z height)
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()));
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     // PICK UP WITH SYRINGE
     ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
     // MOVE x axis out of image
 
@@ -846,10 +846,9 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     move_to_t_plate(x,y);
 
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
+     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
@@ -860,11 +859,17 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
 
 void MainWindow::pick_and_put()
 {
+    auto start = std::chrono::system_clock::now();
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
     this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
     this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+        // CHRONO END
+    std::cout << "[PICK AND PUT]elapsed time: " << elapsed_seconds.count() << "s\n";
 }
 
 void MainWindow::predict_sph(){
@@ -1121,7 +1126,7 @@ void MainWindow::on_move_to_s_plate_clicked()
 
 void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
-
+    std::cout<< "t_p"<<x_idx <<std::endl;
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
     int s_y = STAGE_FIRST_T_WELL_TOP_Y+y_idx*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
@@ -1137,11 +1142,11 @@ void MainWindow::on_move_to_t_plate_clicked()
 void MainWindow::change_plate()
 {
     int ymin = ctrl->stage_get_y_min_pos();
-    int xmax = ctrl->stage_get_x_max_pos();
+    int xmin = ctrl->stage_get_x_min_pos();
     ctrl->pipette_home_z();
-    std::this_thread::sleep_for(std::chrono::microseconds(3000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_home_x();
-    ctrl->stage_move_to_x_async(xmax);
+    ctrl->stage_move_to_x_async(xmin);
     ctrl->stage_move_to_y_sync(ymin);
 }
 
@@ -1152,8 +1157,10 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
     int y_idx=0,x_idx=0;
     for (int idx = 0; idx<selected_obj.size();++idx)
     {
+        std:: cout <<"selected obj idx"<<selected_obj.at(idx) << std::endl;
         this->xz_stage_pickup_sph(selected_obj.at(idx));
         this->put_to_target_plate(x_idx,y_idx);
+        std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
         if(x_idx>8){x_idx=0;y_idx++; }
         x_idx++;
     }
