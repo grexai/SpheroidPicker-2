@@ -829,9 +829,10 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
     ctrl->pipette_movex_sync(-2.6f);
     ctrl->stage_set_speed(original_stage_speed);
+
     //TODO
     // this point CHECK if the spheroid picked up!
-    std::this_thread::sleep_for(std::chrono::milliseconds(4500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
         // CHRONO END

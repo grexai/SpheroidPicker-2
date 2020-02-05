@@ -664,6 +664,8 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             //saving coordinates and features
             float bx = static_cast<float>(bb[0])*nx;
             float by = static_cast<float>(bb[1]*nx);
+            float bb_x = static_cast<float>(bb[2])*nx;
+            float bb_y = static_cast<float>(bb[3])*nx;
             std::vector <float> outcoors;
             outcoors.push_back( bx);
             outcoors.push_back(by);
@@ -677,12 +679,11 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);
-
-
         }
         const int64_t total = labels.total();
         uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
         const int32_t* labelPtr = reinterpret_cast<const int32_t*>(labels.data);
+
         for (int64_t index = 0; index < total; ++index)
         {
             if (labelPtr[index] != 0)

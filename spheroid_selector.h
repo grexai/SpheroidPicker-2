@@ -23,7 +23,6 @@ public slots:
     void clear_list();
 private slots:
     void on_pushButton_clicked();
-
 private:
     Ui::spheroid_selector *ui;
 };
