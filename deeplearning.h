@@ -39,7 +39,7 @@ public:
     i_deeplearning(){}
     virtual ~i_deeplearning()= 0;
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) = 0;
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output)= 0;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes)= 0;
 };
 
 class invecption_v2 : public virtual i_deeplearning
@@ -52,7 +52,7 @@ public:
     void resize(cv::Mat& input, cv::Mat& out);
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) override;
     std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
+    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) override;
   //  std::vector<std::vector<float>> objpos;
     std::vector<std::string> classes;
     std::vector<cv::Scalar> colors;
@@ -143,11 +143,11 @@ public:
 
     cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) ;
 
-    std::vector<std::vector<float>> inferencing(cv::Mat& image) ;
+  //  std::vector<std::vector<float>> inferencing(cv::Mat& image,std::vector<cv::Mat>& bboxes) ;
 
     void create_session();
 
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output) override;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) override;
 
     virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;
 };

@@ -64,7 +64,7 @@ protected:
     i_deeplearning* dl= nullptr;
     propertyreader* propreader = nullptr;
     auto_methods* automethods = nullptr;
-
+    std::vector <cv::Mat> m_bboxes;
     std::vector<float>* cpos1 = nullptr;
     std::vector<float>* cpos2 = nullptr;
     std::vector<float>* cpos3= nullptr;

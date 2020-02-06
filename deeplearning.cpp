@@ -155,7 +155,7 @@ void invecption_v2::setup_dnn_network(const char* cf, const char* model_w, const
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output)
+std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes)
 {
     using namespace cv;
     using namespace std;
@@ -420,12 +420,12 @@ void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* model
     m_anchors = load_anchor(modelPath, IMAGE_SIZE);
     this->create_session();
 }
-
-std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,cv::Mat& output) {
-    std::vector<std::vector<float>> obj = this->inferencing(input);
+/*
+std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) {
+    std::vector<std::vector<float>> obj = this->inferencing(input, bboxes);
     output = input;
     return obj;
-}
+}*/
 
 void matterport_mrcnn::create_session(){
     m_options = TF_NewSessionOptions();
@@ -434,9 +434,10 @@ void matterport_mrcnn::create_session(){
     if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 }
 
-std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
+std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,cv::Mat& output,std::vector<cv::Mat>& bboxes){
 
     auto start = std::chrono::system_clock::now();
+    cv::Mat o_im = image;
     image.convertTo(image, CV_8UC3);
     cv::resize(image, image, cv::Size(1024, 576));
   //  cv::resize(image, image, cv::Size(512, 288));
@@ -667,20 +668,29 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
             float bb_x = static_cast<float>(bb[2])*nx;
             float bb_y = static_cast<float>(bb[3])*nx;
             std::vector <float> outcoors;
-            outcoors.push_back( bx);
-            outcoors.push_back(by);
-            outcoors.push_back(bb_x);
-            outcoors.push_back(bb_y);
+            outcoors.push_back( bx);  // Left   0
+            outcoors.push_back(by);   // Top    1
+            outcoors.push_back(bb_x); // Right  2
+            outcoors.push_back(bb_y); // Bottom 3
             imagetools asd;
             std::vector<float> features = asd.getobjectprops(label);
-            outcoors.push_back(features.at(0)*nx);//length
-            outcoors.push_back(features.at(1)*nx*nx);//area
-            outcoors.push_back(features.at(2));//circularity
-            outcoors.push_back((features.at(3)*nx) + bx); //mx // resize and recoordinate
-            outcoors.push_back((features.at(4)*nx) + by); //my
+            outcoors.push_back(features.at(0)*nx);//length 4
+            outcoors.push_back(features.at(1)*nx*nx);//area 5
+            outcoors.push_back(features.at(2));//circularity 6
+            outcoors.push_back((features.at(3)*nx) + bx); //mx 7// resize and recoordinate
+            outcoors.push_back((features.at(4)*nx) + by); //my 8
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);
+            //cv::Rect rect(cv::Point(bb[0], bb[1]), cv::Point(bb[2], bb[3]));
+         ////   cv::Rect myROI(cv::Point(static_cast<int>(bx),static_cast<int>( by)),cv::Point( static_cast<int>(bb_x), static_cast<int>(bb_y)));
+//            std::cout<< bx<< " : " << by<< " : " << bb_x<< " : " << bb_y<< " : " <<std::endl;
+            cv::Mat croppedRef(image, rect);
+            cv::Mat obj_cropped;
+            // Copy the data into new matrix
+            croppedRef.copyTo(obj_cropped);
+          //  obj_cropped.convertTo(obj_cropped,CV_8UC3);
+            bboxes.push_back(obj_cropped);
         }
         const int64_t total = labels.total();
         uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
@@ -702,7 +712,7 @@ std::vector<std::vector<float>> matterport_mrcnn::inferencing(cv::Mat &image){
         // CHRONO END
         std::cout << "[INFERENCE] elapsed time: " << elapsed_seconds.count() << "s\n";
         cv::resize(newImage, newImage, cv::Size(1920, 1080));
-        newImage.copyTo(image);
+        newImage.copyTo(output);
     }
     return objpos;
 }

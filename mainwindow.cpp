@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
     sph_s = new spheroid_selector;
+    sph_s->set_bbs(m_bboxes);
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
 
     progress.setValue(50);
@@ -64,8 +65,9 @@ MainWindow::MainWindow(QWidget *parent) :
                               nullptr);
         cv::Mat test= cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
         // start a fake inference for finish preload
+
         std::thread t_inf(&i_deeplearning::dnn_inference,dl,
-                          test,test);
+                          test,test,m_bboxes);
         t_inf.detach();
     }else{
         dl = new invecption_v2();
@@ -883,13 +885,16 @@ void MainWindow::predict_sph(){
 
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm);
+   // std::vector<cv::Mat> bbs;
+    this->m_bboxes.clear();
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,m_bboxes);
+
     ui->found_objects->clear();
     delete qfrm_t2;
     qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
     QPainter p(qfrm_t2);
     p.setPen(Qt::black);
-    p.setFont(QFont("Arial", 20));
+    p.setFont(QFont("Arial", 25));
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        QString text(QString::number(idx) );
@@ -945,6 +950,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
 
     //LOCKING CONTROLLER
     this->lock_ui();
+     this->m_bboxes.clear();
     //TODO
     //MOVE the pipette OUT
     //const float platesize_x= ui->set_plate_size_spinbox->value()*10000;
@@ -955,6 +961,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     std::string folder = "Scandata_";
     std::string datetime = "_";
     std::stringstream ss;
+
     ss << (ui->set_plate_size_spinbox->value());
     std::string plate_size_mm = ss.str();
     folder.append(plate_size_mm).append("mm_");
@@ -1007,11 +1014,11 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 imtools->saveImg(tmp.get(),num2str.c_str());
 
                 // INFERENCE AND FEATURE EXTRACTION
-                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter));
+                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),m_bboxes);
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                   for (int idx = 2;idx<7;++idx)
+                   for (int idx = 2;idx<8;++idx)
                    {
                        global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
                    }
