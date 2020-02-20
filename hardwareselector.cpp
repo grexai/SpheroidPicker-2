@@ -25,7 +25,8 @@ void hardwareselector::on_pushButton_clicked()
 {
     this->hide();
     main = new MainWindow(nullptr);
-    main->show();
+    //main->show();
+    main->showMaximized();
     main->set_h4(ui->comboBox_3->currentIndex());
     main->set_pip_man(ui->pip_manip_combobox->currentIndex());
     connect(main,SIGNAL(close_and_return_hw()),this,SLOT(show_hw_selector()));

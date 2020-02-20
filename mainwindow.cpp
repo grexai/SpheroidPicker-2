@@ -276,7 +276,7 @@ void MainWindow::update_window()
     calib_frame_view(displayfrm);
     delete qframe;
     qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
-    //QPainter p(qframe);
+    //QPainter p(qframe );
     qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
     ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
 }
@@ -523,8 +523,6 @@ void MainWindow::on_changeplate_button_clicked()
 {
     m_stage_plate_thread= new std::thread(&MainWindow::change_plate,this);
 }
-
-
 
 void MainWindow::on_start_screening_clicked()
 {
@@ -1123,27 +1121,34 @@ void MainWindow::show_on_view_2()
     ui->tabWidget->setCurrentWidget(ui->tab2);
 }
 
-void MainWindow::on_move_to_s_plate_clicked()
-{
-    int s_x = STAGE_FIRST_WELL_LEFT_X+ui->s_well_x_combobox->currentIndex()*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_WELL_TOP_Y+(ui->s_well_y_spinbox->value()-1)*DIA_96_WELLPLATE;
+void MainWindow::move_to_s_plate(int x_idx,int y_idx){
+    int s_x = STAGE_FIRST_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_WELL_TOP_Y+(y_idx-1)*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x);
     ctrl->stage_move_to_y_sync(s_y);
+}
+
+void MainWindow::on_move_to_s_plate_clicked()
+{
+    m_move_s_plate_thread = new std::thread(&MainWindow::move_to_s_plate,this
+                           ,ui->s_well_x_combobox->currentIndex(),
+                                            ui->s_well_y_spinbox->value());
 }
 
 void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
     std::cout<< "t_p"<<x_idx <<std::endl;
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_T_WELL_TOP_Y+y_idx*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(y_idx-1)*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
     ctrl->stage_move_to_y_sync(s_y+18000);
 }
 
 void MainWindow::on_move_to_t_plate_clicked()
 {
-    m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this
-                                            ,ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
+    m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this,
+                                            ui->t_well_x_combobox->currentIndex(),
+                                            ui->t_well_y_spinbox->value());
 }
 
 void MainWindow::change_plate()
@@ -1168,7 +1173,7 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
         this->xz_stage_pickup_sph(selected_obj.at(idx));
         this->put_to_target_plate(x_idx,y_idx);
         std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
-        if(x_idx>8){x_idx=0;y_idx++; }
+        if(x_idx>6){x_idx=0;y_idx++; }
         x_idx++;
     }
     auto end = std::chrono::system_clock::now();
@@ -1189,6 +1194,7 @@ void MainWindow::on_s_getmin_clicked()
 void MainWindow::on_actionSpheroid_selector_triggered()
 {
     sph_s->show();
+    sph_s->activateWindow();
 }
 
 void MainWindow::on_actionPlate_selector_triggered()

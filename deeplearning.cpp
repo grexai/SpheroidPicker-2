@@ -74,7 +74,7 @@ std::vector<std::vector<float>> invecption_v2::postprocess(cv::Mat& frame, const
         float score = outDetections.at<float>(i, 2);
         if (score > confThreshold)
         {
-            // Extract the bounding box
+            // Extract the bounding boxM
             int classId = static_cast<int>(outDetections.at<float>(i, 1));
             int left = static_cast<int>(frame.cols * outDetections.at<float>(i, 3));
             int top = static_cast<int>(frame.rows * 1.422222f* outDetections.at<float>(i, 4));
@@ -686,10 +686,10 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
          ////   cv::Rect myROI(cv::Point(static_cast<int>(bx),static_cast<int>( by)),cv::Point( static_cast<int>(bb_x), static_cast<int>(bb_y)));
 //            std::cout<< bx<< " : " << by<< " : " << bb_x<< " : " << bb_y<< " : " <<std::endl;
             cv::Mat croppedRef(image, rect);
-            cv::Mat obj_cropped;
+            cv::Mat obj_cropped(roi.rows,roi.cols,CV_8UC3);
             // Copy the data into new matrix
             croppedRef.copyTo(obj_cropped);
-          //  obj_cropped.convertTo(obj_cropped,CV_8UC3);
+            obj_cropped.convertTo(obj_cropped,CV_8UC3);
             bboxes.push_back(obj_cropped);
         }
         const int64_t total = labels.total();

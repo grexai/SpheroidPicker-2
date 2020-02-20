@@ -235,6 +235,8 @@ private slots:
 
      void create_mosaic();
 
+     void move_to_s_plate(int x_idx,int y_idx);
+
      void move_to_t_plate(int x_idx,int y_idx);
 
      void on_move_to_s_plate_clicked();
@@ -246,7 +248,6 @@ private slots:
      void collect_selected_obj(std::vector<int> selected_obj);
 
      void on_s_getmin_clicked();
-
 
      void on_actionSpheroid_selector_triggered();
 
@@ -287,6 +288,7 @@ private:
     std::thread* m_screening_thread= nullptr;
     std::thread* m_picking_thread= nullptr;
     std::thread* m_predict_thread = nullptr;
+    std::thread* m_move_s_plate_thread = nullptr;
     std::thread* m_move_t_plate_thread = nullptr;
     std::thread* m_move_petri_b_thread = nullptr;
     std::thread* m_put_and_pick_thread = nullptr;
