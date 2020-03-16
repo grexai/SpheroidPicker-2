@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
 
     progress.setValue(50);
+    ctrl->pipette_home_z();
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    ctrl->pipette_home_x();
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
                                                                 tr("Do yo want to run stage inicialization?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
@@ -791,7 +794,7 @@ void MainWindow::move_to_petri_B()
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3f));
 
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
@@ -809,21 +812,46 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     //set Pickup speeds
     //ui->found_objects->currentIndex()
     int original_stage_speed = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(30000);
+    ctrl->stage_set_speed(35000);
     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
-    ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
-    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
+    if (global_obj_im_coordinates->at(obj_idx).at(0) <= global_obj_im_coordinates->at(obj_idx).at(1)){
+        ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+        ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
+    }else
+    {
+        ctrl->stage_move_to_y_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
+        ctrl->stage_move_to_x_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+    }
     //
+    // FILE NAME GENERATON
+    std::string folder = "Pick_ups/";
+    std::string fname = "spheroid";
+    std::string datetime = "_";
+
+    if (QDir().exists(folder.c_str()))
+    {
+        QTextStream(stdout) << "this folder already folder exists"<< endl;
+    }
+    else
+    {
+        QTextStream(stdout)<< folder.c_str()<< "created" << endl;
+        QDir().mkdir(folder.c_str());
+    }
+
+    std::stringstream ss;
+    fname.append(get_date_time_str());
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //move to the middle of image with the pipette
+    imtools->saveImg((cameracv->get_current_frm().get()),
+                     (folder+fname));
     ctrl->pipette_move_to_x_sync(this->mid_s_x_p);
     //move Z axis down to the petri (auto Z height)
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
     // PICK UP WITH SYRINGE
     ctrl->pipette_extrude_relative(-static_cast<float>(ui->p_extruder_step_box->value()));
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
     // MOVE x axis out of image
 
@@ -832,7 +860,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
     //TODO
     // this point CHECK if the spheroid picked up!
-    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
         // CHRONO END
@@ -842,17 +870,18 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
 void MainWindow::put_to_target_plate(int x,int y, int type)
 {
-    ctrl->stage_set_speed(50000);// akos changed the speed
+    ctrl->stage_set_speed(40000);// akos changed the speed
     move_to_t_plate(x,y);
 
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    std::cout <<"++" <<static_cast<float>(ui->set_z_spinbox->value()+0.3f) << std::endl;
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3f));
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
      std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 }
 
@@ -931,6 +960,7 @@ std::string MainWindow::get_date_time_str()
     datetime.append((QString::number(current_date.day())).toStdString()+"-");
     datetime.append((QString::number(current_time.hour())).toStdString());
     datetime.append((QString::number(current_time.minute())).toStdString());
+    datetime.append((QString::number(current_time.second())).toStdString());
     return datetime;
 }
 
@@ -1117,7 +1147,7 @@ void MainWindow::show_on_view_2()
     qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
 
-    //ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 }
 
@@ -1132,23 +1162,23 @@ void MainWindow::on_move_to_s_plate_clicked()
 {
     m_move_s_plate_thread = new std::thread(&MainWindow::move_to_s_plate,this
                            ,ui->s_well_x_combobox->currentIndex(),
-                                            ui->s_well_y_spinbox->value());
+                                            ui->s_well_y_spinbox->value()-1);
 }
 
 void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
     std::cout<< "t_p"<<x_idx <<std::endl;
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(y_idx-1)*DIA_96_WELLPLATE;
-    ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
-    ctrl->stage_move_to_y_sync(s_y+18000);
+    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(y_idx)*DIA_96_WELLPLATE;
+    ctrl->stage_move_to_y_async(s_y+18000);
+    ctrl->stage_move_to_x_sync(s_x+27000); // to make it center constans into96
 }
 
 void MainWindow::on_move_to_t_plate_clicked()
 {
     m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this,
                                             ui->t_well_x_combobox->currentIndex(),
-                                            ui->t_well_y_spinbox->value());
+                                            ui->t_well_y_spinbox->value()-1);
 }
 
 void MainWindow::change_plate()
@@ -1157,7 +1187,8 @@ void MainWindow::change_plate()
     int xmin = ctrl->stage_get_x_min_pos();
     ctrl->pipette_home_z();
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    ctrl->pipette_home_x();
+  //  ctrl->pipette_home_x();
+    ctrl->pipette_movex_sync(-10.0f);
     ctrl->stage_move_to_x_async(xmin);
     ctrl->stage_move_to_y_sync(ymin);
 }
