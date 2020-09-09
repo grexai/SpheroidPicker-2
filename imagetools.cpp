@@ -121,7 +121,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
             object_features.at(0) = (static_cast <float>(arclength));
             object_features.at(1) =  static_cast <float>(area);
             object_features.at(2)= static_cast <float>( circularity);
-
+            fitEllipse(contours[i]);
             cout << i << "object circularity " << object_features.at(0) << std::endl;
             Scalar color = Scalar(255,  255, 255);
             drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());

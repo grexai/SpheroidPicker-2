@@ -842,7 +842,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
 void MainWindow::put_to_target_plate(int x,int y, int type)
 {
-    ctrl->stage_set_speed(50000);// akos changed the speed
+    ctrl->stage_set_speed(50000);   // akos changed the speed
     move_to_t_plate(x,y);
 
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
@@ -1130,8 +1130,8 @@ void MainWindow::move_to_s_plate(int x_idx,int y_idx){
 
 void MainWindow::on_move_to_s_plate_clicked()
 {
-    m_move_s_plate_thread = new std::thread(&MainWindow::move_to_s_plate,this
-                           ,ui->s_well_x_combobox->currentIndex(),
+    m_move_s_plate_thread = new std::thread(&MainWindow::move_to_s_plate,this,
+                                            ui->s_well_x_combobox->currentIndex(),
                                             ui->s_well_y_spinbox->value());
 }
 
@@ -1208,3 +1208,5 @@ void MainWindow::on_pushButton_6_clicked()
     std::vector<int> selected_obj = sph_s->list_checked();
     m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
 }
+
+

@@ -10,8 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>1920</width>
-    <height>840</height>
+    <height>921</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Automatic Spheroid Picker</string>
@@ -21,10 +26,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>550</y>
-      <width>301</width>
+      <y>560</y>
+      <width>331</width>
       <height>211</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="title">
      <string>Pressure controller</string>
@@ -32,10 +42,10 @@
     <widget class="QLabel" name="c_p_text">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>140</x>
        <y>150</y>
-       <width>121</width>
-       <height>16</height>
+       <width>151</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="text">
@@ -589,8 +599,8 @@
       <rect>
        <x>120</x>
        <y>30</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -674,6 +684,11 @@
        <height>41</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>X+</string>
      </property>
@@ -681,7 +696,7 @@
     <widget class="QSpinBox" name="s_step_spinbox">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>30</y>
        <width>61</width>
        <height>31</height>
@@ -706,6 +721,11 @@
        <height>41</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Y-</string>
      </property>
@@ -718,6 +738,11 @@
        <width>41</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Center
@@ -733,6 +758,11 @@ Stage</string>
        <height>41</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Y+</string>
      </property>
@@ -745,6 +775,11 @@ Stage</string>
        <width>61</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Steps size</string>
@@ -759,6 +794,11 @@ Stage</string>
        <height>41</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>X-</string>
      </property>
@@ -772,7 +812,7 @@ Stage</string>
     <widget class="QSpinBox" name="s_speed_spinbox">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>70</y>
        <width>62</width>
        <height>31</height>
@@ -833,6 +873,11 @@ Stage</string>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>get coors</string>
      </property>
@@ -846,6 +891,11 @@ Stage</string>
        <height>20</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Speed</string>
      </property>
@@ -855,9 +905,14 @@ Stage</string>
       <rect>
        <x>10</x>
        <y>110</y>
-       <width>61</width>
+       <width>71</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Acceletaion</string>
@@ -866,7 +921,7 @@ Stage</string>
     <widget class="QSpinBox" name="s_accel_spinbox">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>110</y>
        <width>62</width>
        <height>31</height>
@@ -884,6 +939,11 @@ Stage</string>
        <width>61</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Getmin</string>
@@ -911,6 +971,11 @@ Stage</string>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>get coors</string>
      </property>
@@ -923,6 +988,11 @@ Stage</string>
        <width>41</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>X-</string>
@@ -937,6 +1007,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Y-</string>
      </property>
@@ -944,14 +1019,14 @@ Stage</string>
     <widget class="QDoubleSpinBox" name="pip_step_spinbox">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>110</x>
        <y>30</y>
        <width>61</width>
        <height>31</height>
       </rect>
      </property>
      <property name="decimals">
-      <number>4</number>
+      <number>3</number>
      </property>
      <property name="value">
       <double>1.000000000000000</double>
@@ -966,6 +1041,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Z-</string>
      </property>
@@ -978,6 +1058,11 @@ Stage</string>
        <width>41</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>X+</string>
@@ -992,6 +1077,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Z+</string>
      </property>
@@ -1005,6 +1095,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Y+</string>
      </property>
@@ -1017,6 +1112,11 @@ Stage</string>
        <width>81</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string> Home Pipette</string>
@@ -1070,6 +1170,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Home X</string>
      </property>
@@ -1083,6 +1188,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Home Y</string>
      </property>
@@ -1095,6 +1205,11 @@ Stage</string>
        <width>41</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Home Z</string>
@@ -1122,6 +1237,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>X Max</string>
      </property>
@@ -1134,6 +1254,11 @@ Stage</string>
        <width>41</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Y Max</string>
@@ -1148,6 +1273,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Z Max</string>
      </property>
@@ -1155,7 +1285,7 @@ Stage</string>
     <widget class="QSpinBox" name="p_set_speed_spinbox">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>110</x>
        <y>70</y>
        <width>61</width>
        <height>31</height>
@@ -1183,6 +1313,11 @@ Stage</string>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Step size</string>
      </property>
@@ -1196,6 +1331,11 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Speed</string>
      </property>
@@ -1205,9 +1345,14 @@ Stage</string>
       <rect>
        <x>10</x>
        <y>110</y>
-       <width>61</width>
+       <width>81</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Acceleration</string>
@@ -1216,7 +1361,7 @@ Stage</string>
     <widget class="QDoubleSpinBox" name="doubleSpinBox">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>110</x>
        <y>110</y>
        <width>62</width>
        <height>31</height>
@@ -1248,14 +1393,244 @@ Stage</string>
     <zorder>label_4</zorder>
     <zorder>doubleSpinBox</zorder>
    </widget>
+   <widget class="QGroupBox" name="imageing_box">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>780</y>
+      <width>171</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Imaging</string>
+    </property>
+    <widget class="QPushButton" name="save_image_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save Image</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="imagename_lineedit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Image name</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="objcounter">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>190</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>20</y>
+      <width>1311</width>
+      <height>771</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::South</enum>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="live_image">
+     <attribute name="title">
+      <string>Live Image</string>
+     </attribute>
+     <widget class="QGraphicsView" name="graphicsView">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>1280</width>
+        <height>720</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab2">
+     <attribute name="title">
+      <string>Image Viewer</string>
+     </attribute>
+     <widget class="QGraphicsView" name="graphicsView_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>1280</width>
+        <height>720</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="syringe_box">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>420</y>
+      <width>391</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Syringe Control</string>
+    </property>
+    <widget class="QPushButton" name="p_em_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Drawing in</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="p_ep_button">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>30</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Expel</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="p_extruder_step_box">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>30</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>80</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>90</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This amount adds to the drawing in/ expel value, in automatic mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Extra expel:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="pushButton_6">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>800</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Collect the selected objects. The user must select first the objects from tools -&amp;gt; Spheroid selector&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Collect selected</string>
+    </property>
+   </widget>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>10</y>
+      <y>20</y>
       <width>171</width>
       <height>61</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="title">
      <string>Camera Settings</string>
@@ -1265,7 +1640,7 @@ Stage</string>
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>80</width>
+       <width>131</width>
        <height>21</height>
       </rect>
      </property>
@@ -1396,671 +1771,579 @@ Stage</string>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="imageing_box">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>200</y>
-      <width>171</width>
-      <height>91</height>
+      <y>270</y>
+      <width>181</width>
+      <height>211</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Imaging</string>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
-    <widget class="QPushButton" name="save_image_button">
+    <property name="title">
+     <string>AI and manipulation</string>
+    </property>
+    <widget class="QPushButton" name="predict_sph">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Find Spheroid</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="found_objects_txt">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>151</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Found objects quick select</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="found_objects">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>151</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="currentText">
+      <string/>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pick_and_put">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>180</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pick and put selected</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="petri_b">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Put to other petri</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pickup_sph">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>120</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pick up selected</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="plate_manage_groupbox">
+    <property name="geometry">
+     <rect>
+      <x>1740</x>
+      <y>500</y>
+      <width>161</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Plate managment</string>
+    </property>
+    <widget class="QPushButton" name="changeplate_button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moves the capillary out of the microscope, and moves the stage to the bottom right corner. This makes easier to change the plate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Change plate</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="t_well_x_combobox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="currentText">
+      <string>A</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>H</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>E</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>D</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>C</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>A</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QSpinBox" name="t_well_y_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>100</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>12</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="s_well_y_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>40</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>12</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_to_t_plate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move to T Plate</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_to_s_plate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move to S Plate</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="s_well_x_combobox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="currentText">
+      <string>A</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>H</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>G</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>F</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>E</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>D</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>C</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>A</string>
+      </property>
+     </item>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="Scanning_groupbox">
+    <property name="geometry">
+     <rect>
+      <x>1000</x>
+      <y>780</y>
+      <width>721</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Scanning</string>
+    </property>
+    <widget class="QComboBox" name="magnification">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>50</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="currentText">
+      <string>5.5X</string>
+     </property>
+     <property name="currentIndex">
+      <number>6</number>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>0.5X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>2X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>4X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5X</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>5.5X</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PLATE size (mm)</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>3.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>150.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="scanning_progress">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>50</y>
+       <width>241</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="view_scan">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>50</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>View scan</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="current_scaningpos">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>20</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Scaning pos: </string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="start_screening">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>30</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Start screening</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="set_plate_size_spinbox_2">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>50</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>2.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>2.000000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>1730</x>
+      <y>110</y>
+      <width>181</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Calibration</string>
+    </property>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Z dive speed</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="set_z_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>60</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>999.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>50.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="z_dive_speed">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>30</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>999.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>500.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>131</width>
+       <width>81</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Save Image</string>
+      <string>auto z height</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="imagename_lineedit">
+    <widget class="QPushButton" name="save_m_p_button">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>131</width>
+       <x>20</x>
+       <y>90</y>
+       <width>151</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Image name</string>
+      <string>Set X midpoint</string>
      </property>
     </widget>
-    <widget class="QLabel" name="objcounter">
+    <widget class="QPushButton" name="pushButton_5">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>190</y>
-       <width>47</width>
-       <height>13</height>
+       <x>20</x>
+       <y>120</y>
+       <width>151</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>Set Z height</string>
      </property>
     </widget>
-   </widget>
-   <widget class="QLabel" name="current_scaningpos">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>700</y>
-      <width>151</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Scaning pos: </string>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="scanning_progress">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>730</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="view_scan">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>670</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>View scan</string>
-    </property>
-   </widget>
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>20</y>
-      <width>1311</width>
-      <height>761</height>
-     </rect>
-    </property>
-    <property name="tabPosition">
-     <enum>QTabWidget::South</enum>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="live_image">
-     <attribute name="title">
-      <string>Live Image</string>
-     </attribute>
-     <widget class="QGraphicsView" name="graphicsView">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>1280</width>
-        <height>720</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab2">
-     <attribute name="title">
-      <string>Image Viewer</string>
-     </attribute>
-     <widget class="QGraphicsView" name="graphicsView_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>1280</width>
-        <height>720</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="syringe_box">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>440</y>
-      <width>391</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Syringe Control</string>
-    </property>
-    <widget class="QPushButton" name="p_em_button">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>61</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>E-</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="p_ep_button">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>30</y>
-       <width>61</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>E+</string>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="p_extruder_step_box">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>30</y>
-       <width>121</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="decimals">
-      <number>4</number>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>70</y>
-       <width>121</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>610</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>1</number>
-    </property>
-    <property name="minimum">
-     <double>3.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>150.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>580</y>
-      <width>81</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PLATE size (mm)</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="start_screening">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>640</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start screening</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="petri_b">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>390</y>
-      <width>151</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Put to other petri</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pick_and_put">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>420</y>
-      <width>151</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pick and put EXPERIMENTAL</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>110</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>auto z height</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="save_m_p_button">
-    <property name="geometry">
-     <rect>
-      <x>1810</x>
-      <y>140</y>
-      <width>81</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>setX midpoint</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="set_z_spinbox">
-    <property name="geometry">
-     <rect>
-      <x>1820</x>
-      <y>110</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>999.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>50.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="z_dive_speed">
-    <property name="geometry">
-     <rect>
-      <x>1820</x>
-      <y>80</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>999.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>500.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>80</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Z dive speed</string>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="set_plate_size_spinbox_2">
-    <property name="geometry">
-     <rect>
-      <x>1790</x>
-      <y>610</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="decimals">
-     <number>1</number>
-    </property>
-    <property name="minimum">
-     <double>2.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>2.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="found_objects">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>330</y>
-      <width>151</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string/>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="predict_sph">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>300</y>
-      <width>151</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Predtict spheroid</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pickup_sph">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>360</y>
-      <width>151</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Pick up selected</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="magnification">
-    <property name="geometry">
-     <rect>
-      <x>1850</x>
-      <y>610</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string>5.5X</string>
-    </property>
-    <property name="currentIndex">
-     <number>6</number>
-    </property>
-    <property name="sizeAdjustPolicy">
-     <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
-    </property>
-    <item>
-     <property name="text">
-      <string>0.5X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>1X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>2X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>3X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>4X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>5X</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>5.5X</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QCheckBox" name="check_text">
-    <property name="geometry">
-     <rect>
-      <x>1840</x>
-      <y>670</y>
-      <width>72</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Text</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="s_well_x_combobox">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>460</y>
-      <width>41</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>H</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>G</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>F</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>E</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>D</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QSpinBox" name="s_well_y_spinbox">
-    <property name="geometry">
-     <rect>
-      <x>1790</x>
-      <y>460</y>
-      <width>43</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>12</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="move_to_s_plate">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>490</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Move to S Plate</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="t_well_x_combobox">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>520</y>
-      <width>41</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>H</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>G</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>F</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>E</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>D</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QSpinBox" name="t_well_y_spinbox">
-    <property name="geometry">
-     <rect>
-      <x>1790</x>
-      <y>520</y>
-      <width>43</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>1</number>
-    </property>
-    <property name="maximum">
-     <number>12</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="move_to_t_plate">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>550</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Move to T Plate</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_5">
-    <property name="geometry">
-     <rect>
-      <x>1730</x>
-      <y>140</y>
-      <width>80</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set Z height</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="changeplate_button">
-    <property name="geometry">
-     <rect>
-      <x>1830</x>
-      <y>460</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Change plate</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_6">
-    <property name="geometry">
-     <rect>
-      <x>1830</x>
-      <y>570</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>collect TEST</string>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -2069,7 +2352,7 @@ Stage</string>
      <x>0</x>
      <y>0</y>
      <width>1920</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
@@ -2124,6 +2407,11 @@ Stage</string>
   <action name="actionCalibrate_Pipette">
    <property name="text">
     <string>Calibrate Pipette</string>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
    </property>
   </action>
   <action name="actionLight">

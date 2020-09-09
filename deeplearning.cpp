@@ -463,7 +463,6 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
         1.0f,                                                                        //scale factor: was 1.0f
         0.0f, 1.0f };
 
-
     //Defining inputs
     std::vector<TF_Output> inputs;
     std::vector<TF_Tensor*> inputTensors;
