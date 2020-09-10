@@ -23,10 +23,13 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QGroupBox" name="P_C_box">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>560</y>
+      <y>580</y>
       <width>331</width>
       <height>211</height>
      </rect>
@@ -667,7 +670,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>90</y>
       <width>171</width>
       <height>371</height>
      </rect>
@@ -954,7 +957,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>20</y>
+      <y>90</y>
       <width>211</width>
       <height>371</height>
      </rect>
@@ -1463,7 +1466,7 @@ Stage</string>
      <enum>QTabWidget::South</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="live_image">
      <attribute name="title">
@@ -1493,6 +1496,9 @@ Stage</string>
         <height>720</height>
        </rect>
       </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>CrossCursor</cursorShape>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -1500,7 +1506,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>420</y>
+      <y>490</y>
       <width>391</width>
       <height>131</height>
      </rect>
@@ -1621,7 +1627,7 @@ Stage</string>
    <widget class="QGroupBox" name="Camera_settings">
     <property name="geometry">
      <rect>
-      <x>1730</x>
+      <x>190</x>
       <y>20</y>
       <width>171</width>
       <height>61</height>
@@ -1775,7 +1781,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>270</y>
+      <y>200</y>
       <width>181</width>
       <height>211</height>
      </rect>
@@ -1796,6 +1802,9 @@ Stage</string>
        <width>151</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start an AI  prediction on the current image, shows the found objects &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Find Spheroid</string>
@@ -1874,7 +1883,7 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1740</x>
-      <y>500</y>
+      <y>430</y>
       <width>161</width>
       <height>201</height>
      </rect>
@@ -1913,7 +1922,7 @@ Stage</string>
       </rect>
      </property>
      <property name="currentText">
-      <string>A</string>
+      <string>H</string>
      </property>
      <item>
       <property name="text">
@@ -2024,7 +2033,7 @@ Stage</string>
       </rect>
      </property>
      <property name="currentText">
-      <string>A</string>
+      <string>H</string>
      </property>
      <item>
       <property name="text">
@@ -2090,7 +2099,7 @@ Stage</string>
       <rect>
        <x>150</x>
        <y>50</y>
-       <width>51</width>
+       <width>61</width>
        <height>22</height>
       </rect>
      </property>
@@ -2242,12 +2251,28 @@ Stage</string>
       <double>2.000000000000000</double>
      </property>
     </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>30</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current magnitude set on the microscope&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Magnitude</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>110</y>
+      <y>30</y>
       <width>181</width>
       <height>151</height>
      </rect>
@@ -2281,6 +2306,9 @@ Stage</string>
        <width>62</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the minimum value where the pipette descends while automatic drawing in spheroids &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="maximum">
       <double>999.000000000000000</double>
@@ -2345,6 +2373,18 @@ Stage</string>
      </property>
     </widget>
    </widget>
+   <zorder>P_C_box</zorder>
+   <zorder>S_c_box</zorder>
+   <zorder>pip_c_box</zorder>
+   <zorder>imageing_box</zorder>
+   <zorder>tabWidget</zorder>
+   <zorder>pushButton_6</zorder>
+   <zorder>Camera_settings</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>plate_manage_groupbox</zorder>
+   <zorder>Scanning_groupbox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>syringe_box</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -2352,7 +2392,7 @@ Stage</string>
      <x>0</x>
      <y>0</y>
      <width>1920</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">

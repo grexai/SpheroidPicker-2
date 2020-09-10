@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader->apply_settings(settings);
     sph_s = new spheroid_selector;
     sph_s->set_bbs(m_bboxes);
+    p_s = new Plateselector;
     ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
 
     progress.setValue(50);
@@ -76,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
                           propreader->cfg.textGraph.c_str());
     }
     p_s = new Plateselector;
+    connect(p_s,SIGNAL(signal_s_p_changed()),this, SLOT(s_p_changed()));
+    connect(p_s,SIGNAL(signal_t_p_changed()),this, SLOT(s_p_changed()));
     automethods = new auto_methods(ctrl,cameracv,dl);
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
@@ -115,8 +118,10 @@ void MainWindow::setdarkstyle(){
 void MainWindow::setdefault()
 {
    qApp->setStyle(QStyleFactory::create("WindowsDefault"));
-   qApp->setPalette(this->style()->standardPalette());
+  // qApp->setStyle(QPalette::Base)
+
    qApp->style()->standardPalette();
+
  //  qApp->setStyle(this->style()->standardIcon());
  //  qApp->setStyle(this->style()->standardPixmap());
    qApp->setStyleSheet("");
@@ -1117,8 +1122,51 @@ void MainWindow::show_on_view_2()
     qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
 
-    //ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
     ui->tabWidget->setCurrentWidget(ui->tab2);
+}
+
+void MainWindow::s_p_changed()
+{
+    this->s_p_selected = p_s->m_selected_source;
+
+    if(s_p_selected == 0) //96 wp
+    {
+        QTextStream(stdout) << "96 wp selected";
+        ui->s_well_x_combobox->clear();
+
+        for (char c = 'H'; c >= 'A'; --c)
+        {
+            ui->s_well_x_combobox->addItem(QString(c));
+        }
+        ui->s_well_y_spinbox->clear();
+        ui->s_well_y_spinbox->setRange(1,12);
+
+        ui->s_well_x_combobox->setCurrentIndex(ui->s_well_x_combobox->count()-1);
+        ui->s_well_y_spinbox->setValue(1);
+
+    }
+    else if(s_p_selected == 1) //384 wp
+    {
+        QTextStream(stdout) << "384 wp selected";
+        QTextStream(stdout) << ui->s_well_x_combobox->count()<< "nitems";
+        ui->s_well_x_combobox->clear();
+        for (char c = 'P'; c >= 'A'; --c)
+        {
+            ui->s_well_x_combobox->addItem(QString(c));
+        }
+        ui->s_well_x_combobox->setCurrentIndex(ui->s_well_x_combobox->count()-1);
+        ui->s_well_y_spinbox->clear();
+        ui->s_well_y_spinbox->setRange(1,24);
+        ui->s_well_y_spinbox->setValue(1);
+    }
+    else if(s_p_selected == 2) //petri 30mm
+    {
+
+    }else{
+
+    }
+
 }
 
 void MainWindow::move_to_s_plate(int x_idx,int y_idx){
@@ -1199,8 +1247,8 @@ void MainWindow::on_actionSpheroid_selector_triggered()
 
 void MainWindow::on_actionPlate_selector_triggered()
 {
-    p_s = new Plateselector;
     p_s->show();
+    p_s->activateWindow();
 }
 
 void MainWindow::on_pushButton_6_clicked()
@@ -1209,4 +1257,9 @@ void MainWindow::on_pushButton_6_clicked()
     m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
 }
 
+
+void MainWindow::get_selected_source_plate()
+{
+    this->s_p_selected = p_s->m_selected_source;
+}
 

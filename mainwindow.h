@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 //#include <QThread>
 #include <QTimer>
@@ -47,11 +47,19 @@ signals:
 public slots:
    // void show_hw_selector();
     void scan_stopped();
+
     void set_progressbar( int value );
+
     void set_stich_progressbar( int value );
+
     void set_h4(int value);
+
     void set_pip_man(int value);
+
     void show_on_view_2();
+
+    void s_p_changed();
+
 protected:
 
     std::vector<std::vector<float>>*global_obj_im_coordinates=nullptr;
@@ -255,6 +263,8 @@ private slots:
 
      void on_pushButton_6_clicked();
 
+     void get_selected_source_plate();
+
 private:
 
     QTimer *timer= nullptr;
@@ -277,7 +287,7 @@ private:
     float mid_s_x_p=0.0f;
     int m_stage_abs_starter_x = 0;
     int m_stage_abs_starter_y = 0;
-
+    int s_p_selected =0;
 
 
     std::atomic_bool m_s_t_acitive;

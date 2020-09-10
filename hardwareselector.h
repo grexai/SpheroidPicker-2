@@ -20,6 +20,7 @@ private slots:
 private:
     Ui::hardwareselector *ui;
     MainWindow *main;
+
 };
 
 #endif // HARDWARESELECTOR_H

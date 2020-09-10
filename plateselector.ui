@@ -13,14 +13,19 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="s_p_selector">
    <property name="geometry">
     <rect>
      <x>40</x>
      <y>90</y>
      <width>121</width>
-     <height>22</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <item>
     <property name="text">
@@ -38,14 +43,19 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="comboBox_2">
+  <widget class="QComboBox" name="t_p_selector">
    <property name="geometry">
     <rect>
      <x>330</x>
      <y>90</y>
      <width>151</width>
-     <height>22</height>
+     <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <item>
     <property name="text">
@@ -72,6 +82,11 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
    <property name="text">
     <string>Source Plate</string>
    </property>
@@ -85,167 +100,40 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
    <property name="text">
     <string>Target plate</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox_2">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>120</y>
-     <width>43</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>12</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBox">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>120</y>
-     <width>43</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>12</number>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_5">
+  <widget class="QLabel" name="s_label">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>150</y>
-     <width>121</width>
-     <height>21</height>
+     <y>170</y>
+     <width>47</width>
+     <height>13</height>
     </rect>
    </property>
    <property name="text">
-    <string>Move to selected well</string>
+    <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_3">
+  <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
-     <width>41</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>A</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>B</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>C</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>D</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>E</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>F</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>G</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>H</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="pushButton_6">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>150</y>
-     <width>151</width>
-     <height>21</height>
+     <x>340</x>
+     <y>160</y>
+     <width>47</width>
+     <height>13</height>
     </rect>
    </property>
    <property name="text">
-    <string>Move to Selected Well</string>
+    <string>TextLabel</string>
    </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_4">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>120</y>
-     <width>41</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>A</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>B</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>C</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>D</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>E</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>F</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>G</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>H</string>
-    </property>
-   </item>
   </widget>
  </widget>
  <resources/>
