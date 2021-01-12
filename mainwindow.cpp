@@ -940,7 +940,7 @@ std::string MainWindow::get_date_time_str()
 }
 
 /*!
- *screening a given rectangle area at 5X magnification
+ *screening a given rectangle area at the selected magnification
  *predicting every scan
  *calculating every spheroids coordinates to make it middle of screen
  *saving every image, to scanning folder with date, time, size stamp
@@ -1230,14 +1230,6 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
                  elapsed_seconds.count() << "s\n";
 
 }
-
-void MainWindow::on_s_getmin_clicked()
-{
-   int x = ctrl->stage_get_x_min_pos();
-   int y = ctrl->stage_get_y_min_pos();
-   QTextStream(stdout)<<"stage min x,y (" <<x << " , " <<y <<")"<<endl;
-}
-
 
 void MainWindow::on_actionSpheroid_selector_triggered()
 {

@@ -833,8 +833,8 @@ Stage</string>
       <rect>
        <x>10</x>
        <y>330</y>
-       <width>47</width>
-       <height>13</height>
+       <width>61</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -870,8 +870,8 @@ Stage</string>
     <widget class="QPushButton" name="s_get_coors_pushButton">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>320</y>
+       <x>90</x>
+       <y>330</y>
        <width>80</width>
        <height>21</height>
       </rect>
@@ -932,24 +932,6 @@ Stage</string>
      </property>
      <property name="maximum">
       <number>10000</number>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="s_getmin">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>300</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Getmin</string>
      </property>
     </widget>
    </widget>
@@ -1399,8 +1381,8 @@ Stage</string>
    <widget class="QGroupBox" name="imageing_box">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>780</y>
+      <x>640</x>
+      <y>770</y>
       <width>171</width>
       <height>81</height>
      </rect>
@@ -1618,7 +1600,7 @@ Stage</string>
      </font>
     </property>
     <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Collect the selected objects. The user must select first the objects from tools -&amp;gt; Spheroid selector&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Collect the selected objects. First the user must select the objects from tools -&amp;gt; Spheroid selector&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
      <string>Collect selected</string>
@@ -2158,7 +2140,7 @@ Stage</string>
       </rect>
      </property>
      <property name="text">
-      <string>PLATE size (mm)</string>
+      <string>ScanningArea size (mm)</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">

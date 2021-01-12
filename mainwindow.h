@@ -255,8 +255,6 @@ private slots:
 
      void collect_selected_obj(std::vector<int> selected_obj);
 
-     void on_s_getmin_clicked();
-
      void on_actionSpheroid_selector_triggered();
 
      void on_actionPlate_selector_triggered();

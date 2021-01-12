@@ -23,6 +23,7 @@ spheroid_selector::~spheroid_selector()
 void spheroid_selector::set_list(QString data)
 {
     ui->Object_list->addItem(data);
+    //ui->Object_list
    // ui->Object_list->selectAll();
  //   ui->Object_list->currentItem()->setFlags(Qt::ItemIsUserCheckable);
 }
