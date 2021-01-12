@@ -44,4 +44,13 @@ private:
     Ui::spheroid_selector *ui;
 };
 
+
+struct sph_props{
+    int idx;
+    float area;
+    float perimeter;
+    float circularity;
+};
+
+
 #endif // SPHEROID_SELECTOR_H

@@ -34,7 +34,7 @@ public:
     ~MainWindow();
     void setdarkstyle();
     void setdefault();
-
+    std::vector<sph_props> m_current_detections;
     cv::Mat TM;
 signals:
     // The signal of transmit the coordinates of the mouse position

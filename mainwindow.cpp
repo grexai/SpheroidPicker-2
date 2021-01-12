@@ -898,6 +898,8 @@ void MainWindow::predict_sph(){
     QPainter p(qfrm_t2);
     p.setPen(Qt::black);
     p.setFont(QFont("Arial", 25));
+   // m_current_detections = {};
+    // struct for storing spheroid detection data;
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        QString text(QString::number(idx) );
@@ -910,9 +912,16 @@ void MainWindow::predict_sph(){
                     +" Aera: " + QString::number(im_obj.at(idx).at(5),'f',1)
                     +" Circularity: " + QString::number(im_obj.at(idx).at(6),'f',3));
         const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
+        sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(4),im_obj.at(idx).at(4)};
+       // std::cout<< "c-d" << c << std::endl;
+        m_current_detections.push_back(c);
+          std::cout<< "c-d" << m_current_detections.at(idx).idx << std::endl;
+          std::cout<< "c-d" << m_current_detections.at(idx).perimeter << std::endl;
 
+        // m_current_detections->peri.push_back(im_obj.at(idx).at(4));
+      // m_current_detections->area.push_back(im_obj.at(idx).at(5));
+      // m_current_detections->circ.push_back(im_obj.at(idx).at(6));
         p.drawText(rectangle,Qt::TextSingleLine,text);
-
     }
 
     sph_s->list_props();
@@ -920,7 +929,7 @@ void MainWindow::predict_sph(){
  //    p.drawText();-
 
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
+    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
 
 
@@ -1053,6 +1062,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
    // ctrl->stage_set_speed(20000.0f);
     ui->found_objects->clear();
     sph_s->clear_list();
+ //   m_current_detections = {};
     for (int i=0 ;i<global_obj_im_coordinates->size();++i )
     {
        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
@@ -1060,8 +1070,12 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                    +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
                    +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
                    +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
+       //m_current_detections->peri.push_back(global_obj_im_coordinates->at(i).at(4));
+       //m_current_detections->area.push_back(global_obj_im_coordinates->at(i).at(5));
+       //m_current_detections->circ.push_back(global_obj_im_coordinates->at(i).at(6));
 
     }
+
     sph_s->list_props();
     this->unlock_ui();
     ui->start_screening->setText("Start Screening");
@@ -1083,7 +1097,6 @@ void MainWindow::create_mosaic(){
         QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
         if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
         Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT), (wmax * FULL_HD_IMAGE_WIDTH), CV_8UC3));
-
         float p_v=0.0f;
         for (int i = 0; i < hmax; ++i)
         {
