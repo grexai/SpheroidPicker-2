@@ -132,12 +132,21 @@ bool controller::connect_pipette_controller(std::string& port)
     }
 }
 
+
+void controller::pipette_test_sync(const float x)
+{
+    if(apipc == nullptr){return;}
+    apipc->syncronised_move(x);
+    QTextStream(stdout)<< "done";
+}
+
+
 void controller::pipette_movex_sync(const float x)
 {
     if(apipc == nullptr){return;}
-    apipc->setrelativepositioning();
-    apipc->moveToXSync(x);
+    apipc->syncronised_move(x);
 }
+
 
 void controller::pipette_move_to_x_sync(const float x)
 {

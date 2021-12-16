@@ -155,7 +155,7 @@ void invecption_v2::setup_dnn_network(const char* cf, const char* model_w, const
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes)
+std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes)
 {
     using namespace cv;
     using namespace std;
@@ -223,78 +223,6 @@ std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::
  //   cv::resizeWindow("detected object", 1280, 720);
     waitKey(1);
     return objpos;
-}
-
-std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input)
-{
-    using namespace cv;
-    using namespace std;
-    using namespace dnn;
-
-    std::vector<std::vector<float>> objpos;
-    std::cerr << "Read START" << std::endl;
-    // Read image
-
-    cv::Mat frame = input;
-    frame.convertTo(frame, CV_8UC3);
-    Mat frameResized;
-    // resize to 512*512 keeping the ratio
-    this->resize(frame,frameResized);
- //   resize(frame, frameResized, Size(1024, 1024));
-
-    // Create a 4D blob from a frame.
-    cv::Mat blob;
-    blobFromImage(frameResized, blob, 1.0, cv::Size(frameResized.cols, frameResized.rows), cv::Scalar(), true, false);
-
-    std::cerr << "BLOB OK" << std::endl;
-    colors.push_back(Scalar(255, 100, 45, 255.0));
-    //Sets the input to the network
-    net->setInput(blob, "image_tensor");
-    net->enableFusion(1);
-    // Runs the forward pass to get output from the output layers
-    std::vector<String> outNames(2);
-    outNames[0] = "detection_out_final";
-    outNames[1] = "detection_masks";
-    std::vector<cv::Mat> outs;
-
-    {
-    std::cerr << "Start..." << std::endl;
-        // CHRONO START
-    auto start = std::chrono::system_clock::now();
-
-    try
-    {
-        net->forward(outs, outNames);
-    } catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "ex" << std::endl;
-    }
-
-    std::cerr << "ok" << std::endl;
-
-    // Extract the bounding box and mask for each of the detected objects
-    objpos = postprocess(frame, outs);
-
-    auto end = std::chrono::system_clock::now();
-
-        std::chrono::duration<double> elapsed_seconds = end - start;
-
-        // CHRONO END
-        std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-    }
-
-   // Mat detectedFrame;
-//    frame.convertTo(detectedFrame, CV_8U);
- //   cv::namedWindow("detected object", WINDOW_KEEPRATIO);
- //   imshow("detected object", detectedFrame);
- //   cv::resizeWindow("detected object", 1280, 720);
-    waitKey(1);
-    return objpos;
-    //return detectedFrame;
 }
 
 matterport_mrcnn::~matterport_mrcnn(){
@@ -434,16 +362,16 @@ void matterport_mrcnn::create_session(){
     if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 }
 
-std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,cv::Mat& output,std::vector<cv::Mat>& bboxes){
+std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes){
 
     auto start = std::chrono::system_clock::now();
-    cv::Mat o_im = image;
-    image.convertTo(image, CV_8UC3);
-    cv::resize(image, image, cv::Size(1024, 576));
+    cv::Mat o_im = input;
+    input.convertTo(input, CV_8UC3);
+    cv::resize(input, input, cv::Size(1024, 576));
   //  cv::resize(image, image, cv::Size(512, 288));
     float  nx = 1920.0f/1024.0f;
  //   float  nx = 1920.0f/512.0f;
-    const int maxDim = (std::max)(image.cols, image.rows);
+    const int maxDim = (std::max)(input.cols, input.rows);
     std::vector<std::vector<float>> objpos;
     //IMAGE_SIZE = select_anchor();
 
@@ -452,7 +380,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
     //matterport's mrcnn only works for image sizes that are multiples of 64
     if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
 
-    cv::Mat moldedInput = mold_image(image, IMAGE_SIZE, maxDim);
+    cv::Mat moldedInput = mold_image(input, IMAGE_SIZE, maxDim);
 
     static constexpr int NUM_CLASSES = 2;
     static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
@@ -592,13 +520,15 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
     for (int b = 0; b < batchSize; ++b)
     {
         cv::Mat newImage;
-        image.copyTo(newImage);
-
+        input.copyTo(newImage);
+        cv::Mat maskImage;
+        maskImage= cv::Mat::zeros(newImage.size(), CV_8UC3);
         cv::Mat labels = cv::Mat::zeros(newImage.size(), CV_32SC1);
+        cv::Mat labels2 = cv::Mat::zeros(newImage.size(), CV_32SC1);
         //The prediction is always done on squared images
         //If the image is smaller than the used image size, it is padded with zeros, else it is rescaled to that size
         //This float is used to transfer the bounding boxes to the real size
-        float restoreDim = (std::max)(static_cast<float>((std::max)(image.rows, image.cols)), static_cast<float>(IMAGE_SIZE));
+        float restoreDim = (std::max)(static_cast<float>((std::max)(input.rows, input.cols)), static_cast<float>(IMAGE_SIZE));
 
         //getting tensor data for the batch
         const float* detTensorData = &reinterpret_cast<const float*>(TF_TensorData(outputTensors[MRCNN_DETECTION].get()))[b * maxDet * detectionIncrement];
@@ -633,13 +563,13 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
 
             //However we want boxes only on the original image
             //box is outside the original image dimensions
-            if (bb[0] >= image.cols) continue;
-            if (bb[1] >= image.rows) continue;
+            if (bb[0] >= input.cols) continue;
+            if (bb[1] >= input.rows) continue;
 
-            bb[0] = (std::min)((std::max)(bb[0], 0), image.cols);
-            bb[1] = (std::min)((std::max)(bb[1], 0), image.rows);
-            bb[2] = (std::min)((std::max)(bb[2], 0), image.cols);
-            bb[3] = (std::min)((std::max)(bb[3], 0), image.rows);
+            bb[0] = (std::min)((std::max)(bb[0], 0), input.cols);
+            bb[1] = (std::min)((std::max)(bb[1], 0), input.rows);
+            bb[2] = (std::min)((std::max)(bb[2], 0), input.cols);
+            bb[3] = (std::min)((std::max)(bb[3], 0), input.rows);
 
 
         //    std:: cout << "t:" << bb[0]*nx << "t:"<< bb[1]*ny<< "t:"<< bb[2]<< "t:" <<bb[3] << std::endl;
@@ -650,6 +580,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
             cv::resize(mask, mask, rect.size(), 0.0, 0.0, cv::INTER_LINEAR);
 
             cv::Mat label = cv::Mat::zeros(mask.size(), CV_32SC1);
+
             const int64_t total = mask.total();
             const float* maskPtr = reinterpret_cast<const float*>(mask.data);
             int32_t* labelPtr = reinterpret_cast<int32_t*>(label.data);
@@ -672,6 +603,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
             outcoors.push_back(bb_x); // Right  2
             outcoors.push_back(bb_y); // Bottom 3
             imagetools asd;
+
             std::vector<float> features = asd.getobjectprops(label);
             outcoors.push_back(features.at(0)*nx);//length 4
             outcoors.push_back(features.at(1)*nx*nx);//area 5
@@ -681,26 +613,35 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);
+
             //cv::Rect rect(cv::Point(bb[0], bb[1]), cv::Point(bb[2], bb[3]));
          ////   cv::Rect myROI(cv::Point(static_cast<int>(bx),static_cast<int>( by)),cv::Point( static_cast<int>(bb_x), static_cast<int>(bb_y)));
 //            std::cout<< bx<< " : " << by<< " : " << bb_x<< " : " << bb_y<< " : " <<std::endl;
-            cv::Mat croppedRef(image, rect);
+            cv::Mat croppedRef(input, rect);
             cv::Mat obj_cropped(roi.rows,roi.cols,CV_8UC3);
             // Copy the data into new matrix
             croppedRef.copyTo(obj_cropped);
             obj_cropped.convertTo(obj_cropped,CV_8UC3);
             bboxes.push_back(obj_cropped);
         }
+
         const int64_t total = labels.total();
+        std::cout<< total<< "total"<<std::endl;
         uint8_t* imgPtr = reinterpret_cast<uint8_t*>(newImage.data);
+        uint8_t* maskPtr = reinterpret_cast<uint8_t*>(maskImage.data);
+       // labels.copyTo(labels2);
         const int32_t* labelPtr = reinterpret_cast<const int32_t*>(labels.data);
 
         for (int64_t index = 0; index < total; ++index)
         {
             if (labelPtr[index] != 0)
             {
-                imgPtr[(index * 3) +1] = 255;
-                imgPtr[(index * 3) +2] = 90;
+                maskPtr[(index * 3)] = 255;
+                maskPtr[(index * 3)+1] = 255;
+                maskPtr[(index * 3)+2] = 255;
+                imgPtr[(index * 3) ] = 30;
+                imgPtr[(index * 3) +1] = 200;
+                imgPtr[(index * 3) +2] = 30;
             }
         }
 
@@ -712,6 +653,10 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &image,c
         std::cout << "[INFERENCE] elapsed time: " << elapsed_seconds.count() << "s\n";
         cv::resize(newImage, newImage, cv::Size(1920, 1080));
         newImage.copyTo(output);
+        cv::resize(maskImage, maskImage, cv::Size(1920, 1080));
+        maskimage = maskImage;
+     // cv::imshow("rect",maskImage);
+    //  cv::waitKey(0);
     }
     return objpos;
 }

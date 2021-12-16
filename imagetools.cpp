@@ -83,7 +83,8 @@ int2coords imagetools::getSphCoors(cv::Mat &img){
 std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         using namespace cv;
         using namespace std;
-        input.convertTo(input,CV_8UC1);
+        cv::Mat c_input;
+        input.convertTo(c_input,CV_8UC1);
     //	waitKey(0);
         std::vector<float> object_features(5,0.0f);
         Mat canny_output;
@@ -94,10 +95,10 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         /// Detect edges using canny
        // copyMakeBorder(input, input, 10, 10, 10, 10, BORDER_CONSTANT, 0);
 
-        Canny(input, canny_output, 0, 255, 3);
+        Canny(c_input, canny_output, 0, 255, 3);
         /// Find contours
     //	imshow("asd", canny_output);
-        findContours(input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+        findContours(c_input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
         cout << contours.size() << "sizeof c" << endl;
         /// Get the moments
         vector<Moments> mu(contours.size());
@@ -131,7 +132,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         //std::cout<< "msctr x" << mc[0].x << " : y" << mc[0].y<<std::endl;
 
 
-        input = drawing;
+     //   input = drawing;
         return object_features;
 }
 

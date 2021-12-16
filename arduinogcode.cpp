@@ -28,6 +28,14 @@ void arduinogcode::setjerk(int jerk){
     apipc_sc.send(msg);
 }
 
+void arduinogcode::SyncronizedMoveToX(float x_value)
+{
+    QString msg= "G0";
+    apipc_sc.sendAndReceive(msg.append("X").append(QString::number(x_value,'f',2)), EOM);
+
+
+}
+
 // Sends one or more axis to the initial position
 void arduinogcode::goHome(bool x, bool y, bool z){
     QString msg = "G28";
@@ -60,6 +68,7 @@ void arduinogcode::moveToXSync(float x_value){
     QString msg= "G0";
     apipc_sc.send(msg.append("X").append(QString::number(x_value,'f',2)).append(EOM));
 }
+
 
 void arduinogcode::moveToYSync(float y_value)
 {
@@ -194,6 +203,14 @@ void arduinogcode::MoveToXYZSync(std::vector<float> coords)
 
 void arduinogcode::setPipetteposition()
 {
+
+}
+
+
+// TEST function
+void arduinogcode::syncronised_move(float val){
+    QString msg= "G0";
+    apipc_sc.sendAndRecive_sync(msg.append("X").append(QString::number(val,'f',2)), EOM);
 
 }
 

@@ -2,5 +2,5 @@
 #sad
 
 ports.pressurecontroller="COM26"
-ports.pipette="COM6"
+ports.pipette="COM7"
 

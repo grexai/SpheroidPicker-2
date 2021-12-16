@@ -52,6 +52,8 @@ public:
 
     void pipette_movey_sync(const float y);
 
+    void pipette_test_sync(const float x);
+
     void pipette_movez_sync(const float z);
 
     void pipette_move_to_z_sync(const float z);
@@ -73,6 +75,7 @@ public:
     void pipette_home_y();
 
     void pipette_home_z();
+
 
     std::vector<float> pipette_get_coordinates();
 

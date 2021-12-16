@@ -49,6 +49,8 @@ public:
 
     void extrude_relative(float e_value);
 
+    void SyncronizedMoveToX(float x_value);
+
     //G28
     void goHome(bool x, bool y, bool z);
 
@@ -65,6 +67,8 @@ public:
     void MoveToXYZSync(std::vector<float> coords);
 
     void setPipetteposition();
+
+    void syncronised_move(float val);
     class ardinogcodeexeption: public std::exception{
     virtual  const char* what() const throw()
         {

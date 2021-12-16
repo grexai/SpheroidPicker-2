@@ -37,12 +37,47 @@ void serialcom::send(QString& command){
     sp.waitForBytesWritten(50);
 };
 
+
 QByteArray  serialcom::recive(){
     std::lock_guard<std::mutex> lock(comm_mutex);
     QByteArray answer = sp.readLine();
     sp.waitForReadyRead(30);
     return answer;
 }
+
+
+QByteArray serialcom::sendAndRecive_sync(QString& msg, QString& ansEnd)
+{
+    std::lock_guard<std::mutex> lock(comm_mutex);
+
+    QString cmd = msg.append(ansEnd);
+    QByteArray byte_command = msg.toLocal8Bit();
+    sp.write(byte_command);
+    sp.waitForBytesWritten(0);
+    sp.waitForReadyRead(15);
+    QByteArray answer = sp.readAll();
+    QString Pause_command = "M400";
+    Pause_command.append(ansEnd);
+    QByteArray p_command = Pause_command.toLocal8Bit();
+    sp.write(p_command);
+    sp.waitForBytesWritten(15);
+    sp.waitForReadyRead(20);
+    QByteArray answer2 = sp.readAll();
+
+    QTextStream(stdout) << answer2.size() << "ans2";
+    while (answer2.size()<1){
+        sp.waitForReadyRead(5);
+        answer2 = sp.readAll();
+        QTextStream(stdout) << answer2.size();
+
+
+    }
+    QTextStream(stdout) << answer2.size();
+
+    QTextStream(stdout) << answer2 << "\n";
+    return answer;
+}
+
 
 QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
 {
@@ -58,6 +93,7 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
     if (!sp.waitForReadyRead(30)){
         answer.append(sp.readAll());
     }
+
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
@@ -66,6 +102,8 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
     QTextStream(stdout)<< "ans: " << answer << endl ;
     return answer;
 }
+
+
 
 void serialcom::sp_flush(){
     std::lock_guard<std::mutex> lock(comm_mutex);

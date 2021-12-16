@@ -40,7 +40,13 @@ MainWindow::MainWindow(QWidget *parent) :
     sph_s = new spheroid_selector;
     sph_s->set_bbs(m_bboxes);
     p_s = new Plateselector;
-    ctrl->connect_microscope_unit(propreader->cfg.port_pipette,propreader->cfg.port_pressurecontrooler);
+    try {
+       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+    } catch (ispipetteconnected == false) {
+        std::cerr << "pipette controller failed to connect";
+    }
+
+    ctrl->connect_tango_stage();
 
     progress.setValue(50);
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
@@ -64,12 +70,13 @@ MainWindow::MainWindow(QWidget *parent) :
         dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
                               propreader->cfg.matterport_folder.c_str(),
                               nullptr);
-        cv::Mat test= cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+       cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
         // start a fake inference for finish preload
-
-        std::thread t_inf(&i_deeplearning::dnn_inference,dl,
-                          test,test,m_bboxes);
-        t_inf.detach();
+       cv::Mat mask;
+       std::vector<cv::Mat> bbs;
+       //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
+       //t_inf.detach();
+       dl->dnn_inference(test,test,test,m_bboxes);
     }else{
         dl = new invecption_v2();
         dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
@@ -477,7 +484,8 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
-    ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
+    // ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
+    ctrl->pipette_test_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
@@ -514,6 +522,7 @@ void MainWindow::on_save_image_button_clicked()
 {
     imtools->saveImg((cameracv->get_current_frm().get()),
                      (ui->imagename_lineedit->text().toStdString()));
+
 }
 
 void MainWindow::on_s_get_coors_pushButton_clicked()
@@ -792,9 +801,11 @@ void MainWindow::move_to_petri_B()
     ctrl->stage_set_speed(50000);// akos changed the speed
 //    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
 //    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
+    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
 
@@ -837,7 +848,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
     //TODO
     // this point CHECK if the spheroid picked up!
-    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
         // CHRONO END
@@ -849,7 +860,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
 {
     ctrl->stage_set_speed(50000);   // akos changed the speed
     move_to_t_plate(x,y);
-
+   // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
@@ -857,6 +868,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
+
     std::this_thread::sleep_for(std::chrono::milliseconds(4000));
 
 }
@@ -869,7 +881,7 @@ void MainWindow::pick_and_put()
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
     this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
-    this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()-1));
+    this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
@@ -890,7 +902,11 @@ void MainWindow::predict_sph(){
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
    // std::vector<cv::Mat> bbs;
     this->m_bboxes.clear();
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,m_bboxes);
+    cv::Mat mask;
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,mask,m_bboxes);
+   // cv::floodFill(mask, cv::Point(0,0),cv::Scalar(255,255,255));
+   // cv::bitwise_not(mask,mask);
+    imtools->saveImg(&mask,(ui->imagename_lineedit->text()+"_mask").toStdString());
 
     ui->found_objects->clear();
     delete qfrm_t2;
@@ -914,13 +930,11 @@ void MainWindow::predict_sph(){
         const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
         sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(4),im_obj.at(idx).at(4)};
        // std::cout<< "c-d" << c << std::endl;
-        m_current_detections.push_back(c);
+        // make it pointer!
+          m_current_detections.push_back(c);
           std::cout<< "c-d" << m_current_detections.at(idx).idx << std::endl;
           std::cout<< "c-d" << m_current_detections.at(idx).perimeter << std::endl;
 
-        // m_current_detections->peri.push_back(im_obj.at(idx).at(4));
-      // m_current_detections->area.push_back(im_obj.at(idx).at(5));
-      // m_current_detections->circ.push_back(im_obj.at(idx).at(6));
         p.drawText(rectangle,Qt::TextSingleLine,text);
     }
 
@@ -931,8 +945,6 @@ void MainWindow::predict_sph(){
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
-
-
 }
 
 std::string MainWindow::get_date_time_str()
@@ -1023,10 +1035,11 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 auto tmp = cameracv->get_current_frm();
                 cv::Mat displayfrm = imtools->convert_bgr_to_rgb(tmp);
                 scanvector.push_back(displayfrm);
+                cv::Mat maskfrm;
                 imtools->saveImg(tmp.get(),num2str.c_str());
 
                 // INFERENCE AND FEATURE EXTRACTION
-                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),m_bboxes);
+                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes);
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
@@ -1227,14 +1240,17 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
 
-    int y_idx=0,x_idx=0;
-    for (int idx = 0; idx<selected_obj.size();++idx)
+    int y_idx = 0+1, x_idx = 0; //y was 0 maybe this will fix or x = 1
+    for (int idx = 0; idx < selected_obj.size();++idx)
     {
         std:: cout <<"selected obj idx"<<selected_obj.at(idx) << std::endl;
         this->xz_stage_pickup_sph(selected_obj.at(idx));
         this->put_to_target_plate(x_idx,y_idx);
         std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
-        if(x_idx>6){x_idx=0;y_idx++; }
+        if(x_idx>6)// 6 is true for 96 well plate
+        {
+            x_idx=0;
+            y_idx++; }
         x_idx++;
     }
     auto end = std::chrono::system_clock::now();

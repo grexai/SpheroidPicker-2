@@ -39,7 +39,7 @@ public:
     i_deeplearning(){}
     virtual ~i_deeplearning()= 0;
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) = 0;
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes)= 0;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes)= 0;
 };
 
 class invecption_v2 : public virtual i_deeplearning
@@ -51,8 +51,8 @@ public:
     std::vector<std::vector<float>> postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
     void resize(cv::Mat& input, cv::Mat& out);
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) override;
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
-    std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) override;
+  //  std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes) override;
   //  std::vector<std::vector<float>> objpos;
     std::vector<std::string> classes;
     std::vector<cv::Scalar> colors;
@@ -84,8 +84,6 @@ protected:
 public:
     matterport_mrcnn(){}
     ~matterport_mrcnn() override;
-
-
 
     #define TF_DELETER(X) typedef void(*TF_Delete ## X ## _Func)(TF_ ## X *);
     #define TF_POINTER(X) typedef std::unique_ptr< TF_ ## X , TF_Delete ## X ## _Func> TF_ ## X ## _Ptr;
@@ -146,10 +144,9 @@ public:
   //  std::vector<std::vector<float>> inferencing(cv::Mat& image,std::vector<cv::Mat>& bboxes) ;
 
     void create_session();
-
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) override;
-
     virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;
+
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes) override;
 };
 
 

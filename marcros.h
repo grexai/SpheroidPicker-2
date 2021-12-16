@@ -11,8 +11,8 @@
 
 //LEICA STEREO MIC IMAGE SIZES BY MAGNIFICATION
 //um-1
-#define  IMG_W_M5p5x 27426
-#define  IMG_H_M5p5x 15421
+#define  IMG_W_M5p5x 27426 //100 nm   1pxl 14,28 *0.1um
+#define  IMG_H_M5p5x 15421            //
 
 #define IMG_W_M5X 30162
 #define IMG_H_M5X 16959

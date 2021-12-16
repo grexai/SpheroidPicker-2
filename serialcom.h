@@ -22,6 +22,8 @@ public:
 
     QByteArray recive();
 
+    QByteArray sendAndRecive_sync(QString& msg, QString& ansEnd);
+
     QByteArray sendAndReceive(QString& msg, QString& ansEnd);
 
     void sp_flush();
