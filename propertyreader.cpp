@@ -67,6 +67,8 @@ void propertyreader::apply_settings(std::map<std::string, std::string>& settings
     cfg.classesFile = s_param(settings,"dl.classes");
     cfg.matterport_graph = s_param(settings,"matterport.graph");
     cfg.matterport_folder = s_param(settings,"matterport.folder");
+    cfg.wp_96_offset_X = s_param(settings,"offsets.wp96.x");
+    cfg.wp_96_offset_Y = s_param(settings,"offsets.wp96.y");
 }
 
 

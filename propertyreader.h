@@ -17,6 +17,8 @@ typedef struct props{
     std::string classesFile;
     std::string matterport_graph;
     std::string matterport_folder;
+    std::string wp_96_offset_X;
+    std::string wp_96_offset_Y;
 }props;
 
 class propertyreader

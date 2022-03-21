@@ -28,8 +28,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>580</y>
+      <x>0</x>
+      <y>630</y>
       <width>331</width>
       <height>211</height>
      </rect>
@@ -821,8 +821,14 @@ Stage</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
      <property name="maximum">
       <number>100000</number>
+     </property>
+     <property name="singleStep">
+      <number>2000</number>
      </property>
      <property name="value">
       <number>10000</number>
@@ -903,37 +909,6 @@ Stage</string>
       <string>Speed</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Acceletaion</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="s_accel_spinbox">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>110</y>
-       <width>62</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="pip_c_box">
     <property name="geometry">
@@ -1012,6 +987,9 @@ Stage</string>
      </property>
      <property name="decimals">
       <number>3</number>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
      <property name="value">
       <double>1.000000000000000</double>
@@ -1286,7 +1264,7 @@ Stage</string>
       <number>100</number>
      </property>
      <property name="value">
-      <number>500</number>
+      <number>1000</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -1582,6 +1560,49 @@ Stage</string>
      </property>
      <property name="text">
       <string>Extra expel:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="extrude_set_speed_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>80</y>
+       <width>61</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>30000</number>
+     </property>
+     <property name="singleStep">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>1000</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>90</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This amount adds to the drawing in/ expel value, in automatic mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Speed</string>
      </property>
     </widget>
    </widget>
@@ -2309,7 +2330,10 @@ Stage</string>
       </rect>
      </property>
      <property name="maximum">
-      <double>999.000000000000000</double>
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>100.000000000000000</double>
      </property>
      <property name="value">
       <double>500.000000000000000</double>
@@ -2331,9 +2355,9 @@ Stage</string>
     <widget class="QPushButton" name="save_m_p_button">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>0</x>
        <y>90</y>
-       <width>151</width>
+       <width>101</width>
        <height>21</height>
       </rect>
      </property>
@@ -2341,17 +2365,17 @@ Stage</string>
       <string>Set X midpoint</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_5">
+    <widget class="QLabel" name="x_midpoint_ui">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>120</y>
-       <width>151</width>
+       <x>110</x>
+       <y>90</y>
+       <width>51</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Set Z height</string>
+      <string/>
      </property>
     </widget>
    </widget>

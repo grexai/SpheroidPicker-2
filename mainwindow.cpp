@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
    // ui->P_C_box->hide();
+    ui->Camera_settings->hide();
     progress.setValue(10);
     imtools = new imagetools;
     timer = new QTimer(this);
@@ -38,19 +39,20 @@ MainWindow::MainWindow(QWidget *parent) :
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
     sph_s = new spheroid_selector;
+    this->start_camera();
     sph_s->set_bbs(m_bboxes);
     p_s = new Plateselector;
-    try {
-       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
-    } catch (ispipetteconnected == false) {
-        std::cerr << "pipette controller failed to connect";
-    }
+    bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
 
     ctrl->connect_tango_stage();
-
+    progress.setValue(33);
+    progress.setLabelText("homing manipulator");
+    ctrl->pipette_home_z();
+    ctrl->pipette_home_x();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     progress.setValue(50);
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
-                                                                tr("Do yo want to run stage inicialization?\n"),
+                                                                tr("Do you want to run stage inicialization?\n"),
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes) {
@@ -59,10 +61,11 @@ MainWindow::MainWindow(QWidget *parent) :
             ctrl->stage_autocalibrate();
     }
     ctrl->stage_set_speed(ui->s_speed_spinbox->value());
-    progress.setValue(75);
-    progress.setLabelText("Loading neural network graph");
+    progress.setLabelText("Loading neural network");
+    progress.setValue(70);
+    /*
     QMessageBox::StandardButton res1Btn = QMessageBox::question( this, "Automatic Spheroid Picker",
-                                                                tr("Load Matterport Rcnn?"),
+                                                              tr("Load Matterport Rcnn?"),
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
     if (res1Btn == QMessageBox::Yes) {
@@ -82,10 +85,24 @@ MainWindow::MainWindow(QWidget *parent) :
         dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
                           propreader->cfg.model_weights.c_str(),
                           propreader->cfg.textGraph.c_str());
-    }
+    }*/
+    dl = new matterport_mrcnn();
+    dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
+                          propreader->cfg.matterport_folder.c_str(),
+                          nullptr);
+   cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+    // start a fake inference for finish preload
+   cv::Mat mask;
+   std::vector<cv::Mat> bbs;
+   //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
+   //t_inf.detach();
+   dl->dnn_inference(test,test,test,m_bboxes);
+
+
+
     p_s = new Plateselector;
     connect(p_s,SIGNAL(signal_s_p_changed()),this, SLOT(s_p_changed()));
-    connect(p_s,SIGNAL(signal_t_p_changed()),this, SLOT(s_p_changed()));
+    connect(p_s,SIGNAL(signal_t_p_changed()),this, SLOT(t_p_changed()));
     automethods = new auto_methods(ctrl,cameracv,dl);
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
@@ -188,6 +205,7 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     }
 
 }
+
 
 void MainWindow::keyPressEvent( QKeyEvent* e )
 {
@@ -305,10 +323,25 @@ void MainWindow::move_action(){
 void MainWindow::center_this_point_action()
 {
     std::vector<float> mouse;
-    ctrl->stage_set_speed(5000.0f);
+    //ctrl->stage_set_speed(5000.0f);
     mouse.push_back(point_mouse->x()*1.5f);
     mouse.push_back(point_mouse->y()*1.5f);
-    this->center_spheroid(mouse);
+  //  this->center_spheroid(mouse);
+    auto res = this->get_centered_coordinates(mouse);
+    QTextStream(stdout) << res.at(0) << res.at(1) ;
+    std::vector<std::vector<float>> objpos;
+    objpos.push_back(res);
+
+    if (global_obj_im_coordinates == nullptr){
+        global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    }
+    int n  = global_obj_im_coordinates->size();
+    QTextStream(stdout)<< n<< ": number of objects";
+
+
+        //    global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
+    global_obj_im_coordinates->push_back(objpos.at(0));
+    ui->found_objects->addItem(QString::number(n)+"manual item");
     ctrl->stage_set_speed(15000.0f);
 }
 
@@ -338,6 +371,21 @@ void MainWindow::on_actionDark_Mode_triggered()
 void MainWindow::on_actionLight_triggered()
 {
     setdefault();
+}
+
+
+void MainWindow::export_csv(){
+    if (global_obj_im_coordinates != nullptr)
+    {
+        std::ofstream myfile;
+        myfile.open("example.csv");
+        myfile << "This is the first cell in the first column.\n";
+        myfile << "a,b,c,\n";
+        myfile << "c,s,v,\n";
+        myfile << "1,2,3.456\n";
+        myfile << "semi;colon";
+        myfile.close();
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -370,7 +418,8 @@ void MainWindow::on_predict_sph_clicked()
     this->predict_sph();
 }
 
-void MainWindow::on_Campushbtn_clicked()
+
+void MainWindow::start_camera()
 {
     cameracv = new CameraCV(cameraIndex);
     if (Iscameraopen==true){
@@ -400,6 +449,11 @@ void MainWindow::on_Campushbtn_clicked()
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(16);
     }
+}
+
+void MainWindow::on_Campushbtn_clicked()
+{
+    this->start_camera();
 }
 
 void MainWindow::on_exptime_button_clicked()
@@ -484,8 +538,7 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
-    // ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
-    ctrl->pipette_test_sync(ui->pip_step_spinbox->value());
+     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
@@ -647,12 +700,12 @@ void MainWindow::on_view_scan_clicked()
 
 void MainWindow::on_p_ep_button_clicked()
 {
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
+    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()),static_cast<int>(ui->extrude_set_speed_spinbox->value()));
 }
 
 void MainWindow::on_p_em_button_clicked()
 {
-    ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())));
+    ctrl->pipette_extrude_relative(static_cast<float>(-(ui->p_extruder_step_box->value())),static_cast<int>(ui->extrude_set_speed_spinbox->value()));
 }
 
 void MainWindow::on_s_accel_spinbox_valueChanged(int arg1)
@@ -672,6 +725,8 @@ void MainWindow::on_save_m_p_button_clicked()
 
     std::vector<float> pos = ctrl->pipette_get_coordinates();
     this->mid_s_x_p = pos.at(0);
+
+    ui->x_midpoint_ui->setText(std::to_string(this->mid_s_x_p).c_str());
 }
 
 void MainWindow::on_petri_b_clicked()
@@ -777,6 +832,7 @@ void MainWindow::center_spheroid(std::vector<float>& coors)
     std:: vector<float> c_coords = this->get_centered_coordinates(coors);
     ctrl->stage_move_to_x_sync(static_cast<int>(c_coords.at(0)));
     ctrl->stage_move_to_y_sync(static_cast<int>(c_coords.at(1)));
+
     ctrl->stage_set_speed(ui->s_speed_spinbox->value());
 }
 
@@ -817,7 +873,7 @@ void MainWindow::move_to_petri_B()
 }
 
 
-
+/*  OLD function not syncorised
 
 void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
@@ -856,20 +912,79 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 
 }
 
+*/
+
+void MainWindow::xz_stage_pickup_sph(int obj_idx){
+    if (global_obj_im_coordinates != nullptr){
+    auto start = std::chrono::system_clock::now();
+    //set Pickup speeds
+    //ui->found_objects->currentIndex()
+    int original_stage_speed = ctrl->stage_get_x_speed();
+    ctrl->stage_set_speed(30000);
+    ctrl->pipette_set_speed(ui->z_dive_speed->value());
+    //slowly center the selected sph
+    std::vector<float> coors = ctrl->pipette_get_coordinates();
+    while (coors.at(2) < 55 && coors.at(2)==0){
+
+        QTextStream(stdout)<< "pipette is too low";
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        coors = ctrl->pipette_get_coordinates();
+    }
+    QTextStream(stdout)<< "stage move x a";
+    ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+    QTextStream(stdout)<< "stage move y a";
+    ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
+    //
+    //move to the middle of image with the pipette
+    QTextStream(stdout)<< "pip move blocking x";
+    ctrl->pipette_blocking_move_x(this->mid_s_x_p);
+    //move Z axis down to the petri (auto Z height)
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
+    // PICK UP WITH SYRINGE
+      QTextStream(stdout)<< "pip move blocking e";
+    ctrl->pipette_blocking_move_e(-static_cast<float>(ui->p_extruder_step_box->value()));
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+    // MOVE x axis out of image
+    QTextStream(stdout)<< "pip move blocking x";
+    ctrl->pipette_blocking_move_x(this->mid_s_x_p-2.6f);
+    ctrl->stage_set_speed(original_stage_speed);
+
+    //TODO
+    // this point CHECK if the spheroid picked up!
+    //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+        // CHRONO END
+    std::cout << "[PICK UP]elapsed time: " << elapsed_seconds.count() << "s\n";
+    }else{
+        QTextStream(stdout)<< "object highlighted nothing to pick";
+    }
+
+}
+
 void MainWindow::put_to_target_plate(int x,int y, int type)
 {
+    std::vector<float> coors = ctrl->pipette_get_coordinates();
+    while (coors.at(2) < 55 && coors.at(2)==0){
+
+        QTextStream(stdout)<< "pipette is too low";
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        coors = ctrl->pipette_get_coordinates();
+    }
     ctrl->stage_set_speed(50000);   // akos changed the speed
+    QTextStream(stdout)<< "stage move xy";
     move_to_t_plate(x,y);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-    ctrl->pipette_move_to_x_sync(mid_s_x_p);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
-    ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
-     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
-   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
-    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    QTextStream(stdout)<< "pip move blocking x";
+    ctrl->pipette_blocking_move_x(mid_s_x_p);
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    QTextStream(stdout)<< "pip move blocking e";
+    ctrl->pipette_blocking_move_e(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
 
 }
 
@@ -1192,8 +1307,51 @@ void MainWindow::s_p_changed()
     }else{
 
     }
-
 }
+
+void MainWindow::t_p_changed()
+{
+    this->t_p_selected = p_s->m_selected_target;
+
+    if(t_p_selected == 0) //96 wp
+    {
+        QTextStream(stdout) << "96 wp selected";
+        ui->t_well_x_combobox->clear();
+
+        for (char c = 'H'; c >= 'A'; --c)
+        {
+            ui->t_well_x_combobox->addItem(QString(c));
+        }
+        ui->t_well_y_spinbox->clear();
+        ui->t_well_y_spinbox->setRange(1,12);
+
+        ui->t_well_x_combobox->setCurrentIndex(ui->t_well_x_combobox->count()-1);
+        ui->t_well_y_spinbox->setValue(1);
+
+    }
+    else if(t_p_selected == 1) //384 wp
+    {
+        QTextStream(stdout) << "384 wp selected";
+        QTextStream(stdout) << ui->t_well_x_combobox->count()<< "nitems";
+        ui->t_well_x_combobox->clear();
+        for (char c = 'P'; c >= 'A'; --c)
+        {
+            ui->t_well_x_combobox->addItem(QString(c));
+        }
+        ui->t_well_x_combobox->setCurrentIndex(ui->t_well_x_combobox->count()-1);
+        ui->t_well_y_spinbox->clear();
+        ui->t_well_y_spinbox->setRange(1,24);
+        ui->t_well_y_spinbox->setValue(1);
+    }
+    else if(t_p_selected == 2) //petri 30mm
+    {
+
+    }else{
+
+    }
+}
+
+
 
 void MainWindow::move_to_s_plate(int x_idx,int y_idx){
     int s_x = STAGE_FIRST_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
@@ -1212,8 +1370,8 @@ void MainWindow::on_move_to_s_plate_clicked()
 void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
     std::cout<< "t_p"<<x_idx <<std::endl;
-    int s_x = STAGE_FIRST_T_WELL_LEFT_X+x_idx*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_T_WELL_TOP_Y+(y_idx-1)*DIA_96_WELLPLATE;
+    int s_x = STAGE_FIRST_T_WELL_LEFT_X+stoi(propreader->cfg.wp_96_offset_X)+x_idx*DIA_96_WELLPLATE;
+    int s_y = STAGE_FIRST_T_WELL_TOP_Y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
     ctrl->stage_move_to_y_sync(s_y+18000);
 }
@@ -1240,18 +1398,19 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
 
-    int y_idx = 0+1, x_idx = 0; //y was 0 maybe this will fix or x = 1
-    for (int idx = 0; idx < selected_obj.size();++idx)
+    int y_idx = 1, x_idx = 0; // y should start 1
+    for (int idx = 0; idx < selected_obj.size(); ++idx)
     {
         std:: cout <<"selected obj idx"<<selected_obj.at(idx) << std::endl;
         this->xz_stage_pickup_sph(selected_obj.at(idx));
         this->put_to_target_plate(x_idx,y_idx);
         std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
+        x_idx++;
         if(x_idx>6)// 6 is true for 96 well plate
         {
             x_idx=0;
             y_idx++; }
-        x_idx++;
+
     }
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;

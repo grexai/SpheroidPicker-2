@@ -18,6 +18,10 @@
 #include <deeplearning.h>
 #include <propertyreader.h>
 #include <auto_methods.h>
+// for the csv
+
+#include <iostream>
+#include <fstream>
 
 namespace Ui {
 class MainWindow;
@@ -59,6 +63,8 @@ public slots:
     void show_on_view_2();
 
     void s_p_changed();
+
+    void t_p_changed();
 
 protected:
 
@@ -122,6 +128,10 @@ private slots:
     // buttons
 
     void on_Campushbtn_clicked();
+
+    void start_camera();
+
+    void export_csv();
 
     void update_currentpressure();
 
@@ -285,7 +295,8 @@ private:
     float mid_s_x_p=0.0f;
     int m_stage_abs_starter_x = 0;
     int m_stage_abs_starter_y = 0;
-    int s_p_selected =0;
+    int s_p_selected = 0;
+    int t_p_selected = 0;
 
 
     std::atomic_bool m_s_t_acitive;

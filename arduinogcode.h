@@ -45,9 +45,9 @@ public:
 
     void moveToZSync(float z_value);
 
-    void extrude(float e_value);
+    void extrude(float e_value, int speed);
 
-    void extrude_relative(float e_value);
+    void extrude_relative(float e_value, int speed);
 
     void SyncronizedMoveToX(float x_value);
 
@@ -68,7 +68,14 @@ public:
 
     void setPipetteposition();
 
-    void syncronised_move(float val);
+    void syncronised_move_X(float val);
+
+    void syncronised_move_Y(float val);
+
+    void syncronised_move_Z(float val);
+
+    void syncronised_move_E(float val);
+
     class ardinogcodeexeption: public std::exception{
     virtual  const char* what() const throw()
         {

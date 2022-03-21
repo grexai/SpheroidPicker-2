@@ -52,13 +52,19 @@ public:
 
     void pipette_movey_sync(const float y);
 
-    void pipette_test_sync(const float x);
-
     void pipette_movez_sync(const float z);
 
     void pipette_move_to_z_sync(const float z);
 
-    void pipette_extrude_relative(const float e);
+    void pipette_blocking_move_x(const float x);
+
+    void pipette_blocking_move_y(const float y);
+
+    void pipette_blocking_move_z(const float z);
+
+    void pipette_blocking_move_e(const float e);
+
+    void pipette_extrude_relative(const float e, int speed=1000);
 
     void pipette_move(const std::vector<float>coords);
 

@@ -28,21 +28,25 @@ void controller::request_pressure(const float pressure)
     apc->requestPressure(pressure);
 }
 
+
 void controller::request_atm()
 {
     if(apc == nullptr){return;}
     this->request_pressure(0.0f);
 }
 
+
 void controller::vaccum_pulse(const float vacuum, float time )
 {
     apc->breakIn(vacuum, time);
 }
 
+
 float controller::get_pressure()
 {
     return apc->getPipettePressure();
 }
+
 
 void controller::req_pressure_loop()
 {
@@ -57,6 +61,7 @@ void controller::req_pressure_loop()
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
+
 
 QSharedPointer<float> controller::get_current_pressure(){
     std::unique_lock<std::mutex> pressurevaluelock(m_pressurevaluebuff);
@@ -133,18 +138,43 @@ bool controller::connect_pipette_controller(std::string& port)
 }
 
 
-void controller::pipette_test_sync(const float x)
+void controller::pipette_blocking_move_x(const float x)
 {
     if(apipc == nullptr){return;}
-    apipc->syncronised_move(x);
-    QTextStream(stdout)<< "done";
+    apipc->setabsoluepositioning();
+    apipc->syncronised_move_X(x);
+
 }
+
+void controller::pipette_blocking_move_y(const float y)
+{
+    if(apipc == nullptr){return;}
+    apipc->syncronised_move_Y(y);
+}
+
+
+void controller::pipette_blocking_move_z(const float z)
+{
+    if(apipc == nullptr){return;}
+    apipc->setabsoluepositioning();
+    apipc->syncronised_move_Z(z);
+}
+
+void controller::pipette_blocking_move_e(const float e)
+{
+    if(apipc == nullptr){return;}
+    apipc->setrelativepositioning();
+    apipc->syncronised_move_E(e);
+}
+
+
 
 
 void controller::pipette_movex_sync(const float x)
 {
     if(apipc == nullptr){return;}
-    apipc->syncronised_move(x);
+    apipc->setrelativepositioning();
+    apipc->moveToXSync(x);
 }
 
 
@@ -176,10 +206,10 @@ void controller::pipette_move_to_z_sync(const float z)
     apipc->moveToZSync(z);
 }
 
-void controller::pipette_extrude_relative(const float e)
+void controller::pipette_extrude_relative(const float e, int speed)
 {
 
-    apipc->extrude_relative(e);
+    apipc->extrude_relative(e,speed);
 }
 /// struct erdemes otlet
 void controller::pipette_move(const std::vector<float> coords)
@@ -537,9 +567,6 @@ int controller::stage_get_y_max_pos()
         return int(0);
     }
 }
-
-
-
 
 
 void controller::stage_go_center()

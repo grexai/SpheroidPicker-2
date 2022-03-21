@@ -64,17 +64,12 @@ QByteArray serialcom::sendAndRecive_sync(QString& msg, QString& ansEnd)
     sp.waitForReadyRead(20);
     QByteArray answer2 = sp.readAll();
 
-    QTextStream(stdout) << answer2.size() << "ans2";
+    //QTextStream(stdout) << answer2.size() << "ans2";
     while (answer2.size()<1){
-        sp.waitForReadyRead(5);
+        sp.waitForReadyRead(7);
         answer2 = sp.readAll();
         QTextStream(stdout) << answer2.size();
-
-
     }
-    QTextStream(stdout) << answer2.size();
-
-    QTextStream(stdout) << answer2 << "\n";
     return answer;
 }
 

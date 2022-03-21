@@ -32,8 +32,6 @@ void arduinogcode::SyncronizedMoveToX(float x_value)
 {
     QString msg= "G0";
     apipc_sc.sendAndReceive(msg.append("X").append(QString::number(x_value,'f',2)), EOM);
-
-
 }
 
 // Sends one or more axis to the initial position
@@ -84,17 +82,18 @@ void arduinogcode::moveToZSync(float z_value)
     apipc_sc.send(msg.append("Z").append(QString::number(z_value,'f',2)).append(EOM));
 }
 
-void arduinogcode::extrude(float e_value)
+void arduinogcode::extrude(float e_value, int speed)
 {
     QString msg= "G0";
-    apipc_sc.send(msg.append("E").append(QString::number(e_value,'f',2)).append(EOM));
+    apipc_sc.send(msg.append("E").append(QString::number(e_value,'f',2)).append("F").append(QString::number(speed)).append(EOM));
+    QTextStream(stdout) << msg.append("E").append(QString::number(e_value,'f',2)).append("F").append(QString::number(speed)).append(EOM);
 }
 
-void arduinogcode::extrude_relative(float e_value)
+void arduinogcode::extrude_relative(float e_value, int speed)
 {
     QString msg= "M83";
     apipc_sc.send(msg.append(EOM));
-    this->extrude(e_value);
+    this->extrude(e_value,speed);
 
 }
 
@@ -207,13 +206,32 @@ void arduinogcode::setPipetteposition()
 }
 
 
-// TEST function
-void arduinogcode::syncronised_move(float val){
+// Using the sync send and recive and pause command inside the serial com function
+
+
+void arduinogcode::syncronised_move_X(float val){
     QString msg= "G0";
     apipc_sc.sendAndRecive_sync(msg.append("X").append(QString::number(val,'f',2)), EOM);
-
 }
 
+
+void arduinogcode::syncronised_move_Y(float val){
+    QString msg= "G0";
+    apipc_sc.sendAndRecive_sync(msg.append("Y").append(QString::number(val,'f',2)), EOM);
+}
+
+
+void arduinogcode::syncronised_move_Z(float val){
+    QString msg= "G0";
+    QByteArray a = apipc_sc.sendAndRecive_sync(msg.append("Z").append(QString::number(val,'f',2)), EOM);
+    QTextStream(stdout) << a << endl;
+}
+
+
+void arduinogcode::syncronised_move_E(float val){
+    QString msg= "G0";
+    apipc_sc.sendAndRecive_sync(msg.append("E").append(QString::number(val,'f',2)), EOM);
+}
 
 
 
