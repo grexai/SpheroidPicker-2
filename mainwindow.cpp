@@ -1016,6 +1016,9 @@ void MainWindow::pick_and_put()
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
+    if (CleanBeforePicking) {
+
+    }
     this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
     this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
 

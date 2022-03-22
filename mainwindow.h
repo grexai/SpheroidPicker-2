@@ -34,6 +34,7 @@ class MainWindow : public QMainWindow
 public:
     bool Iscameraopen= false;
     int cameraIndex=0;
+    bool CleanBeforePicking = true;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setdarkstyle();
