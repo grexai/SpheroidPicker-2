@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <marcros.h>
 
+#include <QtXml>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -330,8 +332,12 @@ void MainWindow::center_this_point_action()
     auto res = this->get_centered_coordinates(mouse);
     QTextStream(stdout) << res.at(0) << res.at(1) ;
     std::vector<std::vector<float>> objpos;
-    objpos.push_back(res);
 
+    for (int idx = 0; idx <= 6; ++idx)
+    {
+       res.push_back(0);
+    }
+    objpos.push_back(res);
     if (global_obj_im_coordinates == nullptr){
         global_obj_im_coordinates = new std::vector<std::vector<float>>;
     }
@@ -377,14 +383,29 @@ void MainWindow::on_actionLight_triggered()
 void MainWindow::export_csv(){
     if (global_obj_im_coordinates != nullptr)
     {
-        std::ofstream myfile;
-        myfile.open("example.csv");
-        myfile << "This is the first cell in the first column.\n";
-        myfile << "a,b,c,\n";
-        myfile << "c,s,v,\n";
-        myfile << "1,2,3.456\n";
-        myfile << "semi;colon";
-        myfile.close();
+        std::ofstream csvfile;
+        std::string fname = get_date_time_str();
+        QTextStream(stdout)<< QDir::currentPath() << "\n";
+        csvfile.open("./"+fname+".csv");
+        csvfile << "This is the first cell in the first column.\n";
+        csvfile << "bbx0," << "bby0,"<< "bbx1,"<<"bby1,"
+               <<"length,"<< "area,"<<"circularity,"
+               <<"masscenterx,"<<"masscentery\n";
+        for (int idx = 0; idx < global_obj_im_coordinates->size(); ++idx)
+        {
+            for(int j = 0; j < global_obj_im_coordinates->at(idx).size();++j)
+            {
+                csvfile << global_obj_im_coordinates->at(idx).at(j) << ",";
+
+            }
+             csvfile <<  "\n";
+        }
+        csvfile.close();
+    }
+    else
+    {
+    QTextStream(stdout)<< "no object data to save";
+
     }
 }
 
@@ -1070,8 +1091,9 @@ std::string MainWindow::get_date_time_str()
     datetime.append((QString::number(current_date.year())).toStdString());
     datetime.append((QString::number(current_date.month())).toStdString());
     datetime.append((QString::number(current_date.day())).toStdString()+"-");
-    datetime.append((QString::number(current_time.hour())).toStdString());
-    datetime.append((QString::number(current_time.minute())).toStdString());
+    datetime.append((QString::number(current_time.hour())).toStdString()+"h");
+    datetime.append((QString::number(current_time.minute())).toStdString()+"m");
+    datetime.append((QString::number(current_time.second())).toStdString()+"s");
     return datetime;
 }
 
@@ -1124,19 +1146,23 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     int counter = 0;
     if(scanvector.size()>0){scanvector.clear();}
     float p_v=0.0f;
-    folder.append("s_"+datetime);
+    //folder.append("s_"+datetime);
     if (global_obj_im_coordinates != nullptr){delete global_obj_im_coordinates;}
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
+
     for (int j = 0; j < hmax; ++j)
     {
         ctrl->stage_set_speed(7000.0f);
-        ctrl->stage_move_to_y_sync(static_cast<int>(ypos+m_img_height*j));
+        int image_posy =static_cast<int>(ypos+m_img_height*j);
+        ctrl->stage_move_to_y_sync(image_posy);
         ctrl->stage_set_speed(5000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
             {
-                ctrl->stage_move_to_x_sync(static_cast<int>(xpos+m_img_width*i));
+                int image_posx = static_cast<int>(xpos+m_img_width*i);
+                ctrl->stage_move_to_x_sync(image_posx);
+
                 p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
                 QTextStream(stdout)<<"progvalue"<< p_v<< endl;
                 prog_changed(static_cast<int>(p_v));
@@ -1151,14 +1177,16 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 cv::Mat displayfrm = imtools->convert_bgr_to_rgb(tmp);
                 scanvector.push_back(displayfrm);
                 cv::Mat maskfrm;
-                imtools->saveImg(tmp.get(),num2str.c_str());
-
+                std::string image_name = "Image_" + std::to_string(counter*0.000001).substr(8-leading);
+                std::string full_path = folder + image_name;
+                //imtools->saveImg(tmp.get(),num2str.c_str());
+                imtools->saveImg(tmp.get(),full_path.c_str());
                 // INFERENCE AND FEATURE EXTRACTION
                 std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes);
                 for (int k =0; k<im_objects.size();++k)
                 {
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                   for (int idx = 2;idx<8;++idx)
+                   for (int idx = 2;idx<=8;++idx)
                    {
                        global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
                    }
@@ -1191,7 +1219,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     ui->found_objects->clear();
     sph_s->clear_list();
  //   m_current_detections = {};
-    for (int i=0 ;i<global_obj_im_coordinates->size();++i )
+    for (int i=0 ; i<global_obj_im_coordinates->size(); ++i )
     {
        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
        sph_s->set_list(QString::number(i) + ". Spheroid"
@@ -1419,6 +1447,8 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 
 }
 
+
+
 void MainWindow::on_actionSpheroid_selector_triggered()
 {
     sph_s->show();
@@ -1443,3 +1473,78 @@ void MainWindow::get_selected_source_plate()
     this->s_p_selected = p_s->m_selected_source;
 }
 
+
+void MainWindow::on_actionExport_object_properties_triggered()
+{
+    this->export_csv();
+    this->export_bias_xml();
+    QTextStream(stdout)<< "exporting object props\n";
+}
+
+
+void MainWindow::export_bias_xml(){
+    QFile xmlFile("xmlSample.xml");
+    if (!xmlFile.open(QFile::WriteOnly | QFile::Text ))
+    {
+        qDebug() << "Already opened or there is another issue";
+        xmlFile.close();
+    }
+     QTextStream xmlContent(&xmlFile);
+
+    QDomDocument document;
+
+    //make the root element
+    qSetGlobalQHashSeed(0);
+
+    QDomElement root = document.createElement("BIAS");
+    root.setAttribute("version", "\"1.0\"");
+    //add it to document
+    document.appendChild(root);
+    QDomElement images = document.createElement("images");
+    root.appendChild(images);
+    using namespace  cv;
+    if (scanvector.size()>0 && !m_s_t_acitive)
+    {
+        const float platesize_x = ui->set_plate_size_spinbox->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        int wmax = static_cast<int>(platesize_x / m_img_width);
+        int hmax = static_cast<int>(platesize_y / m_img_height);
+        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
+        int counter = 0;
+        int leading = 2;
+        for (int i = 1; i <= hmax; ++i)
+        {
+            for (int j = 1; j <= wmax; ++j)
+            {
+                QDomElement imagenode = document.createElement("image");
+                std::string image_name = "Image_" + std::to_string(counter*0.000001).substr(8-leading)+".png";
+                imagenode.setAttribute("url", image_name.c_str());
+                images.appendChild(imagenode);
+                QDomElement res = document.createElement("resoluiton");
+                res.setAttribute("x", 1.428);
+                res.setAttribute("y", 1.428);
+                res.setAttribute("z", 1.0);
+                imagenode.appendChild(res);
+                QDomElement center = document.createElement("center");
+                center.setAttribute("x", (m_img_height/2)*j);
+                center.setAttribute("y", (m_img_width/2)*i);
+                center.setAttribute("z", 1.0);
+
+
+
+                imagenode.appendChild(center);
+
+                counter = counter+1;
+            }
+        }
+
+    }
+    xmlContent << document.toString();
+
+    qSetGlobalQHashSeed(-1);
+
+
+
+
+
+}

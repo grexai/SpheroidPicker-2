@@ -273,6 +273,10 @@ private slots:
 
      void get_selected_source_plate();
 
+     void export_bias_xml();
+
+     void on_actionExport_object_properties_triggered();
+
 private:
 
     QTimer *timer= nullptr;

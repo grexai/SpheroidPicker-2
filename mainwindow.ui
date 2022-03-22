@@ -2407,6 +2407,8 @@ Stage</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionHW_selector"/>
+    <addaction name="actionExport_object_properties"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
     <addaction name="separator"/>
    </widget>
@@ -2478,6 +2480,11 @@ Stage</string>
   <action name="actionPlate_selector">
    <property name="text">
     <string>Plate selector</string>
+   </property>
+  </action>
+  <action name="actionExport_object_properties">
+   <property name="text">
+    <string>Export object properties</string>
    </property>
   </action>
  </widget>

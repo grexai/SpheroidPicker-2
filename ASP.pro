@@ -22,6 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 QT += serialport
+QT += xml
 CONFIG += console
 CONFIG(release, debug|release) {
 }
