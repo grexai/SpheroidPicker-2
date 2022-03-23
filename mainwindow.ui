@@ -1881,7 +1881,7 @@ Stage</string>
       <string>Pick up selected</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="cleancheckBox">
      <property name="geometry">
       <rect>
        <x>20</x>

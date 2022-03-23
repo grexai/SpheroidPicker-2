@@ -243,7 +243,9 @@ private slots:
 
      void xz_stage_pickup_sph(int obj_idx);
 
-     void clean_pipette();
+     void clean_pipette(int x, int y);
+
+     void two_well_cleaning();
 
      void pick_and_put();
 

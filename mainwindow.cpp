@@ -1010,8 +1010,9 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
 }
 
 
-void MainWindow::clean_pipette()
+void MainWindow::clean_pipette(int x, int y)
 {
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f));
     std::vector<float> coors = ctrl->pipette_get_coordinates();
     while (coors.at(2) < 55 && coors.at(2)==0){
 
@@ -1021,19 +1022,25 @@ void MainWindow::clean_pipette()
     }
     ctrl->stage_set_speed(50000);   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
-    move_to_t_plate(1,1);
+    move_to_t_plate(x,y);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-    ctrl->pipette_blocking_move_z(static_cast<float>(50.0f));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
     QTextStream(stdout)<< "pip move blocking e";
-    ctrl->pipette_blocking_move_e(static_cast<float>(-ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
-    ctrl->pipette_blocking_move_e(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
+    float cleaning_amount = 3.0f;
+    ctrl->pipette_blocking_move_e(-cleaning_amount);
+    ctrl->pipette_blocking_move_e(cleaning_amount);
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
 
+}
+
+void MainWindow::two_well_cleaning()
+{
+    this->clean_pipette(0,1); // H1
+    this->clean_pipette(1,1); // G1
 }
 
 
@@ -1043,8 +1050,8 @@ void MainWindow::pick_and_put()
     //MOVE to the petri "B" 35mm petri
     //if the Petri "A" is centered MID (stage 751431,501665)
     // CENTER 751431 501665 after auto calibration
-    if (CleanBeforePicking) {
-
+    if (ui->cleancheckBox->isChecked() == true) {
+        two_well_cleaning();
     }
     this->xz_stage_pickup_sph(ui->found_objects->currentIndex());
     this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
