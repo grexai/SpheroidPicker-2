@@ -41,6 +41,7 @@ public:
     void setdefault();
     std::vector<sph_props> m_current_detections;
     cv::Mat TM;
+    std::string m_folder ;
 signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
@@ -242,6 +243,8 @@ private slots:
 
      void xz_stage_pickup_sph(int obj_idx);
 
+     void clean_pipette();
+
      void pick_and_put();
 
      //scanning
@@ -277,6 +280,8 @@ private slots:
      void export_bias_xml();
 
      void on_actionExport_object_properties_triggered();
+
+     void on_actionExport_Screening_to_Bias_triggered();
 
 private:
 

@@ -598,7 +598,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             float bb_x = static_cast<float>(bb[2])*nx;
             float bb_y = static_cast<float>(bb[3])*nx;
             std::vector <float> outcoors;
-            outcoors.push_back( bx);  // Left   0
+            outcoors.push_back(bx);  // Left   0
             outcoors.push_back(by);   // Top    1
             outcoors.push_back(bb_x); // Right  2
             outcoors.push_back(bb_y); // Bottom 3

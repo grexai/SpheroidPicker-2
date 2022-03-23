@@ -963,7 +963,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
     // PICK UP WITH SYRINGE
-      QTextStream(stdout)<< "pip move blocking e";
+    QTextStream(stdout)<< "pip move blocking e";
     ctrl->pipette_blocking_move_e(-static_cast<float>(ui->p_extruder_step_box->value()));
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
@@ -1003,6 +1003,33 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
     QTextStream(stdout)<< "pip move blocking e";
+    ctrl->pipette_blocking_move_e(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+
+}
+
+
+void MainWindow::clean_pipette()
+{
+    std::vector<float> coors = ctrl->pipette_get_coordinates();
+    while (coors.at(2) < 55 && coors.at(2)==0){
+
+        QTextStream(stdout)<< "pipette is too low";
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        coors = ctrl->pipette_get_coordinates();
+    }
+    ctrl->stage_set_speed(50000);   // akos changed the speed
+    QTextStream(stdout)<< "stage move xy";
+    move_to_t_plate(1,1);
+   // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    ctrl->pipette_blocking_move_z(static_cast<float>(50.0f));
+    QTextStream(stdout)<< "pip move blocking x";
+    ctrl->pipette_blocking_move_x(mid_s_x_p);
+    QTextStream(stdout)<< "pip move blocking z";
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    QTextStream(stdout)<< "pip move blocking e";
+    ctrl->pipette_blocking_move_e(static_cast<float>(-ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
     ctrl->pipette_blocking_move_e(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
     QTextStream(stdout)<< "pip move blocking z";
     ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
@@ -1139,7 +1166,9 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
         QTextStream(stdout)<< folder.c_str()<< "created" << endl;
         QDir().mkdir(folder.c_str());
     }
+
     QTextStream(stdout)<< "starting..";
+    m_folder = folder;
 
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
@@ -1400,7 +1429,7 @@ void MainWindow::on_move_to_s_plate_clicked()
 
 void MainWindow::move_to_t_plate(int x_idx,int y_idx)
 {
-    std::cout<< "t_p"<<x_idx <<std::endl;
+    std::cout<< "moving to target plate given indexes: "<<x_idx <<" : " << y_idx<<std::endl;
     int s_x = STAGE_FIRST_T_WELL_LEFT_X+stoi(propreader->cfg.wp_96_offset_X)+x_idx*DIA_96_WELLPLATE;
     int s_y = STAGE_FIRST_T_WELL_TOP_Y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*DIA_96_WELLPLATE;
     ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
@@ -1480,23 +1509,25 @@ void MainWindow::get_selected_source_plate()
 void MainWindow::on_actionExport_object_properties_triggered()
 {
     this->export_csv();
-    this->export_bias_xml();
+   // this->export_bias_xml();
     QTextStream(stdout)<< "exporting object props\n";
 }
 
 
 void MainWindow::export_bias_xml(){
-    QFile xmlFile("xmlSample.xml");
+    std::string current_fname = m_folder + "imagelist.xml";
+    QFile xmlFile(current_fname.c_str());
     if (!xmlFile.open(QFile::WriteOnly | QFile::Text ))
     {
         qDebug() << "Already opened or there is another issue";
         xmlFile.close();
     }
-     QTextStream xmlContent(&xmlFile);
+    QTextStream xmlContent(&xmlFile);
 
     QDomDocument document;
 
     //make the root element
+    //magic stuff for not randomly reordering attributes
     qSetGlobalQHashSeed(0);
 
     QDomElement root = document.createElement("BIAS");
@@ -1525,15 +1556,13 @@ void MainWindow::export_bias_xml(){
                 images.appendChild(imagenode);
                 QDomElement res = document.createElement("resoluiton");
                 res.setAttribute("x", 1.428);
-                res.setAttribute("y", 1.428);
+                res.setAttribute("y", 1.427);
                 res.setAttribute("z", 1.0);
                 imagenode.appendChild(res);
                 QDomElement center = document.createElement("center");
-                center.setAttribute("x", (m_img_height/2)*j);
-                center.setAttribute("y", (m_img_width/2)*i);
+                center.setAttribute("x", (((m_img_width)/2)*j/2));
+                center.setAttribute("y", (((m_img_height)/2)*i)/2);
                 center.setAttribute("z", 1.0);
-
-
 
                 imagenode.appendChild(center);
 
@@ -1550,4 +1579,9 @@ void MainWindow::export_bias_xml(){
 
 
 
+}
+
+void MainWindow::on_actionExport_Screening_to_Bias_triggered()
+{
+    this->export_bias_xml();
 }
