@@ -1560,8 +1560,8 @@ void MainWindow::export_bias_xml(){
                 res.setAttribute("z", 1.0);
                 imagenode.appendChild(res);
                 QDomElement center = document.createElement("center");
-                center.setAttribute("x", (((m_img_width)/2)*j/2));
-                center.setAttribute("y", (((m_img_height)/2)*i)/2);
+                center.setAttribute("x", ((m_img_width/10)+j*m_img_width/20));
+                center.setAttribute("y", ((m_img_height/10)+i*m_img_height/20));
                 center.setAttribute("z", 1.0);
 
                 imagenode.appendChild(center);
