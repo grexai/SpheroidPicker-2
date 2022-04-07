@@ -605,7 +605,7 @@ void MainWindow::on_s_center_button_clicked()
 void MainWindow::on_save_image_button_clicked()
 {
     imtools->saveImg((cameracv->get_current_frm().get()),
-                     (ui->imagename_lineedit->text().toStdString()));
+                     (ui->imagename_lineedit->text().toStdString().append(this->get_date_time_str())));
 
 }
 
