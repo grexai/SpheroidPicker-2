@@ -45,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
     sph_s->set_bbs(m_bboxes);
     p_s = new Plateselector;
     bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
-
     ctrl->connect_tango_stage();
     progress.setValue(33);
     progress.setLabelText("homing manipulator");
@@ -299,18 +298,28 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
 void MainWindow::update_window()
 {
 
-    auto cfrm=  cameracv->get_current_frm();
-    if (cfrm == nullptr)
+    auto cfrm =  cameracv->get_current_frm();
+    if(cfrm == nullptr)
     {
         return;
     }
-    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
-    calib_frame_view(displayfrm);
-    delete qframe;
-    qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
-    //QPainter p(qframe );
-    qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
-    ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
+    if(cfrm->empty())
+    {
+        timer->stop();
+        disconnect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
+        cameracv->stopCameraLoop();
+        cameracv->resetvideodevice();
+        cameracv->rmvideodevice();
+        //cameracv->~CameraCV();
+    }else{
+        cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
+        calib_frame_view(displayfrm);
+        delete qframe;
+        qframe = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols, displayfrm.rows, QImage::Format_RGB888);
+        //QPainter p(qframe );
+        qpxmi.setPixmap( QPixmap::fromImage(*qframe) );
+        ui->graphicsView->fitInView(&qpxmi, Qt::KeepAspectRatio);
+    }
 }
 
 //right click actions
@@ -467,6 +476,7 @@ void MainWindow::start_camera()
         ui->graphicsView->installEventFilter(this);
         cameracv->spawnCameraLoop();
         Iscameraopen = cameracv->is_camera_open();
+        QTextStream(stdout) << "camera1";
         connect(timer, SIGNAL(timeout()), this, SLOT(update_window()));
         timer->start(16);
     }
@@ -752,7 +762,8 @@ void MainWindow::on_save_m_p_button_clicked()
 
 void MainWindow::on_petri_b_clicked()
 {
-    m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
+    //m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
+    this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
 }
 
 void MainWindow::on_pick_and_put_clicked()
@@ -884,7 +895,7 @@ void MainWindow::move_to_petri_B()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_x_sync(mid_s_x_p);
-    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+0.3));
+    ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox_2->value()+0.3));
 
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
@@ -941,7 +952,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     //set Pickup speeds
     //ui->found_objects->currentIndex()
     int original_stage_speed = ctrl->stage_get_x_speed();
-    ctrl->stage_set_speed(30000);
+    ctrl->stage_set_speed(15000);
     ctrl->pipette_set_speed(ui->z_dive_speed->value());
     //slowly center the selected sph
     std::vector<float> coors = ctrl->pipette_get_coordinates();
@@ -966,7 +977,7 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     QTextStream(stdout)<< "pip move blocking e";
     ctrl->pipette_blocking_move_e(-static_cast<float>(ui->p_extruder_step_box->value()));
     QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f)); //Akos Z value
     // MOVE x axis out of image
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(this->mid_s_x_p-2.6f);
@@ -988,48 +999,50 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
 void MainWindow::put_to_target_plate(int x,int y, int type)
 {
     std::vector<float> coors = ctrl->pipette_get_coordinates();
-    while (coors.at(2) < 55 && coors.at(2)==0){
+    while (coors.at(2) < 64 && coors.at(2)==0){
 
         QTextStream(stdout)<< "pipette is too low";
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         coors = ctrl->pipette_get_coordinates();
     }
-    ctrl->stage_set_speed(50000);   // akos changed the speed
+    ctrl->stage_set_speed(15000);   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
     move_to_t_plate(x,y);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
     QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox_2->value()));
     QTextStream(stdout)<< "pip move blocking e";
     ctrl->pipette_blocking_move_e(static_cast<float>(ui->p_extruder_step_box->value())+static_cast<float>(ui->doubleSpinBox_2->value()));
     QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f)); //Akos Z value
 
 }
 
 
 void MainWindow::clean_pipette(int x, int y)
 {
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f));
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f));
     std::vector<float> coors = ctrl->pipette_get_coordinates();
-    while (coors.at(2) < 55 && coors.at(2)==0){
+    while (coors.at(2) < 64 && coors.at(2)==0){
 
         QTextStream(stdout)<< "pipette is too low";
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         coors = ctrl->pipette_get_coordinates();
     }
-    ctrl->stage_set_speed(50000);   // akos changed the speed
+    ctrl->stage_set_speed(15000);   // akos changed the speed
+    ctrl->pipette_set_speed(ui->z_dive_speed->value()*2);
     QTextStream(stdout)<< "stage move xy";
     move_to_t_plate(x,y);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
     QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+0.1f));
+    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox_2->value()));
     QTextStream(stdout)<< "pip move blocking e";
     float cleaning_amount = 3.0f;
+
     ctrl->pipette_blocking_move_e(-cleaning_amount);
     ctrl->pipette_blocking_move_e(cleaning_amount);
     QTextStream(stdout)<< "pip move blocking z";
@@ -1041,6 +1054,7 @@ void MainWindow::two_well_cleaning()
 {
     this->clean_pipette(0,1); // H1
     this->clean_pipette(1,1); // G1
+    this->clean_pipette(2,1); // G1
 }
 
 
@@ -1188,18 +1202,30 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     //folder.append("s_"+datetime);
     if (global_obj_im_coordinates != nullptr){delete global_obj_im_coordinates;}
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
-
+    int image_posy = 0;
+    int image_posx  = 0 ;
     for (int j = 0; j < hmax; ++j)
     {
         ctrl->stage_set_speed(7000.0f);
-        int image_posy =static_cast<int>(ypos+m_img_height*j);
+        if (j == 0){
+            image_posy =static_cast<int>(ypos+m_img_height*j);
+        }
+        else{
+           image_posy =static_cast<int>(ypos+m_img_height*j-m_img_height*0.1);
+        }
+
         ctrl->stage_move_to_y_sync(image_posy);
         ctrl->stage_set_speed(5000.0f);
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
             {
-                int image_posx = static_cast<int>(xpos+m_img_width*i);
+                if (i == 0){
+                    image_posx = static_cast<int>(xpos+m_img_width*i);
+                }else
+                {
+                    image_posx = static_cast<int>(xpos+m_img_width*i-m_img_width*0.1);
+                }
                 ctrl->stage_move_to_x_sync(image_posx);
 
                 p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
@@ -1211,7 +1237,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 std::string posy = std::to_string(j+1)+ "/" + std::to_string(hmax);
                 std::string posx = std::to_string(i+1)+ "/" + std::to_string(wmax);
                 ui->current_scaningpos->setText(("Scaning pos: W: "+posx +" H: " + posy).c_str() );
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
                 auto tmp = cameracv->get_current_frm();
                 cv::Mat displayfrm = imtools->convert_bgr_to_rgb(tmp);
                 scanvector.push_back(displayfrm);
@@ -1224,6 +1250,12 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes);
                 for (int k =0; k<im_objects.size();++k)
                 {
+                   QTextStream(stdout) << im_objects.at(k).at(0) << "cors" << im_objects.at(k).at(1);
+                   if (im_objects.at(k).at(0)>1920-192 ||im_objects.at(k).at(1)>1080-108)
+                   {
+                       QTextStream(stdout) << "dropping this MF " ;
+                       continue;
+                   }
                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
                    for (int idx = 2;idx<=8;++idx)
                    {
@@ -1291,7 +1323,7 @@ void MainWindow::create_mosaic(){
         int hmax = static_cast<int>(platesize_y / m_img_height);
         QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
         if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
-        Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT), (wmax * FULL_HD_IMAGE_WIDTH), CV_8UC3));
+        Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT-m_overlap), (wmax * FULL_HD_IMAGE_WIDTH-m_overlap), CV_8UC3));
         float p_v=0.0f;
         for (int i = 0; i < hmax; ++i)
         {
@@ -1553,22 +1585,40 @@ void MainWindow::export_bias_xml(){
         QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
         int counter = 0;
         int leading = 2;
-        for (int i = 1; i <= hmax; ++i)
+        int xval = 0; int yval=0;
+
+        for (int i = 0; i < hmax; ++i)
         {
-            for (int j = 1; j <= wmax; ++j)
+            if (i==0){
+                yval =(m_img_height*0.05);
+            }else{
+                yval = yval + m_img_height*0.1 - m_img_height*0.01;
+               // yval = ((m_img_height*0.5)+i*m_img_height-m_img_height*0.1)*0.1;
+            }
+            for (int j = 0; j < wmax; ++j)
             {
+
                 QDomElement imagenode = document.createElement("image");
                 std::string image_name = "Image_" + std::to_string(counter*0.000001).substr(8-leading)+".png";
                 imagenode.setAttribute("url", image_name.c_str());
                 images.appendChild(imagenode);
-                QDomElement res = document.createElement("resoluiton");
+                QDomElement res = document.createElement("resolution");
                 res.setAttribute("x", 1.428);
                 res.setAttribute("y", 1.427);
                 res.setAttribute("z", 1.0);
                 imagenode.appendChild(res);
                 QDomElement center = document.createElement("center");
-                center.setAttribute("x", ((m_img_width/10)+j*m_img_width/20));
-                center.setAttribute("y", ((m_img_height/10)+i*m_img_height/20));
+
+                if (j == 0){
+                    xval = m_img_width*0.05;}
+                else{
+                    xval = xval + m_img_width*0.1 - m_img_width*0.01 ;
+                   // xval = ((m_img_width*0.5)+j*m_img_width-m_img_width*0.1)*0.1;
+                }
+
+
+                center.setAttribute("x", xval);
+                center.setAttribute("y", yval);
                 center.setAttribute("z", 1.0);
 
                 imagenode.appendChild(center);

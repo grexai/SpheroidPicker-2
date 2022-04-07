@@ -119,9 +119,15 @@ void CameraCV::spawnCameraLoop()
     QTextStream(stdout)<< "setting sizes";
     this->setimagewidth(w);
     this->setimageheight(h);
-   // mActive= true;
+    mActive= true;
     mBGThread = std::thread(&CameraCV::getCameraframe, this);
   //  mBGThread.detach();
+
+}
+
+void CameraCV::stopCameraLoop(){
+    mActive=false;
+    mBGThread.join();
 
 }
 

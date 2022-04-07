@@ -37,6 +37,8 @@ public:
 
     void spawnCameraLoop();
 
+    void stopCameraLoop();
+
     cv::VideoCapture* getCamera();
 
     void freeframe();

@@ -94,7 +94,6 @@ void arduinogcode::extrude_relative(float e_value, int speed)
     QString msg= "M83";
     apipc_sc.send(msg.append(EOM));
     this->extrude(e_value,speed);
-
 }
 
 // set the GCODE interpreter to ABSOLUTE POSIITING MODE

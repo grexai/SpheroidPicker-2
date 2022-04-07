@@ -310,7 +310,7 @@ private:
     int s_p_selected = 0;
     int t_p_selected = 0;
 
-
+    int m_overlap = 0;
     std::atomic_bool m_s_t_acitive;
     cv::Mat* Mimage = nullptr;
 
