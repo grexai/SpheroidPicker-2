@@ -86,7 +86,7 @@ void spheroid_selector::on_Object_list_activated(const QModelIndex &index)
 {
    cv::Mat3b  cfrm;
    m_bbs->at(index.row()).copyTo(cfrm);
-   cv::cvtColor(cfrm,cfrm,CV_BGR2RGB,0);
+   cv::cvtColor(cfrm,cfrm,cv::COLOR_BGR2RGB,0);
  //  cfrm.c
    delete qframe;
    qframe= nullptr;

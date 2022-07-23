@@ -329,10 +329,11 @@ cv::Mat matterport_mrcnn::mold_image(cv::Mat &image, const int IMAGE_SIZE, int m
 
 void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* modelPath, const char* empty){
     read_graph(modelPB);
-
+    std::cout << "Successfully imported graph" << std::endl;
     std::cout << "Successfully imported graph" << std::endl;
 
     static constexpr int NUM_CLASSES = 2;
+    std::cout<< "here";
     static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
     float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
         static_cast<float>(IMAGE_SIZE), static_cast<float>(IMAGE_SIZE), 3.0f,        //original image shape (irrelevant)
@@ -342,11 +343,15 @@ void matterport_mrcnn::setup_dnn_network( const char* modelPB, const char* model
         0.0f, 1.0f };                                                                 //classes (NUM_CLASSES)
 
 //TODO the binary
+    std::cout << "loading anchors";
     std::ifstream anchor_file;
     //TODO LOAD ANCHOR ALL ANCHOR? ONLY 1?
     //IMAGE_SIZE = select_anchor();
+
     m_anchors = load_anchor(modelPath, IMAGE_SIZE);
+    std::cout << "anc ready";
     this->create_session();
+    std::cout << "session ready";
 }
 /*
 std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat& input,cv::Mat& output,std::vector<cv::Mat>& bboxes) {
@@ -394,7 +399,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
     //Defining inputs
     std::vector<TF_Output> inputs;
     std::vector<TF_Tensor*> inputTensors;
-
+    std::cout<< "maybe here \n";
     //image tensor ezt
     TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph, "input_image");
     if (inputOpImage == nullptr) throw std::runtime_error("Missing node!");

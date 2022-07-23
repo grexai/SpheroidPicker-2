@@ -51,7 +51,7 @@ bool CameraCV::is_camera_open(){
 }
 
 void CameraCV::resetvideodevice(){
-     this->camera->set(CV_CAP_PROP_SETTINGS,0.0);
+     this->camera->set(cv::CAP_PROP_SETTINGS,0.0);
 }
 
 /*
@@ -142,12 +142,12 @@ void CameraCV::freeframe(){
 void CameraCV::setimagewidth(float& imwidth){
 
    //QTextStream(stdout)  << "width " << imwidth << endl;
-   this->camera->set(CV_CAP_PROP_FRAME_WIDTH,imwidth);
+   this->camera->set(cv::CAP_PROP_FRAME_WIDTH,imwidth);
 }
 
 void CameraCV::setimageheight(float& imheight){
    //  QTextStream(stdout)  << "heights " << imheight << endl;
-     camera->set(CV_CAP_PROP_FRAME_HEIGHT,imheight);
+     camera->set(cv::CAP_PROP_FRAME_HEIGHT,imheight);
 }
 
 void CameraCV::setframerate(int reqframerate){

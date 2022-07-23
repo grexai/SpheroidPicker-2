@@ -1,5 +1,5 @@
 #include "arduinogcode.h"
-
+#include <QRegExp>
 
 //*********************************//
 //  Controlling based on:          //
@@ -223,7 +223,7 @@ void arduinogcode::syncronised_move_Y(float val){
 void arduinogcode::syncronised_move_Z(float val){
     QString msg= "G0";
     QByteArray a = apipc_sc.sendAndRecive_sync(msg.append("Z").append(QString::number(val,'f',2)), EOM);
-    QTextStream(stdout) << a << endl;
+    QTextStream(stdout) << a << "\n";
 }
 
 

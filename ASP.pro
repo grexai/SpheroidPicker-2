@@ -21,8 +21,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
+QT += core5compat
 QT += serialport
 QT += xml
+QT += core
+CONFIG(staticlib): DEFINES += QUAZIP_STATIC
 CONFIG += console
 CONFIG(release, debug|release) {
 }
@@ -81,72 +84,72 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
-else:unix: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcore
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/'../../libraries/Leica sdk/C++/lib64/' -lahmcore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/'../../libraries/Leica sdk/C++/lib64/' -lahmcore
+else:unix: LIBS += -L$$PWD/'../../libraries/Leica sdk/C++/lib64/' -lahmcore
 
-INCLUDEPATH += $$PWD/'../../../Libraries/Leica sdk/C++/include'
-DEPENDPATH += $$PWD/'../../../Libraries/Leica sdk/C++/lib64'
+INCLUDEPATH += $$PWD/'../../libraries/Leica sdk/C++/include'
+DEPENDPATH += $$PWD/'../../libraries/Leica sdk/C++/lib64'
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/libahmcore'
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/libahmcore'
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/ahmcore.lib'
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/ahmcore.lib'
-else:unix: PRE_TARGETDEPS += $$PWD/'../../../Libraries/Leica sdk/C++/lib64/libahmcore.a'
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../libraries/Leica sdk/C++/lib64/libahmcore'
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../libraries/Leica sdk/C++/lib64/libahmcore'
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/'../../libraries/Leica sdk/C++/lib64/ahmcore.lib'
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/'../../libraries/Leica sdk/C++/lib64/ahmcore.lib'
+else:unix: PRE_TARGETDEPS += $$PWD/'../../../libraries/Leica sdk/C++/lib64/libahmcore.a'
 
-unix|win32: LIBS += -L$$PWD/'../../../Libraries/Leica sdk/C++/lib64/' -lahmcorelocator
+unix|win32: LIBS += -L$$PWD/'../../libraries/Leica sdk/C++/lib64/' -lahmcorelocator
 
 # OPENCV
 
-INCLUDEPATH += $$PWD/'../../../Libraries\opencv-3.4.5\build\install\include'
+INCLUDEPATH += $$PWD/'../../libraries\opencv-4.5.5\opencv-4.5.5\build\install\include'
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_core345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_core345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_core455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_core455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgproc345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgproc345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_imgproc455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_imgproc455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_highgui345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_highgui345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_highgui455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_highgui455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgcodecs345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_imgcodecs345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_imgcodecs455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_imgcodecs455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_videoio345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_videoio345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_videoio455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_videoio455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_ml345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_ml345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_ml455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_ml455
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../Libraries/opencv-3.4.5/build/lib/release/ -lopencv_dnn345
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_dnn455
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../libraries/opencv-4.5.5/opencv-4.5.5/build/lib/Release/ -lopencv_dnn455
 
 
 
 DISTFILES +=
 
 CONFIG(release,tf-cpu|release){
-win32: LIBS += -L$$PWD/../../../Libraries/tf-cpu113/lib/ -llib64tf131
+#win32: LIBS += -L$$PWD/../../../libraries/tf-cpu113/lib/ -tensorflow
 
-INCLUDEPATH += $$PWD/../../../Libraries/tf-cpu113/include
-DEPENDPATH += $$PWD/../../../Libraries/tf-cpu113/include
+INCLUDEPATH += $$PWD/../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\include
+DEPENDPATH += $$PWD/../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\include
 
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-cpu113/lib/lib64tfcpu131.lib
-else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-cpu113/lib/liblib64tf131.a
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\lib\tensorflow.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\lib/tensorflow.a
 
-win32:CONFIG(release, debug|release): LIBS += $$PWD/../../../Libraries/tf-cpu113/lib/lib64tfcpu131.lib
-else:win32:CONFIG(debug, debug|release): $$PWD/../../../Libraries/tf-cpu113/lib/liblib64tf131.a
+win32:CONFIG(release, debug|release): LIBS += $$PWD/../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\lib\tensorflow.lib
+else:win32:CONFIG(debug, debug|release): $$PWD/../../libraries/libtensorflow-gpu-windows-x86_64-2.7.0\lib/tensorflow.a
 }
-else
-{
-win32: LIBS += -L$$PWD/../../../Libraries/tf-gpu131/lib/ -llib64tf131
+#else
+#{
+#win32: LIBS += -L$$PWD/../../libraries/tf-gpu131/lib/ -llib64tf131
 
-INCLUDEPATH += $$PWD/../../../Libraries/tf-gpu131/include
-DEPENDPATH += $$PWD/../../../Libraries/tf-gpu131/include
+#INCLUDEPATH += $$PWD/../../libraries/tf-gpu131/include
+#DEPENDPATH += $$PWD/../../libraries/tf-gpu131/include
 
-win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-gpu131/lib/lib64tf131.lib
-else:win32-g++: PRE_TARGETDEPS += $$PWD/../../../Libraries/tf-gpu131/lib/liblib64tf131.a
+#win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../../libraries/tf-gpu131/lib/lib64tf131.lib
+#else:win32-g++: PRE_TARGETDEPS += $$PWD/../../libraries/tf-gpu131/lib/liblib64tf131.a
 
-win32:CONFIG(release, debug|release): LIBS += $$PWD/../../../Libraries/tf-gpu131/lib/lib64tf131.lib
-else:win32:CONFIG(debug, debug|release): $$PWD/../../../Libraries/tf-gpu131/lib/liblib64tf131.a
-}
+#win32:CONFIG(release, debug|release): LIBS += $$PWD/../../libraries/tf-gpu131/lib/lib64tf131.lib
+#else:win32:CONFIG(debug, debug|release): $$PWD/../../libraries/tf-gpu131/lib/liblib64tf131.a
+#}

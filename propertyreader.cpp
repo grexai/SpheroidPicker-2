@@ -44,19 +44,25 @@ void propertyreader::read_settings(std::string settings_file_path,
                     std::map<std::string, std::string>& settings) {
         using namespace  std;
         std::cout << "Reading settings from file: " << settings_file_path << std::endl;
+
             ifstream input(settings_file_path);
+            cout<< "settings_file_path" << endl;
             if (!input) {
                     throw 20;
+                    cout<< "line" << endl;
             }
             std::string line;
+            cout<< "line" << endl;
             while (getline(input, line)) {
                     std::vector<string> setting = split(line, '=');
                     if (setting.size() >= 2) {
                             if (setting[0][0] != '#') {
                                     settings[setting[0]] = setting[1];
                             }
+
                     }
             }
+
     }
 
 void propertyreader::apply_settings(std::map<std::string, std::string>& settings) {
@@ -69,6 +75,7 @@ void propertyreader::apply_settings(std::map<std::string, std::string>& settings
     cfg.matterport_folder = s_param(settings,"matterport.folder");
     cfg.wp_96_offset_X = s_param(settings,"offsets.wp96.x");
     cfg.wp_96_offset_Y = s_param(settings,"offsets.wp96.y");
+
 }
 
 

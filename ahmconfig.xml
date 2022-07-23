@@ -19,7 +19,7 @@
 			</parameters>
 		<unit name="tango-stage" id="MICROSCOPE-STAGE" detect="*" driver="cms_tango.dll" >
 			<parameters>
-				<driver-config protocol-window="false" comport="COM17">
+				<driver-config protocol-window="false" comport="COM4">
 					<TANGO-X-AXIS reverse="true" />
 					<TANGO-Y-AXIS reverse="true" />
 				</driver-config>

@@ -1,6 +1,8 @@
 #include "imagetools.h"
 #include <thread>
 
+
+
 cv::Mat* imagetools::getframe()
 {
     return (this->frame);
@@ -24,7 +26,8 @@ cv::Mat* imagetools::get_display_frm()
 
 cv::Mat imagetools::convert_bgr_to_rgb(QSharedPointer<cv::Mat> p_input){
     cv::Mat rgb;
-    cvtColor(*p_input,rgb,CV_BGR2RGB,0);
+   // cvtColor(*p_input,rgb,CV_BGR2RGB,0);
+    cvtColor(*p_input,rgb,cv::COLOR_BGR2RGB,0);
     return rgb;
 }
 
@@ -98,7 +101,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         Canny(c_input, canny_output, 0, 255, 3);
         /// Find contours
     //	imshow("asd", canny_output);
-        findContours(c_input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+        findContours(c_input, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
         cout << contours.size() << "sizeof c" << endl;
         /// Get the moments
         vector<Moments> mu(contours.size());

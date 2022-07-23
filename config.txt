@@ -1,6 +1,19 @@
-#Configuration file for spheroid picker
-#sad
+#Configuration file for Autamtic Spheroid Picker
+#sad comment
 
-ports.pressurecontroller="COM26"
-ports.pipette="COM7"
+#port settings:
+ports.pipette=COM4
+ports.pressurecontroller=COM12
 
+#inception_v2 modell pathes
+dl.modelweights=d:/dev/cpp/model.pb
+dl.textgraph=d:/dev/cpp/model.pbtxt
+dl.classes=d:/dev/cpp/mscoco_labels.names
+#matterport maskrcnn model path
+
+matterport.graph=d:/dev/models/mrcnn_sph_im1024_20200618/mrcnn_sph_im1024_20200618.pb
+matterport.folder=d:/dev/models/mrcnn_sph_im1024_20200618/
+
+# well plate offsets
+offsets.wp96.x=2000
+offsets.wp96.y=2000

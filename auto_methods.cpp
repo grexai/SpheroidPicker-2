@@ -55,10 +55,10 @@ void auto_methods::scan_sample(std::atomic_bool &p_s_t_acitive){
     datetime.append((QString::number(QTime::currentTime().minute())).toStdString());
     folder.append(datetime+"/");
     if (QDir().exists(folder.c_str())){
-        QTextStream(stdout) << "this folder already folder exists"<< endl;
+        QTextStream(stdout) << "this folder already folder exists\n";
     }
     else{
-        QTextStream(stdout)<< folder.c_str()<< "created" << endl;
+        QTextStream(stdout)<< folder.c_str()<< "created\n";
         QDir().mkdir(folder.c_str());
     }
     QTextStream(stdout)<< "starting..";

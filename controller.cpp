@@ -14,11 +14,11 @@ bool controller::connect_pressure_controller(std::string& port)
     //arduinopressurecontroller sd(QSP_apc,p1);
     if (apc->isconnected == true)
     {
-       QTextStream(stdout)<< "Pressure controller connected"<< endl;
+       QTextStream(stdout)<< "Pressure controller connected"<< "\n";
        return true;
     }
     else{
-        QTextStream(stdout)<< "Could not connect to pressure controller"<< endl;
+        QTextStream(stdout)<< "Could not connect to pressure controller"<< "\n";
         return false;
     }
 }
@@ -128,11 +128,11 @@ bool controller::connect_pipette_controller(std::string& port)
     apipc = new arduinogcode(QSP_apipc,p1);
     if (apipc->isconnected == true)
     {
-       QTextStream(stdout)<< "Pipette connected!"<< endl;
+       QTextStream(stdout)<< "Pipette connected!"<< "\n";
        return true;
     }
     else{
-        QTextStream(stdout)<< "Could not connect to pipette!"<< endl;
+        QTextStream(stdout)<< "Could not connect to pipette!"<< "\n";
         return false;
     }
 }
@@ -261,7 +261,7 @@ std::vector<float> controller::pipette_get_coordinates(){
 
 void controller::pipette_move_to_img_coordinates(std::vector<float> coords){
     cv::Mat pipc = calconimgpipettecoors(TM,coords,m_centers.img,m_centers.pipette);
-    QTextStream(stdout) <<"calculated pipette coords; "<<"X: "<<pipc.at<float>(0,0)<<" Y: "<< pipc.at<float>(0,1) <<" Z:" << pipc.at<float>(0,2) << endl;
+    QTextStream(stdout) <<"calculated pipette coords; "<<"X: "<<pipc.at<float>(0,0)<<" Y: "<< pipc.at<float>(0,1) <<" Z:" << pipc.at<float>(0,2) << "\n";
     this->pipette_move(pipc);
 }
 
@@ -308,7 +308,7 @@ void controller::pipette_calc_TM(std::vector<float>*pos1,std::vector<float>*pos2
 
 //    std::cout << pipette_mat<< "pipette_mat"<< std::endl;
     TM = calcTMatrix(pipette_mat,cip,m_centers);
-    QTextStream(stdout)<<"done" << endl;
+    QTextStream(stdout)<<"done" << "\n";
 
 }
 
@@ -327,17 +327,17 @@ bool controller::connect_tango_stage(){
                 stage = new Stage(pStageUnit) ;
                 if(!pStageUnit)
                 {
-                    QTextStream(stdout) << "stage_sample: no stage found!" << endl;
+                    QTextStream(stdout) << "stage_sample: no stage found!" << "\n";
                     return false;
                 }
                 stage->printWhatIsSupported();
             }
             else
             {
-                QTextStream(stdout) << "there is something strange: no unit was delivered" << endl;
+                QTextStream(stdout) << "there is something strange: no unit was delivered" << "\n";
                 return false;
             }
-                QTextStream(stdout)<< "Stage controller connected"<< endl;
+                QTextStream(stdout)<< "Stage controller connected"<< "\n";
                 return true;
             }
     }catch (ahm::Exception & ex) {

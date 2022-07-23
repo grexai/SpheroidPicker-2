@@ -1,7 +1,7 @@
 //#include "mainwindow.h"
 #include "hardwareselector.h"
 #include <QApplication>
-#include <QStyleOptionFrameV2>
+//#include <QStyleOptionFrameV2>
 #include <QSplashScreen>
 
 int main(int argc, char *argv[])

@@ -26,13 +26,13 @@ void serialcom::send(QString& command){
     const qint64 bytesWritten = sp.write(byte_command);
     QTextStream m_standardOutput;
     if (bytesWritten == -1) {
-        m_standardOutput << QObject::tr("Failed to write the data to port ")
+        m_standardOutput << QObject::tr("Failed to write the data to port ");
 
-                         << endl;
+
     } else if (bytesWritten != byte_command.size()) {
-        m_standardOutput << QObject::tr("Failed to write all the data to port")
+        m_standardOutput << QObject::tr("Failed to write all the data to port");
 
-                         << endl;
+
     }
     sp.waitForBytesWritten(50);
 };
@@ -94,7 +94,7 @@ QByteArray serialcom::sendAndReceive(QString& msg, QString& ansEnd)
 
     // CHRONO END
     std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
-    QTextStream(stdout)<< "ans: " << answer << endl ;
+    QTextStream(stdout)<< "ans: " << answer << "\n" ;
     return answer;
 }
 

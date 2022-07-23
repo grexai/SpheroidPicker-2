@@ -39,12 +39,22 @@ MainWindow::MainWindow(QWidget *parent) :
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     propreader->read_settings("config.txt",settings);
+    QTextStream(stdout)<< "asdsad\n";
     propreader->apply_settings(settings);
+
     sph_s = new spheroid_selector;
     this->start_camera();
     sph_s->set_bbs(m_bboxes);
     p_s = new Plateselector;
     bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+
+    try {
+       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+    }
+    catch (...) {
+        std::cerr << "pipette controller failed to connect";
+    }
+
     ctrl->connect_tango_stage();
     progress.setValue(33);
     progress.setLabelText("homing manipulator");
@@ -80,7 +90,9 @@ MainWindow::MainWindow(QWidget *parent) :
        std::vector<cv::Mat> bbs;
        //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
        //t_inf.detach();
+       QTextStream(stdout) << QDir::currentPath();
        dl->dnn_inference(test,test,test,m_bboxes);
+       QTextStream(stdout) << QDir::currentPath();
     }else{
         dl = new invecption_v2();
         dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
@@ -100,7 +112,8 @@ MainWindow::MainWindow(QWidget *parent) :
    dl->dnn_inference(test,test,test,m_bboxes);
 
 
-
+   //}
+    QTextStream(stdout) << QDir::currentPath();
     p_s = new Plateselector;
     connect(p_s,SIGNAL(signal_s_p_changed()),this, SLOT(s_p_changed()));
     connect(p_s,SIGNAL(signal_t_p_changed()),this, SLOT(t_p_changed()));
@@ -198,7 +211,7 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
                 QTextStream(stdout) << true;
                 connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
                         this, SLOT(on_graphicsView_customContextMenuRequested(const QPoint &)));
-                QTextStream(stdout) <<"coors x: " << point_mouse->x() << "    y: " << point_mouse->y() << endl;
+                QTextStream(stdout) <<"coors x: " << point_mouse->x() << "    y: " << point_mouse->y()<< "\n";
             }
             else
             return true;
@@ -264,7 +277,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             {
           //      cpos1 = new std::vector<float>;
           //      *cpos1 = ctrl->pipette_get_coordinates();
-          //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<endl;
+          //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<"\n";
             }
 
         }
@@ -274,7 +287,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             {
             //    cpos2 = new std::vector<float>;
             //    *cpos2 = ctrl->pipette_get_coordinates();
-            //     QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<endl;
+            //     QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<"\n";
             }
         }
         if (calib->a.value()==3)
@@ -283,7 +296,7 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             {
             //    cpos3 = new std::vector<float>;
            //     *cpos3 = ctrl->pipette_get_coordinates();
-           //     QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<endl;
+           //     QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<"\n";
           //      ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
 
            // calib->Iscalibrating = false;
@@ -831,7 +844,7 @@ void MainWindow::unlock_ui()
 
 void MainWindow::pickup_sph()
 {
-    QTextStream(stdout) << "pciking up" << endl;
+    QTextStream(stdout) << "pciking up" << "\n";
     //ctrl->pipette_move_to_img_coordinates(dl->objpos.at(0));
     std::this_thread::sleep_for(std::chrono::milliseconds(7000));
     ctrl->vaccum_pulse(static_cast<float>(ui->pulse_value->value()),static_cast<float>(ui->pulse_time->value()));
@@ -1180,11 +1193,11 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     folder.append(get_date_time_str()+"/");
     if (QDir().exists(folder.c_str()))
     {
-        QTextStream(stdout) << "this folder already folder exists"<< endl;
+        QTextStream(stdout) << "this folder already folder exists"<< "\n";
     }
     else
     {
-        QTextStream(stdout)<< folder.c_str()<< "created" << endl;
+        QTextStream(stdout)<< folder.c_str()<< "created" << "\n";
         QDir().mkdir(folder.c_str());
     }
 
@@ -1229,7 +1242,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 ctrl->stage_move_to_x_sync(image_posx);
 
                 p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
-                QTextStream(stdout)<<"progvalue"<< p_v<< endl;
+                QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
                 prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 int leading = 2;
@@ -1321,7 +1334,7 @@ void MainWindow::create_mosaic(){
         const float platesize_y = ui->set_plate_size_spinbox_2->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
         int wmax = static_cast<int>(platesize_x / m_img_width);
         int hmax = static_cast<int>(platesize_y / m_img_height);
-        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
+        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< "\n";
         if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
         Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT-m_overlap), (wmax * FULL_HD_IMAGE_WIDTH-m_overlap), CV_8UC3));
         float p_v=0.0f;
@@ -1329,9 +1342,9 @@ void MainWindow::create_mosaic(){
         {
             for (int j = 0; j < wmax; ++j)
             {
-                QTextStream(stdout) << i <<" : "<<j<< endl;
+                QTextStream(stdout) << i <<" : "<<j<< "\n";
                 p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
-              //  QTextStream(stdout)<<"progvalue"<< p_v<< endl;
+              //  QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
                 stich_prog_changed(static_cast<int>(p_v));
                 for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
                 {
@@ -1582,7 +1595,7 @@ void MainWindow::export_bias_xml(){
         const float platesize_y = ui->set_plate_size_spinbox_2->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
         int wmax = static_cast<int>(platesize_x / m_img_width);
         int hmax = static_cast<int>(platesize_y / m_img_height);
-        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< endl;
+        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< "\n";
         int counter = 0;
         int leading = 2;
         int xval = 0; int yval=0;
