@@ -902,7 +902,7 @@ void MainWindow::move_to_petri_B()
     ctrl->stage_set_speed(50000);// akos changed the speed
 //    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
 //    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));
+    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()),p_s->m_selected_source);
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
 
@@ -913,7 +913,7 @@ void MainWindow::move_to_petri_B()
     ctrl->pipette_extrude_relative(static_cast<float>(ui->p_extruder_step_box->value()));
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     ctrl->pipette_move_to_z_sync(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
-   /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
+    /* ctrl->stage_move_to_x_sync(STAGE_CENTER_X); // Akos center x
     ctrl->stage_move_to_y_sync(STAGE_CENTER_Y); // Akos center y */
 }
 
@@ -1020,7 +1020,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     }
     ctrl->stage_set_speed(15000);   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
-    move_to_t_plate(x,y);
+    move_to_t_plate(x, y , 1);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
@@ -1047,7 +1047,7 @@ void MainWindow::clean_pipette(int x, int y)
     ctrl->stage_set_speed(15000);   // akos changed the speed
     ctrl->pipette_set_speed(ui->z_dive_speed->value()*2);
     QTextStream(stdout)<< "stage move xy";
-    move_to_t_plate(x,y);
+    move_to_t_plate(x,y,1);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
@@ -1382,7 +1382,7 @@ void MainWindow::show_on_view_2()
 void MainWindow::s_p_changed()
 {
     this->s_p_selected = p_s->m_selected_source;
-
+    std::cout << "p_s->m_selected_source" << p_s->m_selected_source<< " checking varriable";
     if(s_p_selected == 0) //96 wp
     {
         QTextStream(stdout) << "96 wp selected";
@@ -1424,7 +1424,7 @@ void MainWindow::s_p_changed()
 void MainWindow::t_p_changed()
 {
     this->t_p_selected = p_s->m_selected_target;
-
+    std::cout << "target plate value" << p_s->m_selected_target << std::endl;
     if(t_p_selected == 0) //96 wp
     {
         QTextStream(stdout) << "96 wp selected";
@@ -1479,20 +1479,47 @@ void MainWindow::on_move_to_s_plate_clicked()
                                             ui->s_well_y_spinbox->value());
 }
 
-void MainWindow::move_to_t_plate(int x_idx,int y_idx)
+void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type = 0)
 {
     std::cout<< "moving to target plate given indexes: "<<x_idx <<" : " << y_idx<<std::endl;
-    int s_x = STAGE_FIRST_T_WELL_LEFT_X+stoi(propreader->cfg.wp_96_offset_X)+x_idx*DIA_96_WELLPLATE;
-    int s_y = STAGE_FIRST_T_WELL_TOP_Y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*DIA_96_WELLPLATE;
-    ctrl->stage_move_to_x_async(s_x+27000); // to make it center constans into96
-    ctrl->stage_move_to_y_sync(s_y+18000);
+    int stage_frist_t_well_left_x = 0;
+    int stage_frist_t_well_top_y = 0;
+    int dia_well_plate = 0;
+    switch(type){
+    case 0:
+        dia_well_plate = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X;
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y;
+        break;
+    case 1:
+        dia_well_plate = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000; // get center coords
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  18000; // get center coords
+        break;
+    case 2:
+        dia_well_plate = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_3DHCS_T_WELL_C_X;
+        stage_frist_t_well_top_y = STAGE_FIRST_3DHCS_T_WELL_C_Y;
+        break;
+    default:
+        dia_well_plate = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X;
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y;
+    }
+    int s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate;
+    int s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate;
+    ctrl->stage_move_to_x_async(s_x); // to make it center constans into96
+    ctrl->stage_move_to_y_sync(s_y);
 }
 
 void MainWindow::on_move_to_t_plate_clicked()
 {
     m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this,
                                             ui->t_well_x_combobox->currentIndex(),
-                                            ui->t_well_y_spinbox->value());
+                                            ui->t_well_y_spinbox->value(),
+                                            p_s->m_selected_source
+                                            );
+
 }
 
 void MainWindow::change_plate()
@@ -1644,10 +1671,6 @@ void MainWindow::export_bias_xml(){
     xmlContent << document.toString();
 
     qSetGlobalQHashSeed(-1);
-
-
-
-
 
 }
 

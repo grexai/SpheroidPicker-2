@@ -69,6 +69,11 @@
    </item>
    <item>
     <property name="text">
+     <string>3D HCS Plate</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
      <string>3mm Petri</string>
     </property>
    </item>

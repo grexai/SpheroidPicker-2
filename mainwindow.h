@@ -261,7 +261,7 @@ private slots:
 
      void move_to_s_plate(int x_idx,int y_idx);
 
-     void move_to_t_plate(int x_idx,int y_idx);
+     void move_to_t_plate(int x_idx,int y_idx,int type);
 
      void on_move_to_s_plate_clicked();
 
