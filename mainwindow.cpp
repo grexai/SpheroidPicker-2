@@ -1437,7 +1437,6 @@ void MainWindow::s_p_changed()
         ui->s_well_y_spinbox->setRange(1,24);
         ui->s_well_y_spinbox->setValue(1);
 
-
     }else{
 
     }
