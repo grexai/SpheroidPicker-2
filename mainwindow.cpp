@@ -902,7 +902,7 @@ void MainWindow::move_to_petri_B()
     ctrl->stage_set_speed(50000);// akos changed the speed
 //    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
 //    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
-    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()),p_s->m_selected_source);
+    move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()),p_s->m_selected_target);
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
 
@@ -1020,7 +1020,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     }
     ctrl->stage_set_speed(15000);   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
-    move_to_t_plate(x, y , 1);
+    move_to_t_plate(x, y , p_s->m_selected_target);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
@@ -1036,30 +1036,40 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
 
 void MainWindow::clean_pipette(int x, int y)
 {
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f));
-    std::vector<float> coors = ctrl->pipette_get_coordinates();
-    while (coors.at(2) < 64 && coors.at(2)==0){
+    // No cleaning in high content
+    if (!(p_s->m_selected_target ==  2))
+    {
+        ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f));
+        std::vector<float> coors = ctrl->pipette_get_coordinates();
+        while (coors.at(2) < 64 && coors.at(2)==0){
 
-        QTextStream(stdout)<< "pipette is too low";
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        coors = ctrl->pipette_get_coordinates();
+            QTextStream(stdout)<< "pipette is too low";
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            coors = ctrl->pipette_get_coordinates();
+        }
+        ctrl->stage_set_speed(15000);   // akos changed the speed
+        ctrl->pipette_set_speed(ui->z_dive_speed->value()*2);
+        QTextStream(stdout)<< "stage move xy";
+        move_to_t_plate(x,y,p_s->m_selected_source);
+       // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+        QTextStream(stdout)<< "pip move blocking x";
+        ctrl->pipette_blocking_move_x(mid_s_x_p);
+        QTextStream(stdout)<< "pip move blocking z";
+        ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox_2->value()));
+        QTextStream(stdout)<< "pip move blocking e";
+        float cleaning_amount = 3.0f;
+
+        ctrl->pipette_blocking_move_e(-cleaning_amount);
+        ctrl->pipette_blocking_move_e(cleaning_amount);
+        QTextStream(stdout)<< "pip move blocking z";
+        ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
+
     }
-    ctrl->stage_set_speed(15000);   // akos changed the speed
-    ctrl->pipette_set_speed(ui->z_dive_speed->value()*2);
-    QTextStream(stdout)<< "stage move xy";
-    move_to_t_plate(x,y,1);
-   // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
-    QTextStream(stdout)<< "pip move blocking x";
-    ctrl->pipette_blocking_move_x(mid_s_x_p);
-    QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox_2->value()));
-    QTextStream(stdout)<< "pip move blocking e";
-    float cleaning_amount = 3.0f;
+    else
+    {
+        QTextStream(stdout)<< "No pipette cleaning is enabled while high content plate is selected";
+    }
 
-    ctrl->pipette_blocking_move_e(-cleaning_amount);
-    ctrl->pipette_blocking_move_e(cleaning_amount);
-    QTextStream(stdout)<< "pip move blocking z";
-    ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+20.0f)); //Akos Z value
 
 }
 
@@ -1413,8 +1423,20 @@ void MainWindow::s_p_changed()
         ui->s_well_y_spinbox->setRange(1,24);
         ui->s_well_y_spinbox->setValue(1);
     }
-    else if(s_p_selected == 2) //petri 30mm
+    else if(s_p_selected == 2) //hcs plate
     {
+        QTextStream(stdout) << "HCS plate selected";
+        QTextStream(stdout) << ui->s_well_x_combobox->count()<< "nitems";
+        ui->s_well_x_combobox->clear();
+        for (char c = 'P'; c >= 'A'; --c)
+        {
+            ui->s_well_x_combobox->addItem(QString(c));
+        }
+        ui->s_well_x_combobox->setCurrentIndex(ui->s_well_x_combobox->count()-1);
+        ui->s_well_y_spinbox->clear();
+        ui->s_well_y_spinbox->setRange(1,24);
+        ui->s_well_y_spinbox->setValue(1);
+
 
     }else{
 
@@ -1455,10 +1477,26 @@ void MainWindow::t_p_changed()
         ui->t_well_y_spinbox->setRange(1,24);
         ui->t_well_y_spinbox->setValue(1);
     }
-    else if(t_p_selected == 2) //petri 30mm
+
+    else if(t_p_selected == 2) //HCS
+    {
+        QTextStream(stdout) << "HCS";
+        QTextStream(stdout) << ui->t_well_x_combobox->count()<< "nitems";
+        ui->t_well_x_combobox->clear();
+        for (char c = 'G'; c >= 'A'; --c)
+        {
+            ui->t_well_x_combobox->addItem(QString(c));
+        }
+        ui->t_well_x_combobox->setCurrentIndex(ui->t_well_x_combobox->count()-1);
+        ui->t_well_y_spinbox->clear();
+        ui->t_well_y_spinbox->setRange(1,8);
+        ui->t_well_y_spinbox->setValue(1);
+    }
+    else if(t_p_selected == 3) //petri 30mm
     {
 
-    }else{
+    }
+    else{
 
     }
 }
@@ -1479,36 +1517,90 @@ void MainWindow::on_move_to_s_plate_clicked()
                                             ui->s_well_y_spinbox->value());
 }
 
-void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type = 0)
+void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type)
 {
     std::cout<< "moving to target plate given indexes: "<<x_idx <<" : " << y_idx<<std::endl;
     int stage_frist_t_well_left_x = 0;
     int stage_frist_t_well_top_y = 0;
-    int dia_well_plate = 0;
+    int dia_well_plate_x = 0;
+    int dia_well_plate_y = 0;
+    int s_x;
+    int s_y;
+    QTextStream(stdout)<< "type: in move_to_plate" << type <<  "\n" ;
     switch(type){
     case 0:
-        dia_well_plate = DIA_96_WELLPLATE;
-        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X;
-        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y;
+        //96 well  plate
+        dia_well_plate_x = DIA_96_WELLPLATE;
+        dia_well_plate_y = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000;
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y + 18000;
+        s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
+        s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
         break;
     case 1:
-        dia_well_plate = DIA_96_WELLPLATE;
-        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000; // get center coords
-        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  18000; // get center coords
+        // 384 well plate
+        dia_well_plate_x = DIA_96_WELLPLATE;
+        dia_well_plate_y = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000; // to make it center constans into96
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  18000; // to make it center constans into96
+        s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
+        s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
         break;
     case 2:
-        dia_well_plate = DIA_96_WELLPLATE;
+        // HCS screening plate
+        dia_well_plate_x = DIA_96_WELLPLATE;
+        //dia_well_plate_y = STAGE_HCS_D_Y;
         stage_frist_t_well_left_x = STAGE_FIRST_3DHCS_T_WELL_C_X;
         stage_frist_t_well_top_y = STAGE_FIRST_3DHCS_T_WELL_C_Y;
+        s_y = stage_frist_t_well_top_y;
+        if (y_idx == 1){
+            s_y += 11000;
+        }
+        if (y_idx == 2){
+            s_y += 26500;
+        }
+        if (y_idx == 3){
+            s_y += 37500;
+        }
+        if (y_idx == 4){
+            s_y +=45700;
+        }
+        if (y_idx == 5){
+            s_y +=56500;
+        }
+        if (y_idx == 6){
+            s_y +=72460;
+        }
+        if (y_idx == 7){
+            s_y +=83540;
+        }
+        s_x = stage_frist_t_well_left_x+x_idx*dia_well_plate_x;
+        QTextStream(stdout)<< "sx" << s_x << "\n sy" << s_y << "\n" ;
+        // s_y = stage_frist_t_well_top_y+(y_idx-1)*dia_well_plate_y;
+
+        break;
+    case 3:
+        // should be petri
+        dia_well_plate_x = DIA_96_WELLPLATE;
+        dia_well_plate_y = DIA_96_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_3DHCS_T_WELL_C_X;
+        stage_frist_t_well_top_y = STAGE_FIRST_3DHCS_T_WELL_C_Y;
+        if (!((y_idx+1) % 3)){
+            stage_frist_t_well_top_y += 82000;
+        }
+        s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
+        s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
         break;
     default:
-        dia_well_plate = DIA_96_WELLPLATE;
+        dia_well_plate_x = DIA_96_WELLPLATE;
+        dia_well_plate_y = DIA_96_WELLPLATE;
         stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X;
         stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y;
+        s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
+        s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
     }
-    int s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate;
-    int s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate;
-    ctrl->stage_move_to_x_async(s_x); // to make it center constans into96
+
+    ctrl->stage_move_to_x_async(s_x);
     ctrl->stage_move_to_y_sync(s_y);
 }
 
@@ -1517,7 +1609,7 @@ void MainWindow::on_move_to_t_plate_clicked()
     m_move_t_plate_thread = new std::thread(&MainWindow::move_to_t_plate,this,
                                             ui->t_well_x_combobox->currentIndex(),
                                             ui->t_well_y_spinbox->value(),
-                                            p_s->m_selected_source
+                                            p_s->m_selected_target
                                             );
 
 }
@@ -1581,7 +1673,7 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::get_selected_source_plate()
 {
-    this->s_p_selected = p_s->m_selected_source;
+    this->s_p_selected = p_s->m_selected_target;
 }
 
 
