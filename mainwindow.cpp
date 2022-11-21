@@ -1565,13 +1565,13 @@ void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type)
             s_y +=45700;
         }
         if (y_idx == 5){
-            s_y +=56500;
+            s_y +=56700;
         }
         if (y_idx == 6){
-            s_y +=72460;
+            s_y +=72380;
         }
         if (y_idx == 7){
-            s_y +=83540;
+            s_y +=83380;
         }
         s_x = stage_frist_t_well_left_x+x_idx*dia_well_plate_x;
         QTextStream(stdout)<< "sx" << s_x << "\n sy" << s_y << "\n" ;

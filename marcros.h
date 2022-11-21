@@ -65,8 +65,4 @@
 
 #define STAGE_HCS_D_Y 109000
 
-
-
-//
-
 #endif // MACROS_H
