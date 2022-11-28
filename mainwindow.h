@@ -241,6 +241,8 @@ private slots:
 
      void put_to_target_plate(int x,int y,int type=0);
 
+     bool check_for_pipette_height(int p_tresh,int max_p_trials);
+
      void xz_stage_pickup_sph(int obj_idx);
 
      void clean_pipette(int x, int y);
@@ -259,7 +261,7 @@ private slots:
 
      void create_mosaic();
 
-     void move_to_s_plate(int x_idx,int y_idx);
+     void move_to_s_plate(int x_idx,int y_idx,int type);
 
      void move_to_t_plate(int x_idx,int y_idx,int type);
 

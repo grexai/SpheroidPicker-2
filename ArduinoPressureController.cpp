@@ -4,7 +4,7 @@
 #include <sstream> // stringstream
 #include <regex>
 
-#include <QtCore5Compat/QRegExp>
+//#include <QtCore5Compat/QRegExp>
 
 
 const int arduinopressurecontroller::UnknownError = INT_MAX;

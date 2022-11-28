@@ -6,15 +6,11 @@ Plateselector::Plateselector(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Plateselector)
 {
-
-
     ui->setupUi(this);
     QPixmap pixmap("384wp.jpg");
     pixmap.scaledToWidth(120);
     ui->s_label->setPixmap(pixmap);
     ui->s_label->setFixedSize(120,80);
-
-
 }
 
 Plateselector::~Plateselector()
