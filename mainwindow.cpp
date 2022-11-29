@@ -796,9 +796,9 @@ void MainWindow::on_save_m_p_button_clicked()
 void MainWindow::on_petri_b_clicked()
 {
     //m_move_petri_b_thread = new std::thread(&MainWindow::move_to_petri_B,this);
-
-    this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
-
+    if (check_for_pipette_height(62,100)){
+        this->put_to_target_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()));//y-1
+    }
 }
 
 void MainWindow::on_pick_and_put_clicked()
@@ -1755,7 +1755,9 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
     int x_row_max = 6;
-
+    if (p_s->m_selected_target==0){int x_row_max = 6;} //96
+    if (p_s->m_selected_target==1){int x_row_max = 12;} // 384
+    if (p_s->m_selected_target==2){int x_row_max = 7;} // HCS
     int y_idx = 1, x_idx = 0; // y should start 1
     for (int idx = 0; idx < selected_obj.size(); ++idx)
     {
