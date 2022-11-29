@@ -36,6 +36,8 @@ private slots:
 
 
 
+    void on_pushButton_clicked();
+
 private:
     QImage* qframe = nullptr;
     QGraphicsPixmapItem  im_view_pxmi;

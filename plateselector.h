@@ -14,12 +14,14 @@ class Plateselector : public QDialog
 public:
     explicit Plateselector(QWidget *parent = nullptr);
     ~Plateselector();
-    int m_selected_source = 0;
+    int m_selected_source = 2;
     int m_selected_target= 0;
     void select_source_plate();
 private slots:
     void on_s_p_selector_currentIndexChanged(int index);
     void on_t_p_selector_currentIndexChanged(int index);
+
+    void on_ps_button_clicked();
 
 signals:
     void signal_s_p_changed();

@@ -113,6 +113,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
    //}
     QTextStream(stdout) << QDir::currentPath();
+
+
     p_s = new Plateselector;
     connect(p_s,SIGNAL(signal_s_p_changed()),this, SLOT(s_p_changed()));
     connect(p_s,SIGNAL(signal_t_p_changed()),this, SLOT(t_p_changed()));
@@ -125,9 +127,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(stich_prog_changed(int)),
         this, SLOT(set_stich_progressbar(int)),Qt::QueuedConnection);
     connect(ctrl,SIGNAL(signal_process_qui()),this,SLOT(slot_process_qui()),Qt::QueuedConnection);
+    emit p_s->signal_s_p_changed();
+    emit p_s->signal_t_p_changed();
+    emit ui->magnification->activated(6);
+    ui->statusBar->addWidget(ui->stage_pos_text);
+    ui->statusBar->addWidget(ui->s_xpos_label);
+    ui->statusBar->addWidget(ui->s_ypos_label);
+    ui->statusBar->addWidget(ui->p_pos_text);
+    ui->statusBar->addWidget(ui->xc_label);
+    ui->statusBar->addWidget(ui->yc_label);
+    ui->statusBar->addWidget(ui->zc_label);
 
-    ui->magnification->activated(6);
     progress.setLabelText("Done");
+
     progress.setValue(100);
     progress.setAutoClose(true);
 }
@@ -239,7 +251,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     case Qt::Key_D:on_s_xp_button_clicked();break;
     case Qt::Key_1:on_p_em_button_clicked();break;
     case Qt::Key_3:on_p_ep_button_clicked();break;
-    case Qt::Key_L: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); break;
+    case Qt::Key_Tab: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); break;
     case Qt::Key_Space:on_pc_pulse_button_clicked();break;
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
@@ -713,15 +725,15 @@ void MainWindow::set_pip_man(int value)
     if(value == 0)
     {
         ui->p_home_y->hide();
-        ui->p_ymax->hide();
+        //ui->p_ymax->hide();
         ui->p_ym_button->hide();
         ui->p_yp_button->hide();
-        ui->p_zmax->hide();
+        //ui->p_zmax->hide();
     }
     if (value == 1)
     {
         ui->p_home_y->show();
-        ui->p_ymax->show();
+        //ui->p_ymax->show();
         ui->p_ym_button->show();
         ui->p_yp_button->show();
 
@@ -1596,8 +1608,8 @@ void MainWindow::move_to_s_plate(int x_idx,int y_idx,int type){
         // 384 well plate
         dia_well_plate_x = DIA_384_WELLPLATE;
         dia_well_plate_y = DIA_384_WELLPLATE;
-        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000; // to make it center constans into96
-        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  18000; // to make it center constans into96
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 13500; // to make it center constans into96
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  9000; // to make it center constans into96
         s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
         s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
         break;
@@ -1654,10 +1666,10 @@ void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type)
         break;
     case 1:
         // 384 well plate
-        dia_well_plate_x = DIA_96_WELLPLATE;
-        dia_well_plate_y = DIA_96_WELLPLATE;
-        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 27000; // to make it center constans into96
-        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  18000; // to make it center constans into96
+        dia_well_plate_x = DIA_384_WELLPLATE;
+        dia_well_plate_y = DIA_384_WELLPLATE;
+        stage_frist_t_well_left_x = STAGE_FIRST_T_WELL_LEFT_X + 13500; // to make it center constans into96
+        stage_frist_t_well_top_y = STAGE_FIRST_T_WELL_TOP_Y +  9000; // to make it center constans into96
         s_x = stage_frist_t_well_left_x+stoi(propreader->cfg.wp_96_offset_X)+x_idx*dia_well_plate_x;
         s_y = stage_frist_t_well_top_y+stoi(propreader->cfg.wp_96_offset_Y)+(y_idx-1)*dia_well_plate_y;
         break;
@@ -1669,25 +1681,25 @@ void MainWindow::move_to_t_plate(int x_idx,int y_idx, int type)
         stage_frist_t_well_top_y = STAGE_FIRST_3DHCS_T_WELL_C_Y;
         s_y = stage_frist_t_well_top_y;
         if (y_idx == 2){
-            s_y += 110000;
+            s_y = 128300;
         }
         if (y_idx == 3){
-            s_y += 265000;
+            s_y = 282200;
         }
         if (y_idx == 4){
-            s_y += 375000;
+            s_y = 390100;
         }
         if (y_idx == 5){
-            s_y +=457000;
+            s_y = 473800;
         }
         if (y_idx == 6){
-            s_y +=567000;
+            s_y = 582000;
         }
         if (y_idx == 7){
-            s_y +=723800;
+            s_y = 733600;
         }
         if (y_idx == 8){
-            s_y +=833800;
+            s_y = 845600;
         }
         s_x = stage_frist_t_well_left_x+x_idx*dia_well_plate_x;
         QTextStream(stdout)<< "sx" << s_x << "\n sy" << s_y << "\n" ;
@@ -1743,6 +1755,7 @@ void MainWindow::change_plate()
 void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
+    int x_row_max = 6;
 
     int y_idx = 1, x_idx = 0; // y should start 1
     for (int idx = 0; idx < selected_obj.size(); ++idx)
@@ -1754,7 +1767,7 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
         x_idx++;
 
 
-        if(x_idx>6)// 6 is true for 96 well plate
+        if(x_idx>x_row_max)// 6 is true for 96 well plate
         {
 
             x_idx=0;

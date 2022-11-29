@@ -115,3 +115,9 @@ void spheroid_selector::update_scene()
 
 }
 
+
+void spheroid_selector::on_pushButton_clicked()
+{
+    this->close();
+}
+

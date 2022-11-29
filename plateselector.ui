@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>234</height>
+    <width>377</width>
+    <height>167</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Plate selector</string>
   </property>
   <widget class="QComboBox" name="s_p_selector">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>90</y>
+     <x>30</x>
+     <y>70</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -46,8 +46,8 @@
   <widget class="QComboBox" name="t_p_selector">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>90</y>
+     <x>190</x>
+     <y>70</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -81,8 +81,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>50</y>
+     <x>30</x>
+     <y>30</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -99,8 +99,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>50</y>
+     <x>200</x>
+     <y>30</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -114,11 +114,11 @@
     <string>Target plate</string>
    </property>
   </widget>
-  <widget class="QLabel" name="s_label">
+  <widget class="QLabel" name="current_source_label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>170</y>
+     <x>30</x>
+     <y>110</y>
      <width>47</width>
      <height>13</height>
     </rect>
@@ -127,17 +127,30 @@
     <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QLabel" name="current_target_label">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>160</y>
+     <x>190</x>
+     <y>110</y>
      <width>47</width>
      <height>13</height>
     </rect>
    </property>
    <property name="text">
     <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="ps_button">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>130</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
    </property>
   </widget>
  </widget>
