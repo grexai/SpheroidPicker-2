@@ -2281,6 +2281,11 @@ Stage</string>
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Stage </string>
     </property>
@@ -2293,6 +2298,11 @@ Stage</string>
       <width>71</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>X:</string>
@@ -2307,6 +2317,11 @@ Stage</string>
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Y:</string>
     </property>
@@ -2319,6 +2334,11 @@ Stage</string>
       <width>91</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Pipette</string>
@@ -2333,6 +2353,11 @@ Stage</string>
       <height>13</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Z: </string>
     </property>
@@ -2346,6 +2371,11 @@ Stage</string>
       <height>13</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Y: </string>
     </property>
@@ -2358,6 +2388,11 @@ Stage</string>
       <width>47</width>
       <height>13</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>X: </string>
