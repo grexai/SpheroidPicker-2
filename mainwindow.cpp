@@ -1030,6 +1030,9 @@ bool MainWindow::check_for_pipette_height(int p_tresh, int p_max_trials)
         }
     }
     QTextStream(stdout)<< "the pipette is too low end of trying\n";
+    QMessageBox messageBox;
+    messageBox.critical(0,"Error","pipette is low operation stopped !");
+    messageBox.setFixedSize(500,200);
     return false;
 }
 
@@ -1755,15 +1758,19 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
 {
     auto start = std::chrono::system_clock::now();
     int x_row_max = 6;
-    if (p_s->m_selected_target==0){int x_row_max = 6;} //96
-    if (p_s->m_selected_target==1){int x_row_max = 12;} // 384
-    if (p_s->m_selected_target==2){int x_row_max = 7;} // HCS
+    if (p_s->m_selected_target==0){x_row_max = 6;} //96
+    if (p_s->m_selected_target==1){x_row_max = 12;} // 384
+    if (p_s->m_selected_target==2){x_row_max = 7;} // HCS
     int y_idx = 1, x_idx = 0; // y should start 1
+    // TODO check selected selected_obj and plate place
     for (int idx = 0; idx < selected_obj.size(); ++idx)
     {
+
         std:: cout <<"selected obj idx"<<selected_obj.at(idx) << std::endl;
-        this->xz_stage_pickup_sph(selected_obj.at(idx));
-        this->put_to_target_plate(x_idx,y_idx);
+        if (check_for_pipette_height(62,100)){
+            this->xz_stage_pickup_sph(selected_obj.at(idx));
+            this->put_to_target_plate(x_idx,y_idx);
+        }
         std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
         x_idx++;
 
@@ -1775,6 +1782,7 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
             y_idx++; }
 
     }
+    ctrl->pipette_home_z();
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << "[SPHEROID COLLECTING] elapsed time: " <<
