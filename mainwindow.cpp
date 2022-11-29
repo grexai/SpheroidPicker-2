@@ -251,7 +251,7 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     case Qt::Key_D:on_s_xp_button_clicked();break;
     case Qt::Key_1:on_p_em_button_clicked();break;
     case Qt::Key_3:on_p_ep_button_clicked();break;
-    case Qt::Key_Tab: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); break;
+    case Qt::Key_L: ui->tabWidget->setCurrentWidget(ui->tabWidget->currentIndex() ? ui->live_image:ui->tab2); break;
     case Qt::Key_Space:on_pc_pulse_button_clicked();break;
     case Qt::Key_Escape: on_actionExit_triggered();break;
     default: ;
@@ -352,10 +352,9 @@ void MainWindow::update_window()
 //right click actions
 
 void MainWindow::move_action(){
-    std::vector<float> mouse ;
-    mouse.push_back(point_mouse->x()*1.5f);
-    mouse.push_back(point_mouse->y()*1.5f);
-    ctrl->pipette_move_to_img_coordinates(mouse);
+    if (ui->found_objects->count()>0){
+        m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,ui->found_objects->currentIndex());
+    }
 }
 
 void MainWindow::center_this_point_action()
@@ -390,16 +389,16 @@ void MainWindow::center_this_point_action()
 void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
     QMenu contextMenu(("Context menu"), ui->graphicsView->viewport());
-    // QAction action1("Move Pipette Here", ui->graphicsView->viewport());
-    //connect(&action1, SIGNAL(triggered()), this, SLOT(move_action()));
-    QAction action2("Center this postion", ui->graphicsView->viewport());
+    QAction action1("Center selected object", ui->graphicsView->viewport());
+    connect(&action1, SIGNAL(triggered()), this, SLOT(move_action()));
+    QAction action2("Add manual item", ui->graphicsView->viewport());
     connect(&action2, SIGNAL(triggered()), this, SLOT(center_this_point_action()));
-    QAction action3("Pick up", ui->graphicsView->viewport());
-    QAction action4("Deploy", ui->graphicsView->viewport());
-    //contextMenu.addAction(&action1);
+    //QAction action3("Pick up", ui->graphicsView->viewport());
+    //QAction action4("Deploy", ui->graphicsView->viewport());
+    contextMenu.addAction(&action1);
     contextMenu.addAction(&action2);
-    contextMenu.addAction(&action3);
-    contextMenu.addAction(&action4);
+    //contextMenu.addAction(&action3);
+    //contextMenu.addAction(&action4);
     contextMenu.exec(ui->graphicsView->viewport()->mapToGlobal(pos));
 }
 
@@ -823,7 +822,7 @@ void MainWindow::on_found_objects_highlighted(int index)
 
 void MainWindow::on_found_objects_activated(int index)
 {
-    m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
+    //m_center_selected_sph_thread = new std::thread (&MainWindow::center_selected_sph,this,index);
 }
 
 
