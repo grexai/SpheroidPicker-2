@@ -65,10 +65,21 @@ QByteArray serialcom::sendAndRecive_sync(QString& msg, QString& ansEnd)
     QByteArray answer2 = sp.readAll();
 
     //QTextStream(stdout) << answer2.size() << "ans2";
+    int tries = 0;
+
     while (answer2.size()<1){
-        sp.waitForReadyRead(7);
+        tries = tries++;
+        sp.waitForReadyRead(30);
         answer2 = sp.readAll();
         QTextStream(stdout) << answer2.size();
+        //QTextStream(stdout) << answer2  << "\n";
+        // if (tries % 50){signal_process_qui();}
+        qApp->processEvents();
+        if (tries>1000)
+        {
+            QString err = "-1";
+            return err.toLocal8Bit();
+        }
     }
     return answer;
 }
@@ -112,3 +123,5 @@ void serialcom::close_port()
     this->sp.close();
 
 }
+
+//#include "moc_serialcom.cpp"

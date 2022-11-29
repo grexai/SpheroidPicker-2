@@ -121,9 +121,10 @@ std::vector<float> arduinogcode::getcurrentpos()
     try
     {
         QString msg = "M114";
-        QByteArray answer=apipc_sc.sendAndReceive(msg,EOM);
+        QByteArray answer=apipc_sc.sendAndRecive_sync(msg,EOM);
         QString s(answer);
         //split strings by ":"
+        QTextStream(stdout) << "answer of send and recive" << s ;
         QStringList resultStrings =  s.split(':');
         // get floating point number regularexpressions
         QRegExp xRegExp("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
@@ -209,18 +210,22 @@ void arduinogcode::setPipetteposition()
 
 
 void arduinogcode::syncronised_move_X(float val){
+
     QString msg= "G0";
-    apipc_sc.sendAndRecive_sync(msg.append("X").append(QString::number(val,'f',2)), EOM);
+    QByteArray a = apipc_sc.sendAndRecive_sync(msg.append("X").append(QString::number(val,'f',2)), EOM);
+    QTextStream(stdout) << a << "\n";
 }
 
 
 void arduinogcode::syncronised_move_Y(float val){
+
     QString msg= "G0";
     apipc_sc.sendAndRecive_sync(msg.append("Y").append(QString::number(val,'f',2)), EOM);
 }
 
 
 void arduinogcode::syncronised_move_Z(float val){
+
     QString msg= "G0";
     QByteArray a = apipc_sc.sendAndRecive_sync(msg.append("Z").append(QString::number(val,'f',2)), EOM);
     QTextStream(stdout) << a << "\n";
@@ -232,5 +237,5 @@ void arduinogcode::syncronised_move_E(float val){
     apipc_sc.sendAndRecive_sync(msg.append("E").append(QString::number(val,'f',2)), EOM);
 }
 
-
+//#include "moc_arduinogcode.cpp"
 

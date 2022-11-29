@@ -4,18 +4,28 @@
 #include "types.h"
 #include <exception>
 #include <iostream>
-class arduinogcode
-{
-public:
-    arduinogcode(QSerialPort& i_qsp,QString& nport): apipc_sc(i_qsp){
+#include <QObject>
 
+class arduinogcode: public QObject
+{
+     Q_OBJECT
+signals:
+    void signal_process_qui();
+
+
+public:
+    arduinogcode(QSerialPort& i_qsp,QString& nport,  QObject* parent = nullptr): QObject(parent), apipc_sc(i_qsp){
         isconnected = this->apipc_sc.openport(nport);
+
+        auto res = connect(&apipc_sc,SIGNAL(signal_process_qui()),this,SIGNAL(signal_process_qui()));
+
         if(isconnected){
             while (this->apipc_sc.sp.waitForReadyRead(1000));
 
             this->apipc_sc.sp.clear();
             this->apipc_sc.send(EOM);
             this->apipc_sc.sp_flush();
+
          }else{
             isconnected= false;
         }
@@ -76,6 +86,8 @@ public:
 
     void syncronised_move_E(float val);
 
+    std::mutex ardudinogcode_mutex;
+
     class ardinogcodeexeption: public std::exception{
     virtual  const char* what() const throw()
         {
@@ -86,8 +98,8 @@ protected:
 
     serialcom apipc_sc;
 
-};
 
+};
 
 
 

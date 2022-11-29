@@ -3,16 +3,18 @@
 #include <QtSerialPort/QSerialPort>
 #include <iostream>
 #include <QtSerialPort>
+#include <QObject>
 
-class serialcom
+class serialcom : public QObject
 {
-
-    std::mutex comm_mutex;
+    Q_OBJECT
+signals:
+    void signal_process_qui();
 
 public:
-    serialcom(QSerialPort& i_sp): sp(i_sp){}
+    serialcom(QSerialPort& i_sp, QObject* parent = nullptr): QObject(parent), sp(i_sp){}
 
-     ~serialcom(){}
+    ~serialcom(){}
 
     QSerialPort& sp;
 
@@ -26,9 +28,11 @@ public:
 
     QByteArray sendAndReceive(QString& msg, QString& ansEnd);
 
+
     void sp_flush();
 
     void close_port();
+    std::mutex comm_mutex;
 };
 
 #endif // SERIALCOM_H

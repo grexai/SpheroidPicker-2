@@ -3,6 +3,8 @@
 
 // Pressure controller
 
+
+
 bool controller::connect_pressure_controller(std::string& port)
 {
     QString p1= QString::fromStdString(port);
@@ -11,6 +13,7 @@ bool controller::connect_pressure_controller(std::string& port)
     // leak safe
     //  QString port = QString::fromStdString(propreader->cfg.port_pressurecontrooler);
     apc = new arduinopressurecontroller(QSP_apc,p1);
+
     //arduinopressurecontroller sd(QSP_apc,p1);
     if (apc->isconnected == true)
     {
@@ -44,6 +47,7 @@ void controller::vaccum_pulse(const float vacuum, float time )
 
 float controller::get_pressure()
 {
+
     return apc->getPipettePressure();
 }
 
@@ -126,6 +130,8 @@ bool controller::connect_pipette_controller(std::string& port)
     QString p1 = QString::fromStdString(port);
     delete apipc;
     apipc = new arduinogcode(QSP_apipc,p1);
+    connect(apipc,SIGNAL(signal_process_qui()),this,SIGNAL(signal_process_qui()));
+
     if (apipc->isconnected == true)
     {
        QTextStream(stdout)<< "Pipette connected!"<< "\n";
@@ -141,6 +147,7 @@ bool controller::connect_pipette_controller(std::string& port)
 void controller::pipette_blocking_move_x(const float x)
 {
     if(apipc == nullptr){return;}
+
     apipc->setabsoluepositioning();
     apipc->syncronised_move_X(x);
 
@@ -149,6 +156,7 @@ void controller::pipette_blocking_move_x(const float x)
 void controller::pipette_blocking_move_y(const float y)
 {
     if(apipc == nullptr){return;}
+
     apipc->syncronised_move_Y(y);
 }
 
@@ -156,6 +164,7 @@ void controller::pipette_blocking_move_y(const float y)
 void controller::pipette_blocking_move_z(const float z)
 {
     if(apipc == nullptr){return;}
+
     apipc->setabsoluepositioning();
     apipc->syncronised_move_Z(z);
 }
@@ -163,16 +172,16 @@ void controller::pipette_blocking_move_z(const float z)
 void controller::pipette_blocking_move_e(const float e)
 {
     if(apipc == nullptr){return;}
+
     apipc->setrelativepositioning();
     apipc->syncronised_move_E(e);
 }
 
 
-
-
 void controller::pipette_movex_sync(const float x)
 {
     if(apipc == nullptr){return;}
+
     apipc->setrelativepositioning();
     apipc->moveToXSync(x);
 }
@@ -181,6 +190,7 @@ void controller::pipette_movex_sync(const float x)
 void controller::pipette_move_to_x_sync(const float x)
 {
     if(apipc == nullptr){return;}
+
     apipc->setabsoluepositioning();
     apipc->moveToXSync(x);
 }
@@ -189,6 +199,7 @@ void controller::pipette_move_to_x_sync(const float x)
 void controller::pipette_movey_sync(const float y)
 {
     if(apipc == nullptr){return;}
+
     apipc->setrelativepositioning();
     apipc->moveToYSync(y);
 }
@@ -202,6 +213,7 @@ void controller::pipette_movez_sync(const float z)
 
 void controller::pipette_move_to_z_sync(const float z)
 {
+
     apipc->setabsoluepositioning();
     apipc->moveToZSync(z);
 }
@@ -214,6 +226,7 @@ void controller::pipette_extrude_relative(const float e, int speed)
 /// struct erdemes otlet
 void controller::pipette_move(const std::vector<float> coords)
 {
+
     apipc->setabsoluepositioning();
     apipc->moveToXSync(coords.at(0));
     apipc->moveToYSync(coords.at(1));
@@ -222,12 +235,14 @@ void controller::pipette_move(const std::vector<float> coords)
 
 void controller::pipette_move_async(const std::vector<float> coords)
 {
+
     apipc->setabsoluepositioning();
     apipc->moveAsync(coords.at(0),coords.at(1),coords.at(2));
 }
 
 void controller::pipette_set_speed(const int speed)
 {
+
     apipc->setfeedrate(speed);
 }
 
@@ -237,16 +252,19 @@ void controller::pipette_home(){
 
 void controller::pipette_xz_home()
 {
+
     apipc->goHome(true,false,true);
 }
 
 void controller::pipette_home_x()
 {
+
     apipc->goHome(true,false,false);
 }
 
 void controller::pipette_home_y()
 {
+
      apipc->goHome(false,true,false);
 }
 
@@ -692,3 +710,4 @@ bool controller::connect_screening_microscope()
 {
     return false;
 }
+//#include "moc_controller.cpp"

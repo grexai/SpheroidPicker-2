@@ -45,6 +45,8 @@ public:
 signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
+
+    //void signal_process_gui_event();
     void prog_changed(int progress);
     void stich_prog_changed(int progress);
     void scan_finished();
@@ -67,6 +69,8 @@ public slots:
     void s_p_changed();
 
     void t_p_changed();
+
+    void  slot_process_qui();
 
 protected:
 

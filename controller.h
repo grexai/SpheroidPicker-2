@@ -6,14 +6,22 @@
 #include <stagecontroller.h>
 #include <calibratedialog.h>
 #include <comps.h>
+#include <QObject>
 //#include <QString>
 //#include <QSerialPort>
 //#include <QThread>
-class controller
+class controller : public QObject
 {
+    Q_OBJECT
+signals:
+
+    void signal_process_qui();
+
 public:
-    controller( )
+
+    controller(QObject* parent = nullptr ): QObject(parent)
     {
+
 
     }
     ~controller()
@@ -82,6 +90,7 @@ public:
 
     void pipette_home_z();
 
+    std::mutex controller_pipette_mutex;
 
     std::vector<float> pipette_get_coordinates();
 

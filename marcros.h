@@ -65,4 +65,13 @@
 
 #define STAGE_HCS_D_Y 109000
 
+// petri 3mm dist
+#define STAGE_FIRST_PETRI_C_X 905946
+#define STAGE_FIRST_PETRI_C_Y 250000
+
+
+
+
+
 #endif // MACROS_H
+

@@ -25,6 +25,7 @@ CONFIG += c++11
 QT += serialport
 QT += xml
 QT += core
+QMAKE_MOC_OPTIONS += -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED
 CONFIG(staticlib): DEFINES += QUAZIP_STATIC
 CONFIG += console
 CONFIG(release, debug|release) {
@@ -53,15 +54,15 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     serialcom.h \
+    controller.h \
+    arduinogcode.h \
     arduinopressurecontroller.h \
     imagetools.h \
     types.h \
     stagecontroller.h \
     calibratedialog.h \
     comps.h \
-    controller.h \
     propertyreader.h \
-    arduinogcode.h \
     deeplearning.h \
     cameracv.h \
     marcros.h \
