@@ -1754,8 +1754,10 @@ void MainWindow::change_plate()
     ctrl->stage_move_to_y_sync(ymin);
 }
 
-void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
+void MainWindow::collect_selected_obj(std::vector<int> selected_obj, int start_x, int start_y)
 {
+    // TODO
+    //check for start  xy max
     auto start = std::chrono::system_clock::now();
     int x_row_max = 6;
     if (p_s->m_selected_target==0){x_row_max = 6;} //96
@@ -1774,13 +1776,11 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj)
         std:: cout <<"selected obj x:y idx "<<x_idx <<" ; "<< y_idx<< std::endl;
         x_idx++;
 
-
         if(x_idx>x_row_max)// 6 is true for 96 well plate
         {
-
             x_idx=0;
-            y_idx++; }
-
+            y_idx++;
+        }
     }
     ctrl->pipette_home_z();
     auto end = std::chrono::system_clock::now();
@@ -1807,7 +1807,10 @@ void MainWindow::on_actionPlate_selector_triggered()
 void MainWindow::on_pushButton_6_clicked()
 {
     std::vector<int> selected_obj = sph_s->list_checked();
-    m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
+    // m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
+
+    this->collect_selected_obj(selected_obj,ui->starting_well_x_spinbox->value(),ui->starting_well_y_spinbox->value());
+
 }
 
 
@@ -1887,7 +1890,6 @@ void MainWindow::export_bias_xml(){
                     xval = xval + m_img_width*0.1 - m_img_width*0.01 ;
                    // xval = ((m_img_width*0.5)+j*m_img_width-m_img_width*0.1)*0.1;
                 }
-
 
                 center.setAttribute("x", xval);
                 center.setAttribute("y", yval);

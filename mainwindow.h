@@ -275,7 +275,7 @@ private slots:
 
      void change_plate();
 
-     void collect_selected_obj(std::vector<int> selected_obj);
+     void collect_selected_obj(std::vector<int> selected_obj,int start_x, int start_y);
 
      void on_actionSpheroid_selector_triggered();
 
@@ -342,3 +342,9 @@ private:
 
 
 #endif // MAINWINDOW_H
+
+
+/*
+ *
+ * */
+
