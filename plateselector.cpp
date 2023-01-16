@@ -15,7 +15,7 @@ Plateselector::Plateselector(QWidget *parent) :
     ui->current_source_label->setText("");
     ui->current_target_label->setText("");
     ui->s_p_selector->setCurrentIndex(2);
-    ui->t_p_selector->setCurrentIndex(0);
+    ui->t_p_selector->setCurrentIndex(2);
     this->m_selected_target = this->ui->t_p_selector->currentIndex();
     this->m_selected_source = this->ui->s_p_selector->currentIndex();
 }

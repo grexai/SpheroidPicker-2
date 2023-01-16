@@ -39,7 +39,7 @@ public:
     i_deeplearning(){}
     virtual ~i_deeplearning()= 0;
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) = 0;
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes)= 0;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf)= 0;
 };
 
 class invecption_v2 : public virtual i_deeplearning
@@ -52,7 +52,7 @@ public:
     void resize(cv::Mat& input, cv::Mat& out);
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) override;
   //  std::vector<std::vector<float>> dnn_inference(cv::Mat& input);
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes) override;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf) override;
   //  std::vector<std::vector<float>> objpos;
     std::vector<std::string> classes;
     std::vector<cv::Scalar> colors;
@@ -108,9 +108,9 @@ public:
   //  const cv::Scalar MEAN_PIXEL(123.7f);
 
     //constants for this graph type
-    static constexpr float DETECTION_CONFIDENCE = 0.9f;
+    static constexpr float DETECTION_CONFIDENCE = 0.5f;
 
-    static constexpr float MASK_CONFIDENCE = 0.9f;
+    static constexpr float MASK_CONFIDENCE = 0.5f;
 
     int IMAGE_SIZE=1024;
 
@@ -146,7 +146,7 @@ public:
     void create_session();
     virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;
 
-    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes) override;
+    virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf) override;
 };
 
 

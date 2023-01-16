@@ -155,7 +155,7 @@ void invecption_v2::setup_dnn_network(const char* cf, const char* model_w, const
     //net.setPreferableTarget(DNN_TARGET_OPENCL);
 };
 
-std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes)
+std::vector<std::vector<float>> invecption_v2::dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf)
 {
     using namespace cv;
     using namespace std;
@@ -367,7 +367,7 @@ void matterport_mrcnn::create_session(){
     if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 }
 
-std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes){
+std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes, float det_conf, float mask_conf){
 
     auto start = std::chrono::system_clock::now();
     cv::Mat o_im = input;
@@ -547,7 +547,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
         for (int d = 0; d < maxDet; ++d, detTensorPtr += detectionIncrement, maskTensorPtr += maskIncrement)
         {
             const float& score = detTensorPtr[MRCNN_DETECTION_SCORE];
-            if (score < DETECTION_CONFIDENCE) continue;
+            if (score < det_conf) continue;
             std::cout << "score: " << score << std::endl;
             const float& classId = detTensorPtr[MRCNN_DETECTION_CLASS];
 
@@ -591,7 +591,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             int32_t* labelPtr = reinterpret_cast<int32_t*>(label.data);
             for (int64_t index = 0; index < total; ++index, maskPtr += NUM_CLASSES)
             {
-                if (maskPtr[1] > MASK_CONFIDENCE)
+                if (maskPtr[1] > mask_conf)
                 {
                     labelPtr[index] = d + 1;
                 }

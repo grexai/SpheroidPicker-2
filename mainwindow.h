@@ -50,11 +50,14 @@ signals:
     void prog_changed(int progress);
     void stich_prog_changed(int progress);
     void scan_finished();
+  //  void collect_finished();
     void close_and_return_hw();
     void stiched_img_rdy();
 public slots:
    // void show_hw_selector();
     void scan_stopped();
+
+   // void collect_stopped();
 
     void set_progressbar( int value );
 
@@ -290,6 +293,8 @@ private slots:
      void on_actionExport_object_properties_triggered();
 
      void on_actionExport_Screening_to_Bias_triggered();
+
+     void on_open_spheroid_selector_pushButton_clicked();
 
 private:
 

@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
    std::vector<cv::Mat> bbs;
    //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
    //t_inf.detach();
-   dl->dnn_inference(test,test,test,m_bboxes);
+   dl->dnn_inference(test,test,test,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
 
 
    //}
@@ -121,6 +121,7 @@ MainWindow::MainWindow(QWidget *parent) :
     automethods = new auto_methods(ctrl,cameracv,dl);
     // USER interface connections
     connect(this, SIGNAL(scan_finished()),this,SLOT(scan_stopped()));
+    connect(this, SIGNAL(collect_finished()),this,SLOT(collect_stopped()));
     connect(this, SIGNAL(stiched_img_rdy()),this,SLOT(show_on_view_2()));
     connect(this, SIGNAL(prog_changed(int)),
         this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
@@ -1003,7 +1004,6 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     std::cout << "[PICK UP]elapsed time: " << elapsed_seconds.count() << "s\n";
 
 }
-
 */
 
 
@@ -1046,18 +1046,16 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
             //ui->found_objects->currentIndex()
 
             int original_stage_speed = ctrl->stage_get_x_speed();
-            ctrl->stage_set_speed(15000);
+            ctrl->stage_set_speed(ui->s_collect_speed_box->value());
 
             ctrl->pipette_set_speed(ui->z_dive_speed->value());
             //slowly center the selected sph
-
 
             QTextStream(stdout)<< "stage move x a";
             ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
             QTextStream(stdout)<< "stage move y a";
 
             ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
-            //
 
             // move to the middle of image with the pipette
             QTextStream(stdout)<< "pip move blocking x";
@@ -1107,7 +1105,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     std::vector<float> coors = ctrl->pipette_get_coordinates();
 
     // do a thread test :D
-    ctrl->stage_set_speed(15000);   // akos changed the speed
+    ctrl->stage_set_speed(ui->s_collect_speed_box->value());   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
     move_to_t_plate(x, y , p_s->m_selected_target);
    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
@@ -1198,7 +1196,7 @@ void MainWindow::predict_sph(){
    // std::vector<cv::Mat> bbs;
     this->m_bboxes.clear();
     cv::Mat mask;
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,mask,m_bboxes);
+    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,mask,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
    // cv::floodFill(mask, cv::Point(0,0),cv::Scalar(255,255,255));
    // cv::bitwise_not(mask,mask);
     imtools->saveImg(&mask,(ui->imagename_lineedit->text()+"_mask").toStdString());
@@ -1298,7 +1296,8 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
 
     QTextStream(stdout)<< "starting..";
     m_folder = folder;
-
+    std::vector<int> orig_speed = ctrl->stage_get_speed();
+    ctrl->stage_set_speed(ui->s_screening_speed_box->value());
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
     const int wmax = static_cast<int>(platesize_x/m_img_width); // um
@@ -1312,9 +1311,11 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
     int image_posy = 0;
     int image_posx  = 0 ;
+
+
     for (int j = 0; j < hmax; ++j)
     {
-        ctrl->stage_set_speed(7000.0f);
+        //ctrl->stage_set_speed(7000.0f);
         if (j == 0){
             image_posy =static_cast<int>(ypos+m_img_height*j);
         }
@@ -1323,7 +1324,9 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
         }
 
         ctrl->stage_move_to_y_sync(image_posy);
-        ctrl->stage_set_speed(5000.0f);
+
+
+
         for (int  i = 0; i< wmax; ++i)
         {
             if(m_s_t_acitive)
@@ -1336,7 +1339,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 }
                 ctrl->stage_move_to_x_sync(image_posx);
 
-                p_v= (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
+                p_v = (static_cast<float>((wmax)*j+i)/static_cast<float>((hmax)*(wmax)))*100;
                 QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
                 prog_changed(static_cast<int>(p_v));
                 std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -1355,7 +1358,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 //imtools->saveImg(tmp.get(),num2str.c_str());
                 imtools->saveImg(tmp.get(),full_path.c_str());
                 // INFERENCE AND FEATURE EXTRACTION
-                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes);
+                std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
                 for (int k =0; k<im_objects.size();++k)
                 {
                    QTextStream(stdout) << im_objects.at(k).at(0) << "cors" << im_objects.at(k).at(1);
@@ -1410,7 +1413,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
        //m_current_detections->circ.push_back(global_obj_im_coordinates->at(i).at(6));
 
     }
-
+    ctrl->stage_set_speed(orig_speed.at(0));
     sph_s->list_props();
     this->unlock_ui();
     ui->start_screening->setText("Start Screening");
@@ -1431,8 +1434,11 @@ void MainWindow::create_mosaic(){
         int hmax = static_cast<int>(platesize_y / m_img_height);
         QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< "\n";
         if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
+
         Mimage = new cv::Mat(cv::Mat::zeros((hmax * FULL_HD_IMAGE_HEIGHT-m_overlap), (wmax * FULL_HD_IMAGE_WIDTH-m_overlap), CV_8UC3));
+
         float p_v=0.0f;
+
         for (int i = 0; i < hmax; ++i)
         {
             for (int j = 0; j < wmax; ++j)
@@ -1440,14 +1446,18 @@ void MainWindow::create_mosaic(){
                 QTextStream(stdout) << i <<" : "<<j<< "\n";
                 p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
               //  QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
-                stich_prog_changed(static_cast<int>(p_v));
-                for (int ii = 0; ii < scanvector.at(i*wmax + j).cols; ++ii)
+               emit stich_prog_changed(static_cast<int>(p_v));
+               QTextStream(stdout)  <<"11:"<< "\n";
+                for (int ii = 0; ii < scanvector.at(i*wmax + j).cols ; ++ii) //- FULL_HD_IMAGE_WIDTH*0.1
                 {
-                    for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)
+                    QTextStream(stdout)  <<"12:"<< "\n";
+                    for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)  //-FULL_HD_IMAGE_HEIGHT*0.1
                     {
+
                         Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
                         Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
                         Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
+
                     }
                 }
             }
@@ -1459,7 +1469,7 @@ void MainWindow::create_mosaic(){
         // CV cell label txt
         imtools->saveImg(Mimage,"mozaic");
         scanvector.clear();
-        stiched_img_rdy();
+        emit stiched_img_rdy();
     }
 
 }
@@ -1762,12 +1772,13 @@ void MainWindow::collect_selected_obj(std::vector<int> selected_obj, int start_x
     int x_row_max = 6;
     if (p_s->m_selected_target==0){x_row_max = 6;} //96
     if (p_s->m_selected_target==1){x_row_max = 12;} // 384
-    if (p_s->m_selected_target==2){x_row_max = 7;} // HCS
-    int y_idx = 1, x_idx = 0; // y should start 1
+    if (p_s->m_selected_target==2){x_row_max = 6;} // HCS
+    int y_idx = start_x, x_idx = start_y; // y should start 1
     // TODO check selected selected_obj and plate place
     for (int idx = 0; idx < selected_obj.size(); ++idx)
     {
 
+        ui->collect_spheroid_progress->setText("progress: " + QString::number(static_cast<double>(idx+1))+"/"+ QString::number(static_cast<double>(selected_obj.size()+1)) );
         std:: cout <<"selected obj idx"<<selected_obj.at(idx) << std::endl;
         if (check_for_pipette_height(62,100)){
             this->xz_stage_pickup_sph(selected_obj.at(idx));
@@ -1798,17 +1809,18 @@ void MainWindow::on_actionSpheroid_selector_triggered()
     sph_s->activateWindow();
 }
 
+
 void MainWindow::on_actionPlate_selector_triggered()
 {
     p_s->show();
     p_s->activateWindow();
 }
 
+
 void MainWindow::on_pushButton_6_clicked()
 {
     std::vector<int> selected_obj = sph_s->list_checked();
     // m_collect_thread = new std::thread(&MainWindow::collect_selected_obj,this,selected_obj);
-
     this->collect_selected_obj(selected_obj,ui->starting_well_x_spinbox->value(),ui->starting_well_y_spinbox->value());
 
 }
@@ -1912,3 +1924,10 @@ void MainWindow::on_actionExport_Screening_to_Bias_triggered()
 {
     this->export_bias_xml();
 }
+
+void MainWindow::on_open_spheroid_selector_pushButton_clicked()
+{
+    sph_s->show();
+    sph_s->activateWindow();
+}
+

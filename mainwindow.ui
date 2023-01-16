@@ -715,7 +715,7 @@
       <rect>
        <x>90</x>
        <y>30</y>
-       <width>61</width>
+       <width>71</width>
        <height>31</height>
       </rect>
      </property>
@@ -831,7 +831,7 @@ Stage</string>
       <rect>
        <x>90</x>
        <y>70</y>
-       <width>62</width>
+       <width>71</width>
        <height>31</height>
       </rect>
      </property>
@@ -1247,8 +1247,8 @@ Stage</string>
    <widget class="QGroupBox" name="imageing_box">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>770</y>
+      <x>420</x>
+      <y>790</y>
       <width>171</width>
       <height>81</height>
      </rect>
@@ -1509,9 +1509,9 @@ Stage</string>
    <widget class="QPushButton" name="pushButton_6">
     <property name="geometry">
      <rect>
-      <x>1740</x>
+      <x>1700</x>
       <y>830</y>
-      <width>151</width>
+      <width>111</width>
       <height>31</height>
      </rect>
     </property>
@@ -1684,9 +1684,9 @@ Stage</string>
     <property name="geometry">
      <rect>
       <x>1730</x>
-      <y>200</y>
+      <y>190</y>
       <width>181</width>
-      <height>241</height>
+      <height>271</height>
      </rect>
     </property>
     <property name="font">
@@ -1700,9 +1700,9 @@ Stage</string>
     <widget class="QPushButton" name="predict_sph">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>30</y>
-       <width>151</width>
+       <width>161</width>
        <height>21</height>
       </rect>
      </property>
@@ -1722,7 +1722,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>110</y>
        <width>161</width>
        <height>16</height>
       </rect>
@@ -1740,7 +1740,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>130</y>
        <width>151</width>
        <height>22</height>
       </rect>
@@ -1761,7 +1761,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>180</y>
+       <y>220</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -1779,7 +1779,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>150</y>
+       <y>190</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -1797,7 +1797,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>120</y>
+       <y>160</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -1815,7 +1815,7 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>210</y>
+       <y>250</y>
        <width>151</width>
        <height>19</height>
       </rect>
@@ -1829,6 +1829,76 @@ Stage</string>
       <string> Clean before Picking</string>
      </property>
     </widget>
+    <widget class="QDoubleSpinBox" name="det_confidence">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.050000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.500000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="mask_confidence">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>80</y>
+       <width>62</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="locale">
+      <locale language="English" country="UnitedStates"/>
+     </property>
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.050000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.500000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>61</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>det conf</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mask conf</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="plate_manage_groupbox">
     <property name="geometry">
@@ -1836,7 +1906,7 @@ Stage</string>
       <x>1740</x>
       <y>460</y>
       <width>161</width>
-      <height>201</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -2027,19 +2097,70 @@ Stage</string>
       </property>
      </item>
     </widget>
+    <widget class="QSpinBox" name="starting_well_x_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>210</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>12</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="starting_xy_text">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>190</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Starting positions </string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="starting_well_y_spinbox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>210</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>12</number>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="Scanning_groupbox">
     <property name="geometry">
      <rect>
-      <x>1000</x>
+      <x>670</x>
       <y>780</y>
-      <width>721</width>
-      <height>80</height>
+      <width>831</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>10</pointsize>
+      <pointsize>12</pointsize>
      </font>
     </property>
     <property name="title">
@@ -2048,11 +2169,16 @@ Stage</string>
     <widget class="QComboBox" name="magnification">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>50</y>
+       <x>160</x>
+       <y>60</y>
        <width>61</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
      </property>
      <property name="currentText">
       <string>5.5X</string>
@@ -2102,24 +2228,29 @@ Stage</string>
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>0</x>
        <y>30</y>
-       <width>121</width>
+       <width>141</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>ScanningArea size (mm)</string>
+      <string>Scanning Area (mm) x y</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="set_plate_size_spinbox">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>50</y>
+       <x>10</x>
+       <y>60</y>
        <width>51</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
      </property>
      <property name="locale">
       <locale language="English" country="UnitedStates"/>
@@ -2137,8 +2268,8 @@ Stage</string>
     <widget class="QProgressBar" name="scanning_progress">
      <property name="geometry">
       <rect>
-       <x>460</x>
-       <y>50</y>
+       <x>580</x>
+       <y>60</y>
        <width>241</width>
        <height>23</height>
       </rect>
@@ -2150,11 +2281,16 @@ Stage</string>
     <widget class="QPushButton" name="view_scan">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>50</y>
+       <x>390</x>
+       <y>60</y>
        <width>161</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>View scan</string>
@@ -2163,8 +2299,8 @@ Stage</string>
     <widget class="QLabel" name="current_scaningpos">
      <property name="geometry">
       <rect>
-       <x>460</x>
-       <y>20</y>
+       <x>580</x>
+       <y>30</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -2176,11 +2312,16 @@ Stage</string>
     <widget class="QPushButton" name="start_screening">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>390</x>
        <y>30</y>
        <width>161</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Start screening</string>
@@ -2190,10 +2331,15 @@ Stage</string>
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>50</y>
+       <y>60</y>
        <width>51</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
      </property>
      <property name="locale">
       <locale language="English" country="UnitedStates"/>
@@ -2211,9 +2357,9 @@ Stage</string>
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>160</x>
        <y>30</y>
-       <width>71</width>
+       <width>81</width>
        <height>20</height>
       </rect>
      </property>
@@ -2222,6 +2368,49 @@ Stage</string>
      </property>
      <property name="text">
       <string>Magnitude</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="s_screening_speed_box">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>50</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="minimum">
+      <number>500</number>
+     </property>
+     <property name="maximum">
+      <number>50000</number>
+     </property>
+     <property name="singleStep">
+      <number>2000</number>
+     </property>
+     <property name="value">
+      <number>5000</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>30</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The current magnitude set on the microscope&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Screening speed</string>
      </property>
     </widget>
    </widget>
@@ -2500,55 +2689,52 @@ Stage</string>
      <string>X: </string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="starting_well_y_spinbox">
+   <widget class="QSpinBox" name="s_collect_speed_box">
     <property name="geometry">
      <rect>
       <x>1830</x>
-      <y>800</y>
-      <width>61</width>
-      <height>22</height>
+      <y>830</y>
+      <width>71</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="minimum">
-     <number>1</number>
+     <number>500</number>
     </property>
     <property name="maximum">
-     <number>12</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="starting_well_x_spinbox">
-    <property name="geometry">
-     <rect>
-      <x>1740</x>
-      <y>800</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>12</number>
+     <number>50000</number>
     </property>
     <property name="singleStep">
-     <number>1</number>
+     <number>2000</number>
     </property>
     <property name="value">
-     <number>0</number>
+     <number>5000</number>
     </property>
    </widget>
-   <widget class="QLabel" name="starting_xy_text">
+   <widget class="QPushButton" name="open_spheroid_selector_pushButton">
     <property name="geometry">
      <rect>
-      <x>1760</x>
-      <y>770</y>
-      <width>141</width>
+      <x>1700</x>
+      <y>790</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Spheroid selector</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="collect_spheroid_progress">
+    <property name="geometry">
+     <rect>
+      <x>1830</x>
+      <y>790</y>
+      <width>81</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Starting positions </string>
+     <string>Progress</string>
     </property>
    </widget>
    <zorder>P_C_box</zorder>
@@ -2570,9 +2756,9 @@ Stage</string>
    <zorder>zc_label</zorder>
    <zorder>yc_label</zorder>
    <zorder>xc_label</zorder>
-   <zorder>starting_well_y_spinbox</zorder>
-   <zorder>starting_well_x_spinbox</zorder>
-   <zorder>starting_xy_text</zorder>
+   <zorder>s_collect_speed_box</zorder>
+   <zorder>open_spheroid_selector_pushButton</zorder>
+   <zorder>collect_spheroid_progress</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
