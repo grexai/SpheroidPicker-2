@@ -18,8 +18,8 @@
 
 struct sph_props{
     int idx;
-    float area;
     float perimeter;
+    float area;
     float circularity;
     float maxdiameter;
 };
@@ -50,6 +50,8 @@ public:
     std::map<QString, MemberPointer> featureMap;
     void update_scene();
     void tickListItems(QListWidget* listWidget, const std::vector<int>& indexesToTick);
+    void get_statistics_of_spheroids();
+
 signals:
     void fill_list();
 public slots:
@@ -79,7 +81,7 @@ protected:
 
 
 private:
-    QMap<QString, QSpinBox*> featureSpinBoxes;
+    QMap<QString, QDoubleSpinBox*> featureSpinBoxes;
     QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter"};
     QStringList featuresAdded = {};
     QListWidget *availableFeaturesList;

@@ -1215,8 +1215,9 @@ void MainWindow::predict_sph(){
         delete m_current_detections;
         m_current_detections = nullptr;
     }
-
+    std::cout << "m_current_detections" << std::endl;
     m_current_detections = new std::vector<sph_props>;
+    std::cout << "m_current_detections" << std::endl;
     sph_s->current_spheroid_data = m_current_detections;
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
    // std::vector<cv::Mat> bbs;
@@ -1263,6 +1264,7 @@ void MainWindow::predict_sph(){
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
+    sph_s->get_statistics_of_spheroids();
 
 }
 

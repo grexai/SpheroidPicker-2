@@ -5,7 +5,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsPixmapItem>
 #include <map>
-
+#include <algorithm>
 
 spheroid_selector::spheroid_selector(QWidget *parent) :
     QWidget(parent),
@@ -66,8 +66,8 @@ void spheroid_selector::addFeature() {
 
     QLabel *featureLabel = new QLabel(feature + ":", this);
 
-    QSpinBox *minSpinBox = new QSpinBox(this);
-    QSpinBox *maxSpinBox = new QSpinBox(this);
+    QDoubleSpinBox *minSpinBox = new QDoubleSpinBox(this);
+    QDoubleSpinBox *maxSpinBox = new QDoubleSpinBox(this);
 
     minSpinBox->setMinimum(0);
     minSpinBox->setMaximum(9999999);
@@ -75,7 +75,7 @@ void spheroid_selector::addFeature() {
     maxSpinBox->setMaximum(9999999);
 
     // Manually set positions for the widgets
-    int yPos = this->height()-60-availableFeatures.size()*30 + featuresAdded.size()*30; // Adjust Y position based on number of features already added
+    int yPos = this->height()-availableFeatures.size()*30 + featuresAdded.size()*30; // Adjust Y position based on number of features already added
     featureLabel->move(10, yPos);
     minSpinBox->move(150, yPos);
     maxSpinBox->move(250, yPos);
@@ -197,7 +197,7 @@ void spheroid_selector::on_pushButton_clicked()
 void spheroid_selector::on_pushButton_2_clicked()
 {
     std::vector<int> satisfyingSpheroids;
-
+    ui->Object_list->clear();
     std::cout << "number of spheroids to check" << current_spheroid_data->size() <<  std::endl;
     for (int spheroid=0; spheroid < current_spheroid_data->size();++spheroid  ){
         bool satisfiesCriteria = true;
@@ -222,12 +222,14 @@ void spheroid_selector::on_pushButton_2_clicked()
             //std::cout <<"example currentspheroid data" << current_spheroid_data->at(spheroid).circularity << std::endl;
             //std::cout <<"featuremap size: " << featureMap.size() << std::endl;
 
-            int maxValue = featureSpinBoxes[feature+"_max"]->value();
+
             //std::cout << "max value of " <<  feature.toStdString() <<maxValue<< std::endl;
+
             if (it != featureMap.end() && current_spheroid_data->at(spheroid).*(it->second.floatMemberPtr) != 0.0) {
                 std::cout << feature.toStdString() <<  "value of the feature" <<current_spheroid_data->at(spheroid).*(it->second.floatMemberPtr) << std::endl;
                 int maxValue = featureSpinBoxes[feature+"_max"]->value();
                 int minValue = featureSpinBoxes[feature]->value();
+                std::cout << "min can be:" << minValue << ", " << "max can be:" << maxValue << std::endl;
                 // Check if the value of the feature satisfies the min-max conditions
                 float featureValue = current_spheroid_data->at(spheroid).*it->second.floatMemberPtr;
                 if (featureValue < minValue || featureValue > maxValue) {
@@ -273,5 +275,78 @@ void spheroid_selector::tickListItems(QListWidget* listWidget, const std::vector
                 item->setCheckState(Qt::Checked); // For check state
             }
         }
+    }
+}
+
+
+
+void spheroid_selector::get_statistics_of_spheroids() {
+    // Initialize variables to store the sum of feature values
+    std::map<QString, float> sumFeatures;
+    // Initialize variables to store the minimum feature values
+    std::map<QString, float> minFeatures;
+    // Initialize variables to store the maximum feature values
+    std::map<QString, float> maxFeatures;
+    // Initialize variables to store the feature values for each spheroid
+    std::map<QString, std::vector<float>> spheroidFeatures;
+
+    // Initialize variables to store the count of spheroids
+    int totalSpheroids = 0;
+
+    // Iterate over each available feature
+    for (const QString& feature : availableFeatures) {
+        // Initialize the sum, min, and max for the current feature
+        sumFeatures[feature] = 0.0;
+        minFeatures[feature] = std::numeric_limits<float>::max();
+        maxFeatures[feature] = std::numeric_limits<float>::lowest();
+
+        // Iterate over each spheroid
+        for (int idx = 0; idx < ui->Object_list->count(); ++idx) {
+            auto it = featureMap.find(QString(feature));
+            if (it != featureMap.end()) {
+                // Compute the feature value for the current spheroid
+                float featureValue = current_spheroid_data->at(idx).*it->second.floatMemberPtr;
+                // Add the feature value to the sum
+                sumFeatures[feature] += featureValue;
+                // Update the minimum feature value
+                minFeatures[feature] = std::min(minFeatures[feature], featureValue);
+                // Update the maximum feature value
+                maxFeatures[feature] = std::max(maxFeatures[feature], featureValue);
+                // Store the feature value for the current spheroid
+                spheroidFeatures[feature].push_back(featureValue);
+                // Increment the total count of spheroids
+                totalSpheroids++;
+            }
+        }
+    }
+
+    // Calculate the average features
+    std::map<QString, float> averageFeatures;
+    for (const auto& pair : sumFeatures) {
+        // Calculate the average for each feature
+        averageFeatures[pair.first] = pair.second / totalSpheroids;
+    }
+
+    // Output the average features
+    for (const auto& pair : averageFeatures) {
+        std::cout << "Average " << pair.first.toStdString() << ": " << pair.second << std::endl;
+    }
+
+    // Calculate the median, minimum, and maximum features
+    for (const auto& pair : spheroidFeatures) {
+        const QString& feature = pair.first;
+        const std::vector<float>& values = pair.second;
+        // Sort the feature values
+        std::vector<float> sortedValues = values;
+        std::sort(sortedValues.begin(), sortedValues.end());
+        // Calculate the median
+        float median = values.size() % 2 == 0 ?
+            (sortedValues[values.size() / 2 - 1] + sortedValues[values.size() / 2]) / 2 :
+            sortedValues[values.size() / 2];
+        // Output the median
+        std::cout << "Median " << feature.toStdString() << ": " << median << std::endl;
+        // Output the minimum and maximum
+        std::cout << "Minimum " << feature.toStdString() << ": " << minFeatures[feature] << std::endl;
+        std::cout << "Maximum " << feature.toStdString() << ": " << maxFeatures[feature] << std::endl;
     }
 }
