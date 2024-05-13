@@ -85,6 +85,10 @@ private:
     QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter"};
     QStringList featuresAdded = {};
     QListWidget *availableFeaturesList;
+    QLabel Arealabel;
+    QLabel Perimeterlabel;
+    QLabel Circulartylabel;
+    QLabel maxdialabel;
     QImage* qframe = nullptr;
     QGraphicsPixmapItem  im_view_pxmi;
     QGraphicsScene* scene= nullptr;

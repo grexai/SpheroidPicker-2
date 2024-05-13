@@ -19,12 +19,12 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     availableFeaturesList = new QListWidget(this);
     availableFeaturesList->addItems(availableFeatures);
     // Position the availableFeaturesList manually
-    availableFeaturesList->move(350, 300); // Example position
+    availableFeaturesList->move(370, 300); // Example position
     availableFeaturesList->resize(120,120);
     // Set addButton parent to this widget
     QPushButton *addButton = new QPushButton("Add Feature", this);
     // Position the addButton manually
-    addButton->move(350, 430); // Example position
+    addButton->move(350, 450); // Example position
 
     // Connect addButton click signal to addFeature slot
     connect(addButton, &QPushButton::clicked, this, &spheroid_selector::addFeature);
@@ -40,7 +40,23 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     idxPointer.intMemberPtr = &sph_props::idx;
     idxPointer.type = MemberPointer::INT;
     featureMap["idx"] = idxPointer;
-
+    // Set parent for QLabel objects
+    Arealabel.setParent(this);
+    Perimeterlabel.setParent(this);
+    Circulartylabel.setParent(this);
+    maxdialabel.setParent(this);
+    Arealabel.setText("Area  stats");
+    int width_of_labels = 300;
+    int area_pos_y = 320;
+    int area_pos_x = 480;
+    Arealabel.move(area_pos_x,area_pos_y);
+    Perimeterlabel.move(area_pos_x,area_pos_y+20);
+    Circulartylabel.move(area_pos_x,area_pos_y+40);
+    maxdialabel.move(area_pos_x,area_pos_y+60);
+    Arealabel.resize(width_of_labels,20);
+    Perimeterlabel.resize(width_of_labels,20);
+    Circulartylabel.resize(width_of_labels,20);
+    maxdialabel.resize(width_of_labels,20);
 
 
 }
@@ -103,7 +119,7 @@ void spheroid_selector::set_list(QString data)
 void spheroid_selector::list_props()
 {
 
-    std::cout<< ui->Object_list->count() <<  std::endl;
+    // std::cout<< ui->Object_list->count() <<  std::endl;
     for (int idx=0; idx<ui->Object_list->count();++idx )
     {
         auto item = ui->Object_list->item(idx);
@@ -197,7 +213,15 @@ void spheroid_selector::on_pushButton_clicked()
 void spheroid_selector::on_pushButton_2_clicked()
 {
     std::vector<int> satisfyingSpheroids;
-    ui->Object_list->clear();
+    for (int idx=0;idx<ui->Object_list->count();++idx)
+    {
+        QListWidgetItem* item = ui->Object_list->item(idx);
+        // Check if the item exists
+        if (item) {
+            // Set the item as selected or checked, depending on your requirement
+            item->setCheckState(Qt::Unchecked); // For check state
+        }
+    }
     std::cout << "number of spheroids to check" << current_spheroid_data->size() <<  std::endl;
     for (int spheroid=0; spheroid < current_spheroid_data->size();++spheroid  ){
         bool satisfiesCriteria = true;
@@ -259,8 +283,6 @@ void spheroid_selector::on_pushButton_2_clicked()
 }
 
 
-
-
 void spheroid_selector::tickListItems(QListWidget* listWidget, const std::vector<int>& indexesToTick) {
     // Iterate over the indexes to tick
     for (int index : indexesToTick) {
@@ -277,7 +299,6 @@ void spheroid_selector::tickListItems(QListWidget* listWidget, const std::vector
         }
     }
 }
-
 
 
 void spheroid_selector::get_statistics_of_spheroids() {
@@ -327,11 +348,6 @@ void spheroid_selector::get_statistics_of_spheroids() {
         averageFeatures[pair.first] = pair.second / totalSpheroids;
     }
 
-    // Output the average features
-    for (const auto& pair : averageFeatures) {
-        std::cout << "Average " << pair.first.toStdString() << ": " << pair.second << std::endl;
-    }
-
     // Calculate the median, minimum, and maximum features
     for (const auto& pair : spheroidFeatures) {
         const QString& feature = pair.first;
@@ -341,12 +357,24 @@ void spheroid_selector::get_statistics_of_spheroids() {
         std::sort(sortedValues.begin(), sortedValues.end());
         // Calculate the median
         float median = values.size() % 2 == 0 ?
-            (sortedValues[values.size() / 2 - 1] + sortedValues[values.size() / 2]) / 2 :
+                    (sortedValues[values.size() / 2 - 1] + sortedValues[values.size() / 2]) / 2 :
             sortedValues[values.size() / 2];
-        // Output the median
-        std::cout << "Median " << feature.toStdString() << ": " << median << std::endl;
-        // Output the minimum and maximum
-        std::cout << "Minimum " << feature.toStdString() << ": " << minFeatures[feature] << std::endl;
-        std::cout << "Maximum " << feature.toStdString() << ": " << maxFeatures[feature] << std::endl;
+
+        // Update the corresponding QLabel with the statistics
+        std::map<QString, QLabel*> labelMap = {
+            {"Area", &Arealabel},
+            {"Perimeter", &Perimeterlabel},
+            {"Circularity", &Circulartylabel},
+            {"Maximum Diameter", &maxdialabel}
+        };
+        auto it = labelMap.find(feature);
+        if (it != labelMap.end()) {
+            QLabel* label = it->second;
+            label->setText(QString(feature+" Avg: %1\t Med: %2\t Min: %3\t Max: %4")
+                           .arg(averageFeatures[feature])
+                           .arg(median)
+                           .arg(minFeatures[feature])
+                           .arg(maxFeatures[feature]));
+        }
     }
 }
