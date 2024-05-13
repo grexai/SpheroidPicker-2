@@ -15,6 +15,9 @@
 #include <QLabel>
 #include <variant>
 #include <QMap>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+
 
 struct sph_props{
     int idx;
@@ -84,6 +87,7 @@ private:
     QMap<QString, QDoubleSpinBox*> featureSpinBoxes;
     QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter"};
     QStringList featuresAdded = {};
+    QTableWidget* tableWidget=nullptr;
     QListWidget *availableFeaturesList;
     QLabel Arealabel;
     QLabel Perimeterlabel;

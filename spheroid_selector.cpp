@@ -6,11 +6,17 @@
 #include <QGraphicsPixmapItem>
 #include <map>
 #include <algorithm>
+#include <iomanip>
+#include <limits>
+#include <QStringList>
+#include <QTableWidgetItem>
+
 
 spheroid_selector::spheroid_selector(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::spheroid_selector)
 {
+
     ui->setupUi(this);
     ui->selected_item_scene->setScene(new QGraphicsScene(this));
     ui->selected_item_scene->scene()->addItem(&im_view_pxmi);
@@ -19,12 +25,12 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     availableFeaturesList = new QListWidget(this);
     availableFeaturesList->addItems(availableFeatures);
     // Position the availableFeaturesList manually
-    availableFeaturesList->move(370, 300); // Example position
+    availableFeaturesList->move(460, 340); // Example position
     availableFeaturesList->resize(120,120);
     // Set addButton parent to this widget
     QPushButton *addButton = new QPushButton("Add Feature", this);
     // Position the addButton manually
-    addButton->move(350, 450); // Example position
+    addButton->move(540, 470); // Example position
 
     // Connect addButton click signal to addFeature slot
     connect(addButton, &QPushButton::clicked, this, &spheroid_selector::addFeature);
@@ -45,10 +51,15 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     Perimeterlabel.setParent(this);
     Circulartylabel.setParent(this);
     maxdialabel.setParent(this);
-    Arealabel.setText("Area  stats");
-    int width_of_labels = 300;
-    int area_pos_y = 320;
-    int area_pos_x = 480;
+
+
+    tableWidget = new QTableWidget();
+    tableWidget->setParent(this);
+    /*
+     *
+     *     //int width_of_labels = 500;
+    //int area_pos_y = 330;
+    //int area_pos_x = 10;
     Arealabel.move(area_pos_x,area_pos_y);
     Perimeterlabel.move(area_pos_x,area_pos_y+20);
     Circulartylabel.move(area_pos_x,area_pos_y+40);
@@ -57,7 +68,7 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     Perimeterlabel.resize(width_of_labels,20);
     Circulartylabel.resize(width_of_labels,20);
     maxdialabel.resize(width_of_labels,20);
-
+    */
 
 }
 
@@ -87,14 +98,16 @@ void spheroid_selector::addFeature() {
 
     minSpinBox->setMinimum(0);
     minSpinBox->setMaximum(9999999);
+    minSpinBox->setValue(0);
     maxSpinBox->setMinimum(0);
+    maxSpinBox->setValue(999999.0);
     maxSpinBox->setMaximum(9999999);
-
+    int label_x_pos = 600;
     // Manually set positions for the widgets
-    int yPos = this->height()-availableFeatures.size()*30 + featuresAdded.size()*30; // Adjust Y position based on number of features already added
-    featureLabel->move(10, yPos);
-    minSpinBox->move(150, yPos);
-    maxSpinBox->move(250, yPos);
+    int yPos = this->height()/2+60 + featuresAdded.size()*30; // Adjust Y position based on number of features already added
+    featureLabel->move(label_x_pos, yPos);
+    minSpinBox->move(label_x_pos+100, yPos);
+    maxSpinBox->move(label_x_pos+200, yPos);
 
     // Add widgets to the spheroid_selector widget
     featureLabel->show();
@@ -251,8 +264,8 @@ void spheroid_selector::on_pushButton_2_clicked()
 
             if (it != featureMap.end() && current_spheroid_data->at(spheroid).*(it->second.floatMemberPtr) != 0.0) {
                 std::cout << feature.toStdString() <<  "value of the feature" <<current_spheroid_data->at(spheroid).*(it->second.floatMemberPtr) << std::endl;
-                int maxValue = featureSpinBoxes[feature+"_max"]->value();
-                int minValue = featureSpinBoxes[feature]->value();
+                float maxValue = featureSpinBoxes[feature+"_max"]->value();
+                float minValue = featureSpinBoxes[feature]->value();
                 std::cout << "min can be:" << minValue << ", " << "max can be:" << maxValue << std::endl;
                 // Check if the value of the feature satisfies the min-max conditions
                 float featureValue = current_spheroid_data->at(spheroid).*it->second.floatMemberPtr;
@@ -301,7 +314,22 @@ void spheroid_selector::tickListItems(QListWidget* listWidget, const std::vector
 }
 
 
+
+
 void spheroid_selector::get_statistics_of_spheroids() {
+
+    int numRows = availableFeatures.size();
+    int numCols = 5; // For Feature, Average, Median, Minimum, Maximum
+
+    this->tableWidget->setRowCount(numRows);
+    this->tableWidget->setColumnCount(numCols);
+    this->tableWidget->resize(400,150);
+    this->tableWidget->move(20,340);
+    // Set the header labels for columns
+    QStringList headerLabels;
+    headerLabels << "Feature" << "Average" << "Median" << "Minimum" << "Maximum";
+    this->tableWidget->setHorizontalHeaderLabels(headerLabels);
+
     // Initialize variables to store the sum of feature values
     std::map<QString, float> sumFeatures;
     // Initialize variables to store the minimum feature values
@@ -349,6 +377,7 @@ void spheroid_selector::get_statistics_of_spheroids() {
     }
 
     // Calculate the median, minimum, and maximum features
+    int row = 0;
     for (const auto& pair : spheroidFeatures) {
         const QString& feature = pair.first;
         const std::vector<float>& values = pair.second;
@@ -369,12 +398,31 @@ void spheroid_selector::get_statistics_of_spheroids() {
         };
         auto it = labelMap.find(feature);
         if (it != labelMap.end()) {
-            QLabel* label = it->second;
-            label->setText(QString(feature+" Avg: %1\t Med: %2\t Min: %3\t Max: %4")
-                           .arg(averageFeatures[feature])
-                           .arg(median)
-                           .arg(minFeatures[feature])
-                           .arg(maxFeatures[feature]));
+
+            // Populate the QTableWidgetItem with the statistics
+            QTableWidgetItem* featureItem = new QTableWidgetItem(feature);
+            QTableWidgetItem* avgItem = new QTableWidgetItem(QString::number(averageFeatures[feature]));
+            QTableWidgetItem* medItem = new QTableWidgetItem(QString::number(median));
+            QTableWidgetItem* minItem = new QTableWidgetItem(QString::number(minFeatures[feature]));
+            QTableWidgetItem* maxItem = new QTableWidgetItem(QString::number(maxFeatures[feature]));
+            this->tableWidget->setItem(row, 0, featureItem);
+            // Set the QTableWidgetItem objects to the table
+            this->tableWidget->setItem(row, 1, avgItem);
+            this->tableWidget->setItem(row, 2, medItem);
+            this->tableWidget->setItem(row, 3, minItem);
+            this->tableWidget->setItem(row, 4, maxItem);
+
+
+            ++row;
+            //QLabel* label = it->second;
+            //label->setText(QString(feature+"\t Avg: %1\t Med: %2\t Min: %3\t Max: %4")
+            //               .arg(averageFeatures[feature])
+            //               .arg(median)
+            //               .arg(minFeatures[feature])
+            //               .arg(maxFeatures[feature]));
         }
     }
+    this->tableWidget->resizeColumnsToContents();
+
 }
+
