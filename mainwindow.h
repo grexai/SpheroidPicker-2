@@ -39,9 +39,10 @@ public:
     ~MainWindow();
     void setdarkstyle();
     void setdefault();
-    std::vector<sph_props> m_current_detections;
+    std::vector<sph_props> *m_current_detections;
     cv::Mat TM;
     std::string m_folder ;
+    std::vector <cv::Mat> m_bboxes;
 signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);
@@ -87,7 +88,7 @@ protected:
     i_deeplearning* dl= nullptr;
     propertyreader* propreader = nullptr;
     auto_methods* automethods = nullptr;
-    std::vector <cv::Mat> m_bboxes;
+
     std::vector<float>* cpos1 = nullptr;
     std::vector<float>* cpos2 = nullptr;
     std::vector<float>* cpos3= nullptr;
@@ -308,6 +309,7 @@ private:
     Ui::MainWindow *ui= nullptr;
     calibratedialog *calib= nullptr;
     spheroid_selector *sph_s= nullptr;
+
     Plateselector *p_s= nullptr;
     float m_img_width;
     float m_img_height;

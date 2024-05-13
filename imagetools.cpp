@@ -89,7 +89,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         cv::Mat c_input;
         input.convertTo(c_input,CV_8UC1);
     //	waitKey(0);
-        std::vector<float> object_features(5,0.0f);
+        std::vector<float> object_features(6,0.0f);
         Mat canny_output;
         RNG rng(12345);
         vector<vector<Point> > contours;
@@ -117,23 +117,31 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
             mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
         }
         // Draw contours
+        float radius;
+        Point2f center;
+
+
         Mat drawing = Mat::zeros(canny_output.size(), CV_32SC1);
-       int i =0;
-            double area = contourArea(contours[i]);
-            double arclength = arcLength(contours[i], true);
-            double circularity = (4 * CV_PI * area / (arclength * arclength));
-            object_features.at(0) = (static_cast <float>(arclength));
-            object_features.at(1) =  static_cast <float>(area);
-            object_features.at(2)= static_cast <float>( circularity);
-          //  fitEllipse(contours[i]);
-            cout << i << "object circularity " << object_features.at(0) << std::endl;
-            Scalar color = Scalar(255,  255, 255);
-            drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
-          //  circle(drawing, mc[i], 4, color, -1, 8, 0);
+        int i =0;
+        double area = contourArea(contours[i]);
+        double arclength = arcLength(contours[i], true);
+        double circularity = (4 * CV_PI * area / (arclength * arclength));
+
+        object_features.at(0) = (static_cast <float>(arclength));
+        object_features.at(1) =  static_cast <float>(area);
+        object_features.at(2)= static_cast <float>(circularity);
+
+        //  fitEllipse(contours[i]);
+        cout << i << "object circularity " << object_features.at(0) << std::endl;
+        Scalar color = Scalar(255,  255, 255);
+        drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, Point());
+        //  circle(drawing, mc[i], 4, color, -1, 8, 0);
         object_features.at(3) = mc[0].x;
         object_features.at(4) = mc[0].y;
         //std::cout<< "msctr x" << mc[0].x << " : y" << mc[0].y<<std::endl;
-
+        minEnclosingCircle(contours[0],center,radius);
+        cout << i << "object max radius " << radius << std::endl;
+        object_features.at(5) = radius;
 
      //   input = drawing;
         return object_features;

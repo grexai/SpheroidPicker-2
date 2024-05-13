@@ -615,6 +615,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             outcoors.push_back(features.at(2));//circularity 6
             outcoors.push_back((features.at(3)*nx) + bx); //mx 7// resize and recoordinate
             outcoors.push_back((features.at(4)*nx) + by); //my 8
+            outcoors.push_back(features.at(5)*nx); //radius
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
             label.copyTo(roi);

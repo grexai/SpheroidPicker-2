@@ -2,7 +2,7 @@
 #sad comment
 
 #port settings:
-ports.pipette=COM4
+ports.pipette=COM6
 ports.pressurecontroller=COM12
 
 #inception_v2 modell pathes
@@ -11,8 +11,8 @@ dl.textgraph=d:/dev/cpp/model.pbtxt
 dl.classes=d:/dev/cpp/mscoco_labels.names
 #matterport maskrcnn model path
 
-matterport.graph=d:/dev/models/mrcnn_sph_im1024_20200618/mrcnn_sph_im1024_20200618.pb
-matterport.folder=d:/dev/models/mrcnn_sph_im1024_20200618/
+matterport.graph=d:/dnn_models/MRCNN/mrcnn_sph_im1024_20200618/mrcnn_sph_im1024_20200618.pb
+matterport.folder=d:/dnn_models/MRCNN/mrcnn_sph_im1024_20200618/
 
 # well plate offsets
 offsets.wp96.x=2000

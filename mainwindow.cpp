@@ -9,6 +9,8 @@
 #include "ui_mainwindow.h"
 #include <marcros.h>
 #include <serialcom.h>
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -38,10 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setLabelText("configuring hardware");
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
+    QTextStream(stdout) << QDir::currentPath() << '\n';
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
 
     sph_s = new spheroid_selector;
+    sph_s->current_spheroid_data = this->m_current_detections;
     this->start_camera();
     sph_s->set_bbs(m_bboxes);
     p_s = new Plateselector;
@@ -99,14 +103,27 @@ MainWindow::MainWindow(QWidget *parent) :
                           propreader->cfg.textGraph.c_str());
     }*/
     dl = new matterport_mrcnn();
+    QTextStream(stdout) << QDir::currentPath() << '\n';
+    QTextStream(stdout) << propreader->cfg.matterport_graph.c_str()<< '\n';
+    QTextStream(stdout) << propreader->cfg.matterport_folder.c_str()<< '\n';
     dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
                           propreader->cfg.matterport_folder.c_str(),
                           nullptr);
+   QTextStream(stdout) << QDir::currentPath();
    cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
     // start a fake inference for finish preload
    cv::Mat mask;
+   QTextStream(stdout) << QDir::currentPath();
    std::vector<cv::Mat> bbs;
    //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
+   //t_inf.detach();
+   std::vector <cv::Mat> bboxes;
+
+   //std::thread t_inf([this, &test, &m_bboxes]() {
+   //    // Use dl, test, m_bboxes directly within the lambda
+   //    dl->dnn_inference(test, test, test, bboxes, ui->det_confidence->value(), ui->mask_confidence->value());
+   //});
+
    //t_inf.detach();
    dl->dnn_inference(test,test,test,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
 
@@ -1192,6 +1209,15 @@ void MainWindow::predict_sph(){
     }
 
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
+
+    if (m_current_detections != nullptr)
+    {
+        delete m_current_detections;
+        m_current_detections = nullptr;
+    }
+
+    m_current_detections = new std::vector<sph_props>;
+    sph_s->current_spheroid_data = m_current_detections;
     cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
    // std::vector<cv::Mat> bbs;
     this->m_bboxes.clear();
@@ -1209,6 +1235,8 @@ void MainWindow::predict_sph(){
     p.setFont(QFont("Arial", 25));
    // m_current_detections = {};
     // struct for storing spheroid detection data;
+
+
     for (int idx = 0; idx < im_obj.size(); ++idx)
     {
        QString text(QString::number(idx) );
@@ -1220,17 +1248,14 @@ void MainWindow::predict_sph(){
                     +" Perimeter: " + QString::number(im_obj.at(idx).at(4),'f',1)
                     +" Aera: " + QString::number(im_obj.at(idx).at(5),'f',1)
                     +" Circularity: " + QString::number(im_obj.at(idx).at(6),'f',3));
-        const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
-        sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(4),im_obj.at(idx).at(4)};
-       // std::cout<< "c-d" << c << std::endl;
-        // make it pointer!
-          m_current_detections.push_back(c);
-          std::cout<< "c-d" << m_current_detections.at(idx).idx << std::endl;
-          std::cout<< "c-d" << m_current_detections.at(idx).perimeter << std::endl;
 
+
+        const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
+        sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6)};
+        m_current_detections->push_back(c);
         p.drawText(rectangle,Qt::TextSingleLine,text);
     }
-
+    QTextStream(stdout) << "end" << '\n';
     sph_s->list_props();
 
  //    p.drawText();-
@@ -1238,6 +1263,7 @@ void MainWindow::predict_sph(){
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
     ui->tabWidget->setCurrentWidget(ui->tab2);
+
 }
 
 std::string MainWindow::get_date_time_str()
@@ -1308,7 +1334,17 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     float p_v=0.0f;
     //folder.append("s_"+datetime);
     if (global_obj_im_coordinates != nullptr){delete global_obj_im_coordinates;}
+
     global_obj_im_coordinates = new std::vector<std::vector<float>>;
+    if (m_current_detections != nullptr)
+    {
+        delete m_current_detections;
+        m_current_detections = nullptr;
+    }
+
+    m_current_detections = new std::vector<sph_props>;
+
+    sph_s->current_spheroid_data = m_current_detections;
     int image_posy = 0;
     int image_posx  = 0 ;
 
