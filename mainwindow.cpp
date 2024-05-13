@@ -1257,10 +1257,10 @@ void MainWindow::predict_sph(){
                     +"\t " + QString::number(im_obj.at(idx).at(7),'f',3));
 
 
-
-        const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
         sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6),im_obj.at(idx).at(7)};
         m_current_detections->push_back(c);
+
+        const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
         p.drawText(rectangle,Qt::TextSingleLine,text);
     }
 
@@ -1417,6 +1417,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                    {
                        global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
                    }
+
               //     std::cout <<"sizeofimageobjat"<< im_objects.at(object_counter).size() << std::endl;
                    // put text TEXT
              //      int baseLine ;
@@ -1453,13 +1454,18 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
        //            +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
        //            +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
        //            +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
-       sph_s->set_list(QString::number(i) + ". Spheroid"
-                   +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
-                   +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
-                   +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
-       //m_current_detections->peri.push_back(global_obj_im_coordinates->at(i).at(4));
-       //m_current_detections->area.push_back(global_obj_im_coordinates->at(i).at(5));
-       //m_current_detections->circ.push_back(global_obj_im_coordinates->at(i).at(6));
+       sph_s->set_list(QString::number(i)+". "
+                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
+                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
+                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3)
+                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(7),'f',3));
+
+
+        sph_props c = {i,global_obj_im_coordinates->at(i).at(4),
+                       global_obj_im_coordinates->at(i).at(5),
+                       global_obj_im_coordinates->at(i).at(6),
+                       global_obj_im_coordinates->at(i).at(7)};
+        m_current_detections->push_back(c);
 
     }
     ctrl->stage_set_speed(orig_speed.at(0));
