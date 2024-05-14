@@ -39,10 +39,13 @@ public:
     ~MainWindow();
     void setdarkstyle();
     void setdefault();
+    void resetToDefaultStyle();
     std::vector<sph_props> *m_current_detections;
     cv::Mat TM;
     std::string m_folder ;
     std::vector <cv::Mat> m_bboxes;
+    std::vector <cv::Mat> * tempboxpointer;
+    cv::Mat* imagePtr = nullptr;
 signals:
     // The signal of transmit the coordinates of the mouse position
    // void signalTargetCoordinate(QPointF point);

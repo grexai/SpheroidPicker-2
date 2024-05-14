@@ -114,21 +114,41 @@ MainWindow::MainWindow(QWidget *parent) :
     // start a fake inference for finish preload
    cv::Mat mask;
    QTextStream(stdout) << QDir::currentPath();
-   std::vector<cv::Mat> bbs;
-   //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
-   //t_inf.detach();
-   std::vector <cv::Mat> bboxes;
-
-   //std::thread t_inf([this, &test, &m_bboxes]() {
-   //    // Use dl, test, m_bboxes directly within the lambda
-   //    dl->dnn_inference(test, test, test, bboxes, ui->det_confidence->value(), ui->mask_confidence->value());
-   //});
-
-   //t_inf.detach();
-   dl->dnn_inference(test,test,test,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
+   std::vector<cv::Mat> bbs = {};
 
 
-   //}
+   if (dl == nullptr) {
+       std::cerr << "Error: dl pointer is nullptr" << std::endl;
+       // Handle the error or exit the program
+   }
+
+   if (ui == nullptr) {
+       std::cerr << "Error: ui pointer is nullptr" << std::endl;
+       // Handle the error or exit the program
+   }
+
+   if (ui->det_confidence == nullptr) {
+       std::cerr << "Error: ui->det_confidence pointer is nullptr" << std::endl;
+       // Handle the error or exit the program
+   }
+
+   if (ui->mask_confidence == nullptr) {
+       std::cerr << "Error: ui->mask_confidence pointer is nullptr" << std::endl;
+       // Handle the error or exit the program
+   }
+   cv::Mat* imagePtr = new cv::Mat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
+   std::vector<cv::Mat>* tempboxpointer = new std::vector<cv::Mat>();
+
+   std::thread* inferenceThread = new std::thread([&]() {
+       try {
+           dl->dnn_inference(*imagePtr, *imagePtr, *imagePtr, *tempboxpointer, 0.5,0.5);
+       } catch (const std::exception& e) {
+           std::cerr << "Exception in thread: " << e.what() << std::endl;
+       } catch (...) {
+           std::cerr << "Unknown exception in thread" << std::endl;
+       }
+   });
+    inferenceThread->detach();
     QTextStream(stdout) << QDir::currentPath();
 
 
@@ -160,6 +180,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     progress.setValue(100);
     progress.setAutoClose(true);
+    std::cout<<"done contructor" << std::endl;
 }
 
 
@@ -195,6 +216,14 @@ void MainWindow::setdefault()
  //  qApp->setStyle(this->style()->standardIcon());
  //  qApp->setStyle(this->style()->standardPixmap());
    qApp->setStyleSheet("");
+}
+
+void MainWindow::resetToDefaultStyle() {
+    // Retrieve the system's default palette
+    QPalette defaultPalette = QApplication::style()->standardPalette();
+
+    qApp->setPalette(defaultPalette);
+    qApp->setStyleSheet("");
 }
 
 MainWindow::~MainWindow()
@@ -429,7 +458,8 @@ void MainWindow::on_actionDark_Mode_triggered()
 
 void MainWindow::on_actionLight_triggered()
 {
-    setdefault();
+    // setdefault();
+    resetToDefaultStyle();
 }
 
 

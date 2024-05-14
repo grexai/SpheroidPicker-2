@@ -368,8 +368,20 @@ void matterport_mrcnn::create_session(){
 }
 
 std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes, float det_conf, float mask_conf){
+    std::cout<< "start matterport mrcnn inference" << std::endl;
+    if (input.empty()) {
+        std::cerr << "Error: Input image is empty." << std::endl;
+        // Handle the error or exit the function
+    }
+
+    if (input.type() != CV_8UC3) {
+        std::cerr << "Error: Input image should be of type CV_8UC3 (BGR)." << std::endl;
+        // Handle the error or convert the input to the correct format
+    }
+
 
     auto start = std::chrono::system_clock::now();
+
     cv::Mat o_im = input;
     input.convertTo(input, CV_8UC3);
     cv::resize(input, input, cv::Size(1024, 576));
@@ -384,9 +396,9 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
 
     //matterport's mrcnn only works for image sizes that are multiples of 64
     if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
-
+    std::cout<< "maybe here \n";
     cv::Mat moldedInput = mold_image(input, IMAGE_SIZE, maxDim);
-
+    std::cout<< "maybe here \n";
     static constexpr int NUM_CLASSES = 2;
     static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
     float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id

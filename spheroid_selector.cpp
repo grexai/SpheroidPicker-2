@@ -53,8 +53,8 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     maxdialabel.setParent(this);
 
 
-    tableWidget = new QTableWidget();
-    tableWidget->setParent(this);
+    tableWidget = new QTableWidget(this);
+    //tableWidget->setParent(this);
     /*
      *
      *     //int width_of_labels = 500;
@@ -412,7 +412,6 @@ void spheroid_selector::get_statistics_of_spheroids() {
             this->tableWidget->setItem(row, 3, minItem);
             this->tableWidget->setItem(row, 4, maxItem);
 
-
             ++row;
             //QLabel* label = it->second;
             //label->setText(QString(feature+"\t Avg: %1\t Med: %2\t Min: %3\t Max: %4")
@@ -422,7 +421,9 @@ void spheroid_selector::get_statistics_of_spheroids() {
             //               .arg(maxFeatures[feature]));
         }
     }
-    this->tableWidget->resizeColumnsToContents();
+    //this->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    this->tableWidget->resizeColumnsToContents();
+    //this->tableWidget->verticalHeader()
 }
 
