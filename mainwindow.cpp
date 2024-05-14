@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     QProgressDialog progress("Getting User Interface ready", nullptr, 0, 0);
     progress.setRange(0,100);
     progress.setWindowModality(Qt::WindowModal);

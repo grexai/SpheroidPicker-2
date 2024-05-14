@@ -10,7 +10,8 @@
 #include <limits>
 #include <QStringList>
 #include <QTableWidgetItem>
-
+#include <QHeaderView>
+#include <cmath> // for std::isnan
 
 spheroid_selector::spheroid_selector(QWidget *parent) :
     QWidget(parent),
@@ -100,7 +101,7 @@ void spheroid_selector::addFeature() {
     minSpinBox->setMaximum(9999999);
     minSpinBox->setValue(0);
     maxSpinBox->setMinimum(0);
-    maxSpinBox->setValue(999999.0);
+    maxSpinBox->setValue(9999999.0);
     maxSpinBox->setMaximum(9999999);
     int label_x_pos = 600;
     // Manually set positions for the widgets
@@ -223,18 +224,31 @@ void spheroid_selector::on_pushButton_clicked()
 }
 
 
-void spheroid_selector::on_pushButton_2_clicked()
+void spheroid_selector::check_list_elements(bool check)
 {
-    std::vector<int> satisfyingSpheroids;
     for (int idx=0;idx<ui->Object_list->count();++idx)
     {
         QListWidgetItem* item = ui->Object_list->item(idx);
         // Check if the item exists
         if (item) {
             // Set the item as selected or checked, depending on your requirement
-            item->setCheckState(Qt::Unchecked); // For check state
+            if (check){
+                item->setCheckState(Qt::Checked); // For check state
+            }
+            else{
+                item->setCheckState(Qt::Unchecked); // For check state
+            }
+
         }
     }
+}
+
+
+void spheroid_selector::on_pushButton_2_clicked()
+{
+    std::vector<int> satisfyingSpheroids;
+    this->check_list_elements(false);
+
     std::cout << "number of spheroids to check" << current_spheroid_data->size() <<  std::endl;
     for (int spheroid=0; spheroid < current_spheroid_data->size();++spheroid  ){
         bool satisfiesCriteria = true;
@@ -340,7 +354,7 @@ void spheroid_selector::get_statistics_of_spheroids() {
     std::map<QString, std::vector<float>> spheroidFeatures;
 
     // Initialize variables to store the count of spheroids
-    int totalSpheroids = 0;
+    int totalSpheroids = ui->Object_list->count();
 
     // Iterate over each available feature
     for (const QString& feature : availableFeatures) {
@@ -355,16 +369,19 @@ void spheroid_selector::get_statistics_of_spheroids() {
             if (it != featureMap.end()) {
                 // Compute the feature value for the current spheroid
                 float featureValue = current_spheroid_data->at(idx).*it->second.floatMemberPtr;
-                // Add the feature value to the sum
-                sumFeatures[feature] += featureValue;
-                // Update the minimum feature value
-                minFeatures[feature] = std::min(minFeatures[feature], featureValue);
-                // Update the maximum feature value
-                maxFeatures[feature] = std::max(maxFeatures[feature], featureValue);
-                // Store the feature value for the current spheroid
-                spheroidFeatures[feature].push_back(featureValue);
-                // Increment the total count of spheroids
-                totalSpheroids++;
+                // Ignore NaN values
+                if (!std::isnan(featureValue)) {
+                    // Add the feature value to the sum
+                    sumFeatures[feature] += featureValue;
+                    // Update the minimum feature value
+                    minFeatures[feature] = std::min(minFeatures[feature], featureValue);
+                    // Update the maximum feature value
+                    maxFeatures[feature] = std::max(maxFeatures[feature], featureValue);
+                    // Store the feature value for the current spheroid
+                    spheroidFeatures[feature].push_back(featureValue);
+                    // Increment the total count of spheroids
+                    //totalSpheroids++;
+                }
             }
         }
     }
@@ -373,7 +390,9 @@ void spheroid_selector::get_statistics_of_spheroids() {
     std::map<QString, float> averageFeatures;
     for (const auto& pair : sumFeatures) {
         // Calculate the average for each feature
-        averageFeatures[pair.first] = pair.second / totalSpheroids;
+        std::cout<<  pair.second  <<"sum,total"<< totalSpheroids<<std::endl;
+        averageFeatures[pair.first] = totalSpheroids > 0 ? pair.second / totalSpheroids : 0.0;
+        std::cout<< averageFeatures[pair.first]<<"avg value of " ;
     }
 
     // Calculate the median, minimum, and maximum features
@@ -385,9 +404,12 @@ void spheroid_selector::get_statistics_of_spheroids() {
         std::vector<float> sortedValues = values;
         std::sort(sortedValues.begin(), sortedValues.end());
         // Calculate the median
-        float median = values.size() % 2 == 0 ?
-                    (sortedValues[values.size() / 2 - 1] + sortedValues[values.size() / 2]) / 2 :
-            sortedValues[values.size() / 2];
+        float median = 0.0;
+        if (!sortedValues.empty()) {
+            median = values.size() % 2 == 0 ?
+                        (sortedValues[values.size() / 2 - 1] + sortedValues[values.size() / 2]) / 2 :
+                sortedValues[values.size() / 2];
+        }
 
         // Update the corresponding QLabel with the statistics
         std::map<QString, QLabel*> labelMap = {
@@ -401,10 +423,10 @@ void spheroid_selector::get_statistics_of_spheroids() {
 
             // Populate the QTableWidgetItem with the statistics
             QTableWidgetItem* featureItem = new QTableWidgetItem(feature);
-            QTableWidgetItem* avgItem = new QTableWidgetItem(QString::number(averageFeatures[feature]));
-            QTableWidgetItem* medItem = new QTableWidgetItem(QString::number(median));
-            QTableWidgetItem* minItem = new QTableWidgetItem(QString::number(minFeatures[feature]));
-            QTableWidgetItem* maxItem = new QTableWidgetItem(QString::number(maxFeatures[feature]));
+            QTableWidgetItem* avgItem = new QTableWidgetItem(QString::number(averageFeatures[feature], 'f', 3));
+            QTableWidgetItem* medItem = new QTableWidgetItem(QString::number(median, 'f', 3));
+            QTableWidgetItem* minItem = new QTableWidgetItem(QString::number(minFeatures[feature], 'f', 3));
+            QTableWidgetItem* maxItem = new QTableWidgetItem(QString::number(maxFeatures[feature], 'f', 3));
             this->tableWidget->setItem(row, 0, featureItem);
             // Set the QTableWidgetItem objects to the table
             this->tableWidget->setItem(row, 1, avgItem);
@@ -421,9 +443,14 @@ void spheroid_selector::get_statistics_of_spheroids() {
             //               .arg(maxFeatures[feature]));
         }
     }
-    //this->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    this->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    this->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->tableWidget->resizeColumnsToContents();
-    //this->tableWidget->verticalHeader()
+}
+
+void spheroid_selector::on_pushButton_3_clicked()
+{
+    this->check_list_elements(true);
 }
 
