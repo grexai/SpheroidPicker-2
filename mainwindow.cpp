@@ -23,86 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     progress.setValue(0);
 
     ui->setupUi(this);
-    ui->graphicsView->setScene(new QGraphicsScene(this));
-    ui->graphicsView->scene()->addItem(&qpxmi);
-    ui->graphicsView_2->setScene(new QGraphicsScene(this));
-    ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-   // ui->P_C_box->hide();
-    ui->Camera_settings->hide();
-    progress.setValue(10);
-    imtools = new imagetools;
-    timer = new QTimer(this);
-   // timer->setSingleShot(false); // always restarts
-    disp_pressure= new QTimer(this);
-    ctrl = new controller;
-    m_s_t_acitive.store(false);
-    ui->scanning_progress->setValue(static_cast<int>(m_status));
-    progress.setValue(25);
-    progress.setLabelText("configuring hardware");
+
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;
     QTextStream(stdout) << QDir::currentPath() << '\n';
     propreader->read_settings("config.txt",settings);
     propreader->apply_settings(settings);
-
-    sph_s = new spheroid_selector;
-    sph_s->current_spheroid_data = this->m_current_detections;
-    this->start_camera();
-    sph_s->set_bbs(m_bboxes);
-    p_s = new Plateselector;
-    bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
-
-    try {
-       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
-    }
-    catch (...) {
-        std::cerr << "pipette controller failed to connect";
-    }
-
-    ctrl->connect_tango_stage();
-    progress.setValue(33);
-    progress.setLabelText("homing manipulator");
-    ctrl->pipette_home_z();
-    ctrl->pipette_home_x();
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    progress.setValue(50);
-    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
-                                                                tr("Do you want to run stage inicialization?\n"),
-                                                                QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn == QMessageBox::Yes) {
-            progress.setLabelText("Stage inicialization, may take about 1 minute");
-            ctrl->stage_set_speed(30000);
-            ctrl->stage_autocalibrate();
-    }
-    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
+    progress.setValue(5);
     progress.setLabelText("Loading neural network");
-    progress.setValue(70);
-    /*
-    QMessageBox::StandardButton res1Btn = QMessageBox::question( this, "Automatic Spheroid Picker",
-                                                              tr("Load Matterport Rcnn?"),
-                                                                QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (res1Btn == QMessageBox::Yes) {
-        dl = new matterport_mrcnn();
-        dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
-                              propreader->cfg.matterport_folder.c_str(),
-                              nullptr);
-       cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
-        // start a fake inference for finish preload
-       cv::Mat mask;
-       std::vector<cv::Mat> bbs;
-       //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
-       //t_inf.detach();
-       QTextStream(stdout) << QDir::currentPath();
-       dl->dnn_inference(test,test,test,m_bboxes);
-       QTextStream(stdout) << QDir::currentPath();
-    }else{
-        dl = new invecption_v2();
-        dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
-                          propreader->cfg.model_weights.c_str(),
-                          propreader->cfg.textGraph.c_str());
-    }*/
     dl = new matterport_mrcnn();
     QTextStream(stdout) << QDir::currentPath() << '\n';
     QTextStream(stdout) << propreader->cfg.matterport_graph.c_str()<< '\n';
@@ -139,7 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
    }
    cv::Mat* imagePtr = new cv::Mat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
    std::vector<cv::Mat>* tempboxpointer = new std::vector<cv::Mat>();
-
+   progress.setValue(10);
+   progress.setLabelText("Warming up neural network in the background...");
    std::thread* inferenceThread = new std::thread([&]() {
        try {
            dl->dnn_inference(*imagePtr, *imagePtr, *imagePtr, *tempboxpointer, 0.5,0.5);
@@ -151,6 +80,88 @@ MainWindow::MainWindow(QWidget *parent) :
    });
     inferenceThread->detach();
     QTextStream(stdout) << QDir::currentPath();
+
+
+    progress.setValue(30);
+    progress.setLabelText("Getting UI ready..");
+    ui->graphicsView->setScene(new QGraphicsScene(this));
+    ui->graphicsView->scene()->addItem(&qpxmi);
+    ui->graphicsView_2->setScene(new QGraphicsScene(this));
+    ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
+   // ui->P_C_box->hide();
+    ui->Camera_settings->hide();
+    progress.setValue(10);
+    imtools = new imagetools;
+    timer = new QTimer(this);
+   // timer->setSingleShot(false); // always restarts
+    disp_pressure= new QTimer(this);
+    ctrl = new controller;
+    m_s_t_acitive.store(false);
+    ui->scanning_progress->setValue(static_cast<int>(m_status));
+    progress.setValue(50);
+    progress.setLabelText("Starting Camera");
+
+
+    sph_s = new spheroid_selector;
+    sph_s->current_spheroid_data = this->m_current_detections;
+    this->start_camera();
+    sph_s->set_bbs(m_bboxes);
+    p_s = new Plateselector;
+    progress.setValue(60);
+    progress.setLabelText("Starting manipulator..");
+    bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+
+    try {
+       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+    }
+    catch (...) {
+        std::cerr << "pipette controller failed to connect";
+    }
+
+    ctrl->connect_tango_stage();
+    progress.setValue(70);
+    ctrl->pipette_home_z();
+    ctrl->pipette_home_x();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    progress.setValue(80);
+    progress.setLabelText("Starting microscope stage...");
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                                tr("Do you want to run stage inicialization?\n"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn == QMessageBox::Yes) {
+            progress.setLabelText("Stage inicialization, may take about 1 minute");
+            ctrl->stage_set_speed(30000);
+            ctrl->stage_autocalibrate();
+    }
+    ctrl->stage_set_speed(ui->s_speed_spinbox->value());
+
+
+    /*
+    QMessageBox::StandardButton res1Btn = QMessageBox::question( this, "Automatic Spheroid Picker",
+                                                              tr("Load Matterport Rcnn?"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (res1Btn == QMessageBox::Yes) {
+        dl = new matterport_mrcnn();
+        dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
+                              propreader->cfg.matterport_folder.c_str(),
+                              nullptr);
+       cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+        // start a fake inference for finish preload
+       cv::Mat mask;
+       std::vector<cv::Mat> bbs;
+       //std::thread t_inf(&i_deeplearning::dnn_inference,dl,test,test,test,m_bboxes);
+       //t_inf.detach();
+       QTextStream(stdout) << QDir::currentPath();
+       dl->dnn_inference(test,test,test,m_bboxes);
+       QTextStream(stdout) << QDir::currentPath();
+    }else{
+        dl = new invecption_v2();
+        dl->setup_dnn_network(propreader->cfg.classesFile.c_str(),
+                          propreader->cfg.model_weights.c_str(),
+                          propreader->cfg.textGraph.c_str());
+    }*/
 
 
     p_s = new Plateselector;
@@ -177,7 +188,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addWidget(ui->yc_label);
     ui->statusBar->addWidget(ui->zc_label);
 
-    progress.setLabelText("Done");
+    progress.setLabelText("Finished");
 
     progress.setValue(100);
     progress.setAutoClose(true);

@@ -54,6 +54,7 @@ public:
     void update_scene();
     void tickListItems(QListWidget* listWidget, const std::vector<int>& indexesToTick);
     void get_statistics_of_spheroids();
+    void check_list_elements(bool check=true);
 
 signals:
     void fill_list();
@@ -74,13 +75,15 @@ private slots:
 
     void on_Object_list_activated(const QModelIndex &index);
 
-    void uncheck_list_elements();
+
 
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
     void addFeature();
+
+    void on_pushButton_3_clicked();
 
 protected:
 
