@@ -47,6 +47,8 @@ class spheroid_selector : public QWidget
     Q_OBJECT
 
 public:
+
+    float getFeatureStatistic(const QString& feature, const QString& statistic);
     explicit spheroid_selector(QWidget *parent = nullptr);
     ~spheroid_selector();
     std::vector<sph_props>*current_spheroid_data=nullptr;
@@ -83,12 +85,30 @@ private slots:
 
     void addFeature();
 
+    void removeAllFeatures();
+
     void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
 
 protected:
 
 
 private:
+
+    // Initialize variables to store the sum of feature values
+    std::map<QString, float> sumFeatures;
+    // Initialize variables to store the minimum feature values
+    std::map<QString, float> minFeatures;
+    // Initialize variables to store the maximum feature values
+    std::map<QString, float> maxFeatures;
+    // Initialize variables to store the feature values for each spheroid
+    std::map<QString, std::vector<float>> spheroidFeatures;
+
+    std::map<QString, float> averageFeatures;
+
+
+    QMap<QString, QLabel*> featureLabels;
     QMap<QString, QDoubleSpinBox*> featureSpinBoxes;
     QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter"};
     QStringList featuresAdded = {};

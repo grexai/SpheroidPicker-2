@@ -16,13 +16,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
+    ui->setupUi(this);
     QProgressDialog progress("Getting User Interface ready", nullptr, 0, 0);
     progress.setRange(0,100);
     progress.setWindowModality(Qt::WindowModal);
     progress.setMinimumDuration(0);
     progress.setValue(0);
 
-    ui->setupUi(this);
 
     std::map<std::string, std::string> settings;
     propreader = new propertyreader;

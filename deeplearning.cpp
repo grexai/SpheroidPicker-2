@@ -396,9 +396,8 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
 
     //matterport's mrcnn only works for image sizes that are multiples of 64
     if(IMAGE_SIZE < 128 || IMAGE_SIZE % 64 != 0) throw std::runtime_error(std::string("Invalid image size: ") + std::to_string(IMAGE_SIZE));
-    std::cout<< "maybe here \n";
+
     cv::Mat moldedInput = mold_image(input, IMAGE_SIZE, maxDim);
-    std::cout<< "maybe here \n";
     static constexpr int NUM_CLASSES = 2;
     static constexpr int METADATA_LEN = 1 + 3 + 3 + 4 + 1 + NUM_CLASSES;
     float IMAGE_METADATA[METADATA_LEN] = { 0.0f,                                                                        //image id
@@ -411,7 +410,6 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
     //Defining inputs
     std::vector<TF_Output> inputs;
     std::vector<TF_Tensor*> inputTensors;
-    std::cout<< "maybe here \n";
     //image tensor ezt
     TF_Operation* inputOpImage = TF_GraphOperationByName(m_graph, "input_image");
     if (inputOpImage == nullptr) throw std::runtime_error("Missing node!");

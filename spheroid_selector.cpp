@@ -26,15 +26,17 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     availableFeaturesList = new QListWidget(this);
     availableFeaturesList->addItems(availableFeatures);
     // Position the availableFeaturesList manually
-    availableFeaturesList->move(460, 340); // Example position
+    availableFeaturesList->move(440, 340); // Example position
     availableFeaturesList->resize(120,120);
     // Set addButton parent to this widget
     QPushButton *addButton = new QPushButton("Add Feature", this);
+    QPushButton *removeFeatureButton = new QPushButton("Remove all Feature", this);
     // Position the addButton manually
-    addButton->move(540, 470); // Example position
-
+    addButton->move(450, 470); // Example position
+    removeFeatureButton->move(450, 500); // Example position
     // Connect addButton click signal to addFeature slot
     connect(addButton, &QPushButton::clicked, this, &spheroid_selector::addFeature);
+    connect(removeFeatureButton, &QPushButton::clicked, this, &spheroid_selector::removeAllFeatures);
     // Map feature names to member names
 
     featureMap["Area"] = {&sph_props::area, MemberPointer::FLOAT};
@@ -101,14 +103,16 @@ void spheroid_selector::addFeature() {
     minSpinBox->setMaximum(9999999);
     minSpinBox->setValue(0);
     maxSpinBox->setMinimum(0);
-    maxSpinBox->setValue(9999999.0);
     maxSpinBox->setMaximum(9999999);
+    maxSpinBox->setValue(999999.0);
     int label_x_pos = 600;
     // Manually set positions for the widgets
     int yPos = this->height()/2+60 + featuresAdded.size()*30; // Adjust Y position based on number of features already added
     featureLabel->move(label_x_pos, yPos);
-    minSpinBox->move(label_x_pos+100, yPos);
-    maxSpinBox->move(label_x_pos+200, yPos);
+    featureLabel->resize(50,30);
+    featureLabel->setWordWrap(true);
+    minSpinBox->move(label_x_pos+60, yPos);
+    maxSpinBox->move(label_x_pos+160, yPos);
 
     // Add widgets to the spheroid_selector widget
     featureLabel->show();
@@ -119,7 +123,29 @@ void spheroid_selector::addFeature() {
     // Store the spin boxes in the map
     featureSpinBoxes.insert(feature, minSpinBox);
     featureSpinBoxes.insert(feature + "_max", maxSpinBox);
+    featureLabels.insert(feature, featureLabel);
 }
+
+void spheroid_selector::removeAllFeatures() {
+    // Remove all added features from the GUI
+    for (const QString& feature : featuresAdded) {
+        //QLabel *label = featureLabels[feature];
+        QLabel *label = featureLabels.value(feature);
+        QDoubleSpinBox *minSpinBox = featureSpinBoxes[feature];
+        QDoubleSpinBox *maxSpinBox = featureSpinBoxes[feature + "_max"];
+
+        if (label)
+            delete label;
+        delete minSpinBox;
+        delete maxSpinBox;
+    }
+
+    // Clear the lists and maps
+    featuresAdded.clear();
+    featureSpinBoxes.clear();
+}
+
+
 
 void spheroid_selector::set_list(QString data)
 {
@@ -329,7 +355,6 @@ void spheroid_selector::tickListItems(QListWidget* listWidget, const std::vector
 
 
 
-
 void spheroid_selector::get_statistics_of_spheroids() {
 
     int numRows = availableFeatures.size();
@@ -345,20 +370,20 @@ void spheroid_selector::get_statistics_of_spheroids() {
     this->tableWidget->setHorizontalHeaderLabels(headerLabels);
 
     // Initialize variables to store the sum of feature values
-    std::map<QString, float> sumFeatures;
+    // std::map<QString, float> sumFeatures;
     // Initialize variables to store the minimum feature values
-    std::map<QString, float> minFeatures;
+    // std::map<QString, float> minFeatures;
     // Initialize variables to store the maximum feature values
-    std::map<QString, float> maxFeatures;
+    // std::map<QString, float> maxFeatures;
     // Initialize variables to store the feature values for each spheroid
-    std::map<QString, std::vector<float>> spheroidFeatures;
+    // std::map<QString, std::vector<float>> spheroidFeatures;
 
     // Initialize variables to store the count of spheroids
-    int totalSpheroids = ui->Object_list->count();
-
+    int totalSpheroids;
     // Iterate over each available feature
     for (const QString& feature : availableFeatures) {
         // Initialize the sum, min, and max for the current feature
+        totalSpheroids = 0;
         sumFeatures[feature] = 0.0;
         minFeatures[feature] = std::numeric_limits<float>::max();
         maxFeatures[feature] = std::numeric_limits<float>::lowest();
@@ -370,7 +395,8 @@ void spheroid_selector::get_statistics_of_spheroids() {
                 // Compute the feature value for the current spheroid
                 float featureValue = current_spheroid_data->at(idx).*it->second.floatMemberPtr;
                 // Ignore NaN values
-                if (!std::isnan(featureValue)) {
+                if (!std::isnan(featureValue) &&  featureValue>0) {
+
                     // Add the feature value to the sum
                     sumFeatures[feature] += featureValue;
                     // Update the minimum feature value
@@ -380,14 +406,15 @@ void spheroid_selector::get_statistics_of_spheroids() {
                     // Store the feature value for the current spheroid
                     spheroidFeatures[feature].push_back(featureValue);
                     // Increment the total count of spheroids
-                    //totalSpheroids++;
+                    totalSpheroids++;
                 }
             }
         }
+
     }
 
     // Calculate the average features
-    std::map<QString, float> averageFeatures;
+    // std::map<QString, float> averageFeatures;
     for (const auto& pair : sumFeatures) {
         // Calculate the average for each feature
         std::cout<<  pair.second  <<"sum,total"<< totalSpheroids<<std::endl;
@@ -452,5 +479,11 @@ void spheroid_selector::get_statistics_of_spheroids() {
 void spheroid_selector::on_pushButton_3_clicked()
 {
     this->check_list_elements(true);
+}
+
+
+void spheroid_selector::on_pushButton_4_clicked()
+{
+    this->check_list_elements(false);
 }
 
