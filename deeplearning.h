@@ -32,6 +32,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <tensorflow/c/c_api.h>
+#include <QMutex>
+#include <QMutexLocker>
+
 
 class i_deeplearning
 {
@@ -147,6 +150,10 @@ public:
     virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;
 
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf) override;
+private:
+
+    QMutex m_mutex;
+
 };
 
 
