@@ -141,7 +141,7 @@ public:
 
     cv::Mat mold_image(cv::Mat &image, const int IMAGE_SIZE, int maxDim) ;
 
-  //  std::vector<std::vector<float>> inferencing(cv::Mat& image,std::vector<cv::Mat>& bboxes) ;
+    // std::vector<std::vector<float>> inferencing(cv::Mat& image,std::vector<cv::Mat>& bboxes) ;
 
     void create_session();
     virtual void setup_dnn_network(const char* modelPB, const char* modelPath, const char* empty) override;

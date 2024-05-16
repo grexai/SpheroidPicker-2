@@ -18,8 +18,8 @@
 #include <deeplearning.h>
 #include <propertyreader.h>
 #include <auto_methods.h>
+#include <mosaicworker.h>
 // for the csv
-
 #include <iostream>
 #include <fstream>
 
@@ -40,8 +40,10 @@ public:
     void setdarkstyle();
     void setdefault();
     void resetToDefaultStyle();
+    cv::Mat openImageWithFileDialog();
     std::vector<sph_props> *m_current_detections;
     cv::Mat TM;
+    cv::Mat *testimage = nullptr;
     std::string m_folder ;
     std::vector <cv::Mat> m_bboxes;
     std::vector <cv::Mat> * tempboxpointer;
@@ -264,13 +266,13 @@ private slots:
 
      //scanning
 
-     void predict_sph();
+     void predict_sph(QSharedPointer<cv::Mat> input);
 
      std::string get_date_time_str();
 
      void screen_area(float plate_w_mm,float plate_h_mm);
 
-     void create_mosaic();
+
 
      void move_to_s_plate(int x_idx,int y_idx,int type);
 
@@ -300,8 +302,16 @@ private slots:
 
      void on_open_spheroid_selector_pushButton_clicked();
 
-private:
+     void on_actionLoad_an_image_and_predict_triggered();
 
+     void onProgressChanged(int value);
+
+     void onMosaicFinished(cv::Mat* result);
+
+private:
+    void create_mosaic();
+    QThread* thread = nullptr;
+    MosaicWorker* worker=nullptr;
     QTimer *timer= nullptr;
     QTimer *disp_pressure= nullptr;
     QGraphicsScene* scene= nullptr;

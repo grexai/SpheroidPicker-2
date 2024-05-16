@@ -2780,6 +2780,7 @@ Stage</string>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
     <addaction name="separator"/>
+    <addaction name="actionLoad_an_image_and_predict"/>
    </widget>
    <widget class="QMenu" name="menuTheme">
     <property name="title">
@@ -2857,6 +2858,11 @@ Stage</string>
   <action name="actionExport_Screening_to_Bias">
    <property name="text">
     <string>Export Screening to Bias</string>
+   </property>
+  </action>
+  <action name="actionLoad_an_image_and_predict">
+   <property name="text">
+    <string>Load an image and predict</string>
    </property>
   </action>
  </widget>

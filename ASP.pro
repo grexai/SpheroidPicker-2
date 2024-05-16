@@ -35,6 +35,7 @@ CONFIG(release, debug|release) {
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    mosaicworker.cpp \
     stagecontroller.cpp \
     serialcom.cpp \
     arduinopressurecontroller.cpp \
@@ -53,6 +54,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    mosaicworker.h \
     serialcom.h \
     controller.h \
     arduinogcode.h \

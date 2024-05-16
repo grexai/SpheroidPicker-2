@@ -9,7 +9,7 @@
 #include "ui_mainwindow.h"
 #include <marcros.h>
 #include <serialcom.h>
-
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,46 +38,46 @@ MainWindow::MainWindow(QWidget *parent) :
     dl->setup_dnn_network(propreader->cfg.matterport_graph.c_str(),
                           propreader->cfg.matterport_folder.c_str(),
                           nullptr);
-   QTextStream(stdout) << QDir::currentPath();
-   cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+    QTextStream(stdout) << QDir::currentPath();
+    cv::Mat test = cv::imread("BIOMAGwhite-01.png", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
     // start a fake inference for finish preload
-   cv::Mat mask;
-   QTextStream(stdout) << QDir::currentPath();
-   std::vector<cv::Mat> bbs = {};
+    cv::Mat mask;
+    QTextStream(stdout) << QDir::currentPath();
+    std::vector<cv::Mat> bbs = {};
 
 
-   if (dl == nullptr) {
-       std::cerr << "Error: dl pointer is nullptr" << std::endl;
-       // Handle the error or exit the program
-   }
+    if (dl == nullptr) {
+        std::cerr << "Error: dl pointer is nullptr" << std::endl;
+        // Handle the error or exit the program
+    }
 
-   if (ui == nullptr) {
-       std::cerr << "Error: ui pointer is nullptr" << std::endl;
-       // Handle the error or exit the program
-   }
+    if (ui == nullptr) {
+        std::cerr << "Error: ui pointer is nullptr" << std::endl;
+        // Handle the error or exit the program
+    }
 
-   if (ui->det_confidence == nullptr) {
-       std::cerr << "Error: ui->det_confidence pointer is nullptr" << std::endl;
-       // Handle the error or exit the program
-   }
+    if (ui->det_confidence == nullptr) {
+        std::cerr << "Error: ui->det_confidence pointer is nullptr" << std::endl;
+        // Handle the error or exit the program
+    }
 
-   if (ui->mask_confidence == nullptr) {
-       std::cerr << "Error: ui->mask_confidence pointer is nullptr" << std::endl;
-       // Handle the error or exit the program
-   }
-   cv::Mat* imagePtr = new cv::Mat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
-   std::vector<cv::Mat>* tempboxpointer = new std::vector<cv::Mat>();
-   progress.setValue(10);
-   progress.setLabelText("Warming up neural network in the background...");
-   std::thread* inferenceThread = new std::thread([&]() {
-       try {
-           dl->dnn_inference(*imagePtr, *imagePtr, *imagePtr, *tempboxpointer, 0.5,0.5);
-       } catch (const std::exception& e) {
-           std::cerr << "Exception in thread: " << e.what() << std::endl;
-       } catch (...) {
-           std::cerr << "Unknown exception in thread" << std::endl;
-       }
-   });
+    if (ui->mask_confidence == nullptr) {
+        std::cerr << "Error: ui->mask_confidence pointer is nullptr" << std::endl;
+        // Handle the error or exit the program
+    }
+    cv::Mat* imagePtr = new cv::Mat(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
+    std::vector<cv::Mat>* tempboxpointer = new std::vector<cv::Mat>();
+    progress.setValue(10);
+    progress.setLabelText("Warming up neural network in the background...");
+    std::thread* inferenceThread = new std::thread([&]() {
+        try {
+            dl->dnn_inference(*imagePtr, *imagePtr, *imagePtr, *tempboxpointer, 0.5,0.5);
+        } catch (const std::exception& e) {
+            std::cerr << "Exception in thread: " << e.what() << std::endl;
+        } catch (...) {
+            std::cerr << "Unknown exception in thread" << std::endl;
+        }
+    });
     inferenceThread->detach();
     QTextStream(stdout) << QDir::currentPath();
 
@@ -88,12 +88,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->scene()->addItem(&qpxmi);
     ui->graphicsView_2->setScene(new QGraphicsScene(this));
     ui->graphicsView_2->scene()->addItem(&im_view_pxmi);
-   // ui->P_C_box->hide();
+    // ui->P_C_box->hide();
     ui->Camera_settings->hide();
     progress.setValue(10);
     imtools = new imagetools;
     timer = new QTimer(this);
-   // timer->setSingleShot(false); // always restarts
+    // timer->setSingleShot(false); // always restarts
     disp_pressure= new QTimer(this);
     ctrl = new controller;
     m_s_t_acitive.store(false);
@@ -106,13 +106,14 @@ MainWindow::MainWindow(QWidget *parent) :
     sph_s->current_spheroid_data = this->m_current_detections;
     this->start_camera();
     sph_s->set_bbs(m_bboxes);
+
     p_s = new Plateselector;
     progress.setValue(60);
     progress.setLabelText("Starting manipulator..");
     bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
 
     try {
-       bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
+        bool ispipetteconnected = ctrl->connect_pipette_controller(propreader->cfg.port_pipette);
     }
     catch (...) {
         std::cerr << "pipette controller failed to connect";
@@ -130,9 +131,9 @@ MainWindow::MainWindow(QWidget *parent) :
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
     if (resBtn == QMessageBox::Yes) {
-            progress.setLabelText("Stage inicialization, may take about 1 minute");
-            ctrl->stage_set_speed(30000);
-            ctrl->stage_autocalibrate();
+        progress.setLabelText("Stage inicialization, may take about 1 minute");
+        ctrl->stage_set_speed(30000);
+        ctrl->stage_autocalibrate();
     }
     ctrl->stage_set_speed(ui->s_speed_spinbox->value());
 
@@ -173,9 +174,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(collect_finished()),this,SLOT(collect_stopped()));
     connect(this, SIGNAL(stiched_img_rdy()),this,SLOT(show_on_view_2()));
     connect(this, SIGNAL(prog_changed(int)),
-        this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
+            this, SLOT(set_progressbar(int)),Qt::QueuedConnection);
     connect(this, SIGNAL(stich_prog_changed(int)),
-        this, SLOT(set_stich_progressbar(int)),Qt::QueuedConnection);
+            this, SLOT(set_stich_progressbar(int)),Qt::QueuedConnection);
     connect(ctrl,SIGNAL(signal_process_qui()),this,SLOT(slot_process_qui()),Qt::QueuedConnection);
     emit p_s->signal_s_p_changed();
     emit p_s->signal_t_p_changed();
@@ -220,14 +221,14 @@ void MainWindow::setdarkstyle(){
 
 void MainWindow::setdefault()
 {
-   qApp->setStyle(QStyleFactory::create("WindowsDefault"));
-  // qApp->setStyle(QPalette::Base)
+    qApp->setStyle(QStyleFactory::create("WindowsDefault"));
+    // qApp->setStyle(QPalette::Base)
 
-   qApp->style()->standardPalette();
+    qApp->style()->standardPalette();
 
- //  qApp->setStyle(this->style()->standardIcon());
- //  qApp->setStyle(this->style()->standardPixmap());
-   qApp->setStyleSheet("");
+    //  qApp->setStyle(this->style()->standardIcon());
+    //  qApp->setStyle(this->style()->standardPixmap());
+    qApp->setStyleSheet("");
 }
 
 void MainWindow::resetToDefaultStyle() {
@@ -245,20 +246,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_currentpressure()
 {
-  //  float cp = (QRandomGenerator::global()->generate());
-  /*  if (ctrl->get_current_pressure()==nullptr){
+    //  float cp = (QRandomGenerator::global()->generate());
+    /*  if (ctrl->get_current_pressure()==nullptr){
         return;
     }else
     {
 */
     ui->lcdNumber->display( QString::number(static_cast<int>(ctrl->get_pressure())));
-   // ui->lcdNumber->display( "13");
+    // ui->lcdNumber->display( "13");
     //}
 }
 
 void MainWindow::show_currentpressure()
 {
-   // ctrl->spawn_pressure_thread();
+    // ctrl->spawn_pressure_thread();
     connect(disp_pressure, SIGNAL(timeout()), this, SLOT(update_currentpressure()));
     disp_pressure->start(500);
 }
@@ -267,9 +268,9 @@ void MainWindow::show_currentpressure()
 
 bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
     if (obj == ui->graphicsView && true)
-       {
-         if (event->type() == QEvent::MouseButtonPress)
-         {
+    {
+        if (event->type() == QEvent::MouseButtonPress)
+        {
             QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
             if(point_mouse!= nullptr){
                 delete point_mouse;
@@ -287,8 +288,8 @@ bool MainWindow::eventFilter( QObject *obj, QEvent *event ){
                 QTextStream(stdout) <<"coors x: " << point_mouse->x() << "    y: " << point_mouse->y()<< "\n";
             }
             else
-            return true;
-         }
+                return true;
+        }
     }
 
 }
@@ -317,6 +318,34 @@ void MainWindow::keyPressEvent( QKeyEvent* e )
     }
     QMainWindow::keyPressEvent(e);
 }
+
+
+
+cv::Mat MainWindow::openImageWithFileDialog() {
+    // Create a Qt application
+    int argc = 0;
+    char** argv = nullptr;
+    QApplication app(argc, argv);
+
+    // Open file dialog
+    QString imagePath = QFileDialog::getOpenFileName(nullptr,
+                                                     QObject::tr("Open Image"), "", QObject::tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
+
+    if (!imagePath.isEmpty()) {
+        // Load the image using OpenCV
+        cv::Mat image = cv::imread(imagePath.toStdString());
+        if (!image.empty()) {
+            return image;
+        } else {
+            qDebug() << "Failed to load image: " << imagePath;
+        }
+    } else {
+        qDebug() << "No file selected.";
+    }
+
+    return cv::Mat();
+}
+
 
 void MainWindow::closeEvent (QCloseEvent *event)
 {
@@ -348,9 +377,9 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             imtools->addPointToImage(disp,Point(100,disp.rows-100));
             if(cpos1 == nullptr)
             {
-          //      cpos1 = new std::vector<float>;
-          //      *cpos1 = ctrl->pipette_get_coordinates();
-          //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<"\n";
+                //      cpos1 = new std::vector<float>;
+                //      *cpos1 = ctrl->pipette_get_coordinates();
+                //      QTextStream(stdout ) << "point 1 saved:" << cpos1->at(0) <<" "<<cpos1->at(1)<< " "<< cpos1->at(2) <<"\n";
             }
 
         }
@@ -358,22 +387,22 @@ void MainWindow::calib_frame_view(cv::Mat& disp){
             imtools->addPointToImage(disp,Point(disp.cols-100,disp.rows-100));
             if(cpos2== nullptr)
             {
-            //    cpos2 = new std::vector<float>;
-            //    *cpos2 = ctrl->pipette_get_coordinates();
-            //     QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<"\n";
+                //    cpos2 = new std::vector<float>;
+                //    *cpos2 = ctrl->pipette_get_coordinates();
+                //     QTextStream(stdout ) << "point 2 saved: " << cpos2->at(0) <<"y: "<<cpos2->at(1)<< "z: "<< cpos2->at(2) <<"\n";
             }
         }
         if (calib->a.value()==3)
         {
             if(cpos3 == nullptr)
             {
-            //    cpos3 = new std::vector<float>;
-           //     *cpos3 = ctrl->pipette_get_coordinates();
-           //     QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<"\n";
-          //      ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
+                //    cpos3 = new std::vector<float>;
+                //     *cpos3 = ctrl->pipette_get_coordinates();
+                //     QTextStream(stdout ) << "point 3 saved: x: " << cpos3->at(0) <<"y: "<<cpos3->at(1)<< "z: "<< cpos3->at(2) <<"\n";
+                //      ctrl->pipette_calc_TM(cpos1,cpos2,cpos3);
 
-           // calib->Iscalibrating = false;
-              //   calib->deleteLater();
+                // calib->Iscalibrating = false;
+                //   calib->deleteLater();
 
             }
         }
@@ -422,14 +451,14 @@ void MainWindow::center_this_point_action()
     //ctrl->stage_set_speed(5000.0f);
     mouse.push_back(point_mouse->x()*1.5f);
     mouse.push_back(point_mouse->y()*1.5f);
-  //  this->center_spheroid(mouse);
+    //  this->center_spheroid(mouse);
     auto res = this->get_centered_coordinates(mouse);
     QTextStream(stdout) << res.at(0) << res.at(1) ;
     std::vector<std::vector<float>> objpos;
 
     for (int idx = 0; idx <= 6; ++idx)
     {
-       res.push_back(0);
+        res.push_back(0);
     }
     objpos.push_back(res);
     if (global_obj_im_coordinates == nullptr){
@@ -439,7 +468,7 @@ void MainWindow::center_this_point_action()
     QTextStream(stdout)<< n<< ": number of objects";
 
 
-        //    global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
+    //    global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
     global_obj_im_coordinates->push_back(objpos.at(0));
     ui->found_objects->addItem(QString::number(n)+"manual item");
     ctrl->stage_set_speed(15000.0f);
@@ -484,7 +513,7 @@ void MainWindow::export_csv(){
         csvfile.open("./"+fname+".csv");
         csvfile << "This is the first cell in the first column.\n";
         csvfile << "bbx0," << "bby0,"<< "bbx1,"<<"bby1,"
-               <<"length,"<< "area,"<<"circularity,"
+                <<"length,"<< "area,"<<"circularity,"
                <<"masscenterx,"<<"masscentery\n";
         for (int idx = 0; idx < global_obj_im_coordinates->size(); ++idx)
         {
@@ -493,13 +522,13 @@ void MainWindow::export_csv(){
                 csvfile << global_obj_im_coordinates->at(idx).at(j) << ",";
 
             }
-             csvfile <<  "\n";
+            csvfile <<  "\n";
         }
         csvfile.close();
     }
     else
     {
-    QTextStream(stdout)<< "no object data to save";
+        QTextStream(stdout)<< "no object data to save";
 
     }
 }
@@ -529,9 +558,17 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 
 void MainWindow::on_predict_sph_clicked()
 {
-   // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
-    sph_s->clear_list();
-    this->predict_sph();
+    // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
+    if (sph_s) {
+        sph_s->clear_list();
+    } else {
+        std::cerr << "Error: sph_s is null." << std::endl;
+        // Handle the error appropriately
+        // For example, log the error, throw an exception, or return early
+        return;
+    }
+    //  auto cfrm = camer
+    this->predict_sph(cameracv->get_current_frm());
 }
 
 
@@ -545,15 +582,15 @@ void MainWindow::start_camera()
         Iscameraopen= false;
         disconnect(timer, SIGNAL(timeout()), this,nullptr);
     }else{
-      //  imtools->setvideodevice(cameraIndex);
+        //  imtools->setvideodevice(cameraIndex);
         if(!cameracv->getCamera()->open(cameraIndex))
-              {
-                  QMessageBox::critical(this,
-                                        "Camera Error",
-                                        "Make sure you entered a correct camera index,"
-                                        "<br>or that the camera is not being accessed by another program!");
-                  return;
-              }
+        {
+            QMessageBox::critical(this,
+                                  "Camera Error",
+                                  "Make sure you entered a correct camera index,"
+                                  "<br>or that the camera is not being accessed by another program!");
+            return;
+        }
 
         ui->Campushbtn->setText("Camera off");
 
@@ -655,7 +692,7 @@ void MainWindow::on_s_ym_button_clicked()
 
 void MainWindow::on_p_xp_button_clicked()
 {
-     ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
+    ctrl->pipette_movex_sync(ui->pip_step_spinbox->value());
 }
 
 void MainWindow::on_p_xm_button_clicked()
@@ -762,8 +799,8 @@ void MainWindow::set_h4(int value)
     }
     if (value == 1)
     {
-       ui->P_C_box->show();
-       ui->syringe_box->hide();
+        ui->P_C_box->show();
+        ui->syringe_box->hide();
     }
 }
 
@@ -771,7 +808,7 @@ void MainWindow::scan_stopped()
 {
     QMessageBox::information(this,"Scanning done","Scanning of the plate finished,pipette and stage controller unlocked" );
     m_s_t_acitive=false;
-   // this->m_screening_thread->join();
+    // this->m_screening_thread->join();
 }
 
 void MainWindow::slot_process_qui(){
@@ -801,26 +838,104 @@ void MainWindow::set_pip_man(int value)
 
 void MainWindow::on_p_set_speed_spinbox_valueChanged(int arg1)
 {
-     QTextStream(stdout)<< "speed changed to: " << arg1 ;
-     ctrl->pipette_set_speed(arg1);
+    QTextStream(stdout)<< "speed changed to: " << arg1 ;
+    ctrl->pipette_set_speed(arg1);
 }
 
 void MainWindow::on_s_speed_spinbox_valueChanged(int arg1)
 {
-     ctrl->stage_set_speed(static_cast<int>(arg1));
+    ctrl->stage_set_speed(static_cast<int>(arg1));
 }
 
 void MainWindow::on_view_scan_clicked()
 {
-   delete m_stich_prog;
-   m_stich_prog=new QProgressDialog("Stiching", nullptr, 0, 0);
-   m_stich_prog->setRange(0,100);
-   m_stich_prog->setWindowModality(Qt::WindowModal);
-   m_stich_prog->setMinimumDuration(0);
-   m_stich_prog->setValue(0);
-   m_stich_prog->setAutoClose(true);
-   m_create_mosaic_thread = new std::thread(&MainWindow::create_mosaic,this);
+    delete m_stich_prog;
+    m_stich_prog=new QProgressDialog("Stiching", nullptr, 0, 0);
+    m_stich_prog->setRange(0,100);
+    m_stich_prog->setWindowModality(Qt::WindowModal);
+    m_stich_prog->setMinimumDuration(0);
+    m_stich_prog->setValue(0);
+    m_stich_prog->setAutoClose(true);
+    this->create_mosaic();
+
+    std::cout<<"signal emitted"<<std::endl;
+
 }
+
+void MainWindow::create_mosaic() {
+    using namespace cv;
+
+    if (scanvector.size() > 0 && !m_s_t_acitive) {
+        const float platesize_x = ui->set_plate_size_spinbox->value() * C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value() * C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        //int m_img_width = FULL_HD_IMAGE_WIDTH; // your value here
+        //int m_img_height = FULL_HD_IMAGE_HEIGHT; // your value here
+        std::cout << m_img_height << "::" << m_img_width << std::endl;
+        const int overlap_x = static_cast<int>(FULL_HD_IMAGE_WIDTH * 0.1);
+        const int overlap_y = static_cast<int>(FULL_HD_IMAGE_HEIGHT * 0.1);
+        std::cout << overlap_x << "::" << overlap_y << std::endl;
+        if (worker) {
+            worker->deleteLater();
+            worker = nullptr;
+        }
+        if (thread) {
+            thread->quit();
+            thread->wait();
+            delete thread;
+            thread = nullptr;
+        }
+
+        worker = new MosaicWorker(scanvector, platesize_x, platesize_y, m_img_width, m_img_height,
+                                  overlap_x, overlap_y);
+        thread = new QThread;
+
+        connect(worker, &MosaicWorker::progressChanged, this, &MainWindow::onProgressChanged);
+        connect(worker, &MosaicWorker::finished, this, &MainWindow::onMosaicFinished);
+        connect(thread, &QThread::started, worker, &MosaicWorker::process);
+        connect(worker, &MosaicWorker::finished, worker, &MosaicWorker::deleteLater);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        connect(worker, &MosaicWorker::finished, this, [this]() {
+            thread->quit();
+            thread->wait();
+            delete thread;
+            thread = nullptr;
+            worker = nullptr;
+        });
+
+        worker->moveToThread(thread);
+        std::cout <<  "worker moved to thread"  << std::endl;
+        thread->start();
+        std::cout <<  "thread started"  << std::endl;
+    }
+}
+
+
+
+void MainWindow::onProgressChanged(int value) {
+    emit stich_prog_changed(value);
+}
+
+void MainWindow::onMosaicFinished(cv::Mat* result) {
+    m_stich_prog->setLabelText("Done");
+    m_stich_prog->setValue(100);
+    m_stich_prog = nullptr;
+    std::cout<< "on mosaic finished Mimage shapes:" <<result->rows <<" "<< result->cols << "\n";
+    //imtools->saveImg(result, "mosaic");
+    if (Mimage != nullptr) {
+        delete Mimage;
+        Mimage = nullptr;
+    }
+    Mimage = result;
+    //delete result;
+    scanvector.clear();
+    std::cout<<"scanvector cleared"<<std::endl;
+    emit stiched_img_rdy();
+    std::cout<<"signal emitted"<<std::endl;
+}
+
+
+
+
 
 void MainWindow::on_p_ep_button_clicked()
 {
@@ -868,7 +983,7 @@ void MainWindow::on_pick_and_put_clicked()
         //    m_put_and_pick_thread->join();
         //}
 
-       // m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
+        // m_put_and_pick_thread = new std::thread (&MainWindow::pick_and_put,this);
         pick_and_put();
 
     }
@@ -888,9 +1003,9 @@ void MainWindow::on_found_objects_activated(int index)
 
 void MainWindow::on_pickup_sph_clicked()
 {
-   //
-   bool yes = 0;
-   if (check_for_pipette_height(62,100)){
+    //
+    bool yes = 0;
+    if (check_for_pipette_height(62,100)){
 
         //m_picking_thread = new std::thread(&MainWindow::xz_stage_pickup_sph,this,ui->found_objects->currentIndex());
         xz_stage_pickup_sph(ui->found_objects->currentIndex());
@@ -899,7 +1014,7 @@ void MainWindow::on_pickup_sph_clicked()
         //    m_picking_thread->join();
         //    QTextStream(stdout) << "joining picking thread";
         //}
-   }
+    }
 
 
 
@@ -921,13 +1036,13 @@ void MainWindow::on_magnification_activated(int index)
 {
     switch (index)
     {
-        case 0 : m_img_width=IMG_W_M0p61X; m_img_height=IMG_H_M0p61X;break;
-        case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
-        case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
-        case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
-        case 4 : m_img_width=IMG_W_M4X; m_img_height=IMG_H_M4X;break;
-        case 5 : m_img_width=IMG_W_M5X; m_img_height= IMG_H_M5X;break;
-        case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
+    case 0 : m_img_width=IMG_W_M0p61X; m_img_height=IMG_H_M0p61X;break;
+    case 1 : m_img_width=IMG_W_M1X; m_img_height=IMG_H_M1X;break;
+    case 2 : m_img_width=IMG_W_M2X; m_img_height=IMG_H_M2X;break;
+    case 3 : m_img_width=IMG_W_M3X; m_img_height=IMG_H_M3X;break;
+    case 4 : m_img_width=IMG_W_M4X; m_img_height=IMG_H_M4X;break;
+    case 5 : m_img_width=IMG_W_M5X; m_img_height= IMG_H_M5X;break;
+    case 6 : m_img_width=IMG_W_M5p5x; m_img_height=IMG_H_M5p5x;break;
     }
 }
 
@@ -1007,8 +1122,8 @@ void MainWindow::move_to_petri_B()
 {
 
     ctrl->stage_set_speed(50000);// akos changed the speed
-//    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
-//    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
+    //    ctrl->stage_move_to_x_sync(STAGE_CENTER_X-366407);
+    //    ctrl->stage_move_to_y_sync(STAGE_CENTER_Y);
     move_to_t_plate(ui->t_well_x_combobox->currentIndex(),(ui->t_well_y_spinbox->value()),p_s->m_selected_target);
     //ctrl->stage_move_to_x_sync(877396+27000); //Akos
     //ctrl->stage_move_to_y_sync(1820+18000);  // Akos
@@ -1100,56 +1215,56 @@ void MainWindow::xz_stage_pickup_sph(int obj_idx){
     if (global_obj_im_coordinates != nullptr){
 
 
-            auto start = std::chrono::system_clock::now();
-            //set Pickup speeds
-            //ui->found_objects->currentIndex()
+        auto start = std::chrono::system_clock::now();
+        //set Pickup speeds
+        //ui->found_objects->currentIndex()
 
-            int original_stage_speed = ctrl->stage_get_x_speed();
-            ctrl->stage_set_speed(ui->s_collect_speed_box->value());
+        int original_stage_speed = ctrl->stage_get_x_speed();
+        ctrl->stage_set_speed(ui->s_collect_speed_box->value());
 
-            ctrl->pipette_set_speed(ui->z_dive_speed->value());
-            //slowly center the selected sph
+        ctrl->pipette_set_speed(ui->z_dive_speed->value());
+        //slowly center the selected sph
 
-            QTextStream(stdout)<< "stage move x a";
-            ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
-            QTextStream(stdout)<< "stage move y a";
+        QTextStream(stdout)<< "stage move x a";
+        ctrl->stage_move_to_x_async(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(0)));
+        QTextStream(stdout)<< "stage move y a";
 
-            ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
+        ctrl->stage_move_to_y_sync(static_cast<int>(global_obj_im_coordinates->at(obj_idx).at(1)));
 
-            // move to the middle of image with the pipette
-            QTextStream(stdout)<< "pip move blocking x";
-            ctrl->pipette_blocking_move_x(this->mid_s_x_p);
-            //move Z axis down to the petri (auto Z height)
+        // move to the middle of image with the pipette
+        QTextStream(stdout)<< "pip move blocking x";
+        ctrl->pipette_blocking_move_x(this->mid_s_x_p);
+        //move Z axis down to the petri (auto Z height)
 
-            QTextStream(stdout)<< "pip move blocking z";
-            ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
+        QTextStream(stdout)<< "pip move blocking z";
+        ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value())+0.1f);
 
-            // PICK UP WITH SYRINGE
-            QTextStream(stdout)<< "pip move blocking e";
+        // PICK UP WITH SYRINGE
+        QTextStream(stdout)<< "pip move blocking e";
 
-            ctrl->pipette_blocking_move_e(-static_cast<float>(ui->p_extruder_step_box->value()));
-            qApp->processEvents();
-            QTextStream(stdout)<< "pip move blocking z";
+        ctrl->pipette_blocking_move_e(-static_cast<float>(ui->p_extruder_step_box->value()));
+        qApp->processEvents();
+        QTextStream(stdout)<< "pip move blocking z";
 
-            ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f)); //Akos Z value
+        ctrl->pipette_blocking_move_z(static_cast<float>(ui->set_z_spinbox->value()+25.0f)); //Akos Z value
 
-            // MOVE x axis out of image
-            QTextStream(stdout)<< "pip move blocking x";
+        // MOVE x axis out of image
+        QTextStream(stdout)<< "pip move blocking x";
 
-            ctrl->pipette_blocking_move_x(this->mid_s_x_p-2.6f);
-
-
-            ctrl->stage_set_speed(original_stage_speed);
+        ctrl->pipette_blocking_move_x(this->mid_s_x_p-2.6f);
 
 
-            //TODO
-            // this point CHECK if the spheroid picked up!
-            //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-            auto end = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsed_seconds = end - start;
-                // CHRONO END
-            std::cout << "[PICK UP]elapsed time: " << elapsed_seconds.count() << "s\n";
-       // }else{
+        ctrl->stage_set_speed(original_stage_speed);
+
+
+        //TODO
+        // this point CHECK if the spheroid picked up!
+        //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        // CHRONO END
+        std::cout << "[PICK UP]elapsed time: " << elapsed_seconds.count() << "s\n";
+        // }else{
         //    QTextStream(stdout)<< "pipette is too low";
         //}
 
@@ -1167,7 +1282,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
     ctrl->stage_set_speed(ui->s_collect_speed_box->value());   // akos changed the speed
     QTextStream(stdout)<< "stage move xy";
     move_to_t_plate(x, y , p_s->m_selected_target);
-   // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
     ctrl->pipette_blocking_move_x(mid_s_x_p);
     QTextStream(stdout)<< "pip move blocking z";
@@ -1237,84 +1352,91 @@ void MainWindow::pick_and_put()
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-        // CHRONO END
+    // CHRONO END
     std::cout << "[PICK AND PUT]elapsed time: " << elapsed_seconds.count() << "s\n";
 }
 
-void MainWindow::predict_sph(){
-    auto cfrm = cameracv->get_current_frm();
+void MainWindow::predict_sph(QSharedPointer<cv::Mat> input){
 
-    if (global_obj_im_coordinates != nullptr)
-    {
-        delete global_obj_im_coordinates;
-        global_obj_im_coordinates = nullptr;
-    }
+    try {
+    //auto cfrm = cameracv->get_current_frm();
 
-    global_obj_im_coordinates = new std::vector<std::vector<float>>;
+        if (global_obj_im_coordinates != nullptr)
+        {
+            delete global_obj_im_coordinates;
+            global_obj_im_coordinates = nullptr;
+        }
 
-    if (m_current_detections != nullptr)
-    {
-        delete m_current_detections;
-        m_current_detections = nullptr;
-    }
-    std::cout << "m_current_detections" << std::endl;
-    m_current_detections = new std::vector<sph_props>;
-    std::cout << "m_current_detections" << std::endl;
-    sph_s->current_spheroid_data = m_current_detections;
-    cv::Mat displayfrm = imtools->convert_bgr_to_rgb(cfrm);
-   // std::vector<cv::Mat> bbs;
-    this->m_bboxes.clear();
-    cv::Mat mask;
-    std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,mask,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
-   // cv::floodFill(mask, cv::Point(0,0),cv::Scalar(255,255,255));
-   // cv::bitwise_not(mask,mask);
-    imtools->saveImg(&mask,(ui->imagename_lineedit->text()+"_mask").toStdString());
+        global_obj_im_coordinates = new std::vector<std::vector<float>>;
 
-    ui->found_objects->clear();
-    delete qfrm_t2;
-    qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
-    QPainter p(qfrm_t2);
-    p.setPen(Qt::black);
-    p.setFont(QFont("Arial", 25));
-   // m_current_detections = {};
-    // struct for storing spheroid detection data;
+        if (m_current_detections != nullptr)
+        {
+            delete m_current_detections;
+            m_current_detections = nullptr;
+        }
+        std::cout << "m_current_detections" << std::endl;
+        m_current_detections = new std::vector<sph_props>;
+        std::cout << "m_current_detections" << std::endl;
+        sph_s->current_spheroid_data = m_current_detections;
+        cv::Mat displayfrm = imtools->convert_bgr_to_rgb(input);
+        // std::vector<cv::Mat> bbs;
+        this->m_bboxes.clear();
+        cv::Mat mask;
+        std::vector<std::vector<float>> im_obj = dl->dnn_inference(displayfrm,displayfrm,mask,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
+        // cv::floodFill(mask, cv::Point(0,0),cv::Scalar(255,255,255));
+        // cv::bitwise_not(mask,mask);
+        imtools->saveImg(&mask,(ui->imagename_lineedit->text()+"_mask").toStdString());
 
-
-    for (int idx = 0; idx < im_obj.size(); ++idx)
-    {
-       QString text(QString::number(idx) );
-       global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
-       ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(4),'f',1)
-                                                      +" A:" + QString::number(im_obj.at(idx).at(5),'f',1)
-                                                      +" C:" + QString::number(im_obj.at(idx).at(6),'f',3));
-       //sph_s->set_list(text+". "
-       //             +"\tPerimeter: " + QString::number(im_obj.at(idx).at(4),'f',1)
-       //             +"\tArea: " + QString::number(im_obj.at(idx).at(5),'f',1)
-       //             +"\tCircularity: " + QString::number(im_obj.at(idx).at(6),'f',3)
-       //             +"\tMaximum diameter : " + QString::number(im_obj.at(idx).at(7),'f',3));
-       sph_s->set_list(text+". "
-                    +"\t " + QString::number(im_obj.at(idx).at(4),'f',1)
-                    +"\t " + QString::number(im_obj.at(idx).at(5),'f',1)
-                    +"\t " + QString::number(im_obj.at(idx).at(6),'f',3)
-                    +"\t " + QString::number(im_obj.at(idx).at(7),'f',3));
+        ui->found_objects->clear();
+        delete qfrm_t2;
+        qfrm_t2 = new QImage(const_cast< unsigned char*>(displayfrm.data),displayfrm.cols,displayfrm.rows, QImage::Format_RGB888);
+        QPainter p(qfrm_t2);
+        p.setPen(Qt::black);
+        p.setFont(QFont("Arial", 25));
+        // m_current_detections = {};
+        // struct for storing spheroid detection data;
 
 
-        sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6),im_obj.at(idx).at(7)};
-        m_current_detections->push_back(c);
+        for (int idx = 0; idx < im_obj.size(); ++idx)
+        {
+            QString text(QString::number(idx) );
+            global_obj_im_coordinates->push_back(this->get_centered_coordinates(im_obj.at(idx)));
 
-        const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
-        p.drawText(rectangle,Qt::TextSingleLine,text);
-    }
+            ui->found_objects->addItem(QString::number(idx)+" L:" + QString::number(im_obj.at(idx).at(4),'f',1)
+                                       +" A:" + QString::number(im_obj.at(idx).at(5),'f',1)
+                                       +" C:" + QString::number(im_obj.at(idx).at(6),'f',3));
+            //sph_s->set_list(text+". "
+            //             +"\tPerimeter: " + QString::number(im_obj.at(idx).at(4),'f',1)
+            //             +"\tArea: " + QString::number(im_obj.at(idx).at(5),'f',1)
+            //             +"\tCircularity: " + QString::number(im_obj.at(idx).at(6),'f',3)
+            //             +"\tMaximum diameter : " + QString::number(im_obj.at(idx).at(7),'f',3));
 
-    sph_s->list_props();
+            sph_s->set_list(text+". "
+                            +"\t " + QString::number(im_obj.at(idx).at(4),'f',1)
+                            +"\t " + QString::number(im_obj.at(idx).at(5),'f',1)
+                            +"\t " + QString::number(im_obj.at(idx).at(6),'f',3)
+                            +"\t " + QString::number(im_obj.at(idx).at(7),'f',3));
 
- //    p.drawText();-
+            sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6),im_obj.at(idx).at(7)};
+            m_current_detections->push_back(c);
 
-    im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
-    ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
-    ui->tabWidget->setCurrentWidget(ui->tab2);
-    sph_s->get_statistics_of_spheroids();
+            const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);
+            p.drawText(rectangle,Qt::TextSingleLine,text);
+        }
 
+        sph_s->list_props();
+
+        //    p.drawText();-
+
+        im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2));
+        ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatioByExpanding);
+        ui->tabWidget->setCurrentWidget(ui->tab2);
+        sph_s->get_statistics_of_spheroids();
+    } catch (const std::exception& e) {
+           // Handle the exception
+           std::cerr << "An error occurred: " << e.what() << std::endl;
+           // You can also emit signals or perform other error handling actions as needed.
+       }
 }
 
 std::string MainWindow::get_date_time_str()
@@ -1338,7 +1460,7 @@ std::string MainWindow::get_date_time_str()
  *saving every image, to scanning folder with date, time, size stamp
  */
 
-void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
+void MainWindow::screen_area(float plate_w_mm, float plate_h_mm)
 {
     using namespace  cv;
     auto start = std::chrono::system_clock::now();
@@ -1377,6 +1499,8 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     ctrl->stage_set_speed(ui->s_screening_speed_box->value());
     const int xpos=ctrl->stage_get_x_coords();
     const int ypos=ctrl->stage_get_y_coords();
+
+    std::cout << platesize_x<<"  : : "<<m_img_width << std::endl;
     const int wmax = static_cast<int>(platesize_x/m_img_width); // um
     const int hmax = static_cast<int>(platesize_y/m_img_height); // um
     QTextStream(stdout)<< "wmax: "<<wmax << " hmax" << hmax;
@@ -1407,7 +1531,7 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
             image_posy =static_cast<int>(ypos+m_img_height*j);
         }
         else{
-           image_posy =static_cast<int>(ypos+m_img_height*j-m_img_height*0.1);
+            image_posy =static_cast<int>(ypos+m_img_height*j-m_img_height*0.1);
         }
 
         ctrl->stage_move_to_y_sync(image_posy);
@@ -1448,30 +1572,30 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
                 std::vector<std::vector<float>>im_objects = dl->dnn_inference(scanvector.at(counter),scanvector.at(counter),maskfrm,m_bboxes,ui->det_confidence->value(),ui->mask_confidence->value());
                 for (int k =0; k<im_objects.size();++k)
                 {
-                   QTextStream(stdout) << im_objects.at(k).at(0) << "cors" << im_objects.at(k).at(1);
-                   if (im_objects.at(k).at(0)>1920-192 ||im_objects.at(k).at(1)>1080-108)
-                   {
-                       QTextStream(stdout) << "dropping this MF " ;
-                       continue;
-                   }
-                   global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                   for (int idx = 2;idx<=8;++idx)
-                   {
-                       global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
-                   }
+                    QTextStream(stdout) << im_objects.at(k).at(7) << "cors" << im_objects.at(k).at(8);
+                    //if (im_objects.at(k).at(7)>1920-384 ||im_objects.at(k).at(8)>1080-216)
+                    //{
+                    //    QTextStream(stdout) << "dropping this MF " ;
+                    //    continue;
+                    //}
+                    global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
+                    for (int idx = 2;idx<=9;++idx)
+                    {
+                        global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
+                    }
 
-              //     std::cout <<"sizeofimageobjat"<< im_objects.at(object_counter).size() << std::endl;
-                   // put text TEXT
-             //      int baseLine ;
-            //       std::string label_txt = std::to_string(object_counter);//,conf: <" + std::to_string(score) + ">";
-           //        cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 1,2, &baseLine);
-          //         rectangle(scanvector.at(counter), cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6) - round(labelSize.height)), cv::Point(im_objects.at(object_counter).at(5) + round(labelSize.width), im_objects.at(object_counter).at(6) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
-         //          putText(scanvector.at(counter), label_txt,cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),1);
-                   object_counter++;
+                    //     std::cout <<"sizeofimageobjat"<< im_objects.at(object_counter).size() << std::endl;
+                    // put text TEXT
+                    //      int baseLine ;
+                    //       std::string label_txt = std::to_string(object_counter);//,conf: <" + std::to_string(score) + ">";
+                    //        cv::Size labelSize = getTextSize(label_txt, cv::FONT_HERSHEY_SIMPLEX, 1,2, &baseLine);
+                    //         rectangle(scanvector.at(counter), cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6) - round(labelSize.height)), cv::Point(im_objects.at(object_counter).at(5) + round(labelSize.width), im_objects.at(object_counter).at(6) + baseLine), cv::Scalar(255, 255, 255), cv::FILLED);
+                    //          putText(scanvector.at(counter), label_txt,cv::Point(im_objects.at(object_counter).at(5), im_objects.at(object_counter).at(6)),cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0,0,0),1);
+                    object_counter++;
                 }
                 counter++;
             }else{
-               // scanvector.clear();
+                // scanvector.clear();
                 return;
             }
         }
@@ -1481,26 +1605,26 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
 
-        // CHRONO END
+    // CHRONO END
     std::cout << "[SCANNING] elapsed time: " << elapsed_seconds.count() << "s\n";
     prog_changed(100);
     m_s_t_acitive=false;
-   // ctrl->stage_set_speed(20000.0f);
+    // ctrl->stage_set_speed(20000.0f);
     ui->found_objects->clear();
     sph_s->clear_list();
- //   m_current_detections = {};
+    //   m_current_detections = {};
     for (int i=0 ; i<global_obj_im_coordinates->size(); ++i )
     {
-       ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
-       //sph_s->set_list(QString::number(i) + ". Spheroid"
-       //            +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
-       //            +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
-       //            +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
-       sph_s->set_list(QString::number(i)+". "
-                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
-                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
-                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3)
-                    +"\t " + QString::number(global_obj_im_coordinates->at(i).at(7),'f',3));
+        ui->found_objects->addItem(QString::number(i)+" L:" + QString::number(global_obj_im_coordinates->at(i).at(2),'f',1)+" A:" + QString::number(global_obj_im_coordinates->at(i).at(3),'f',1)+ " C:" + QString::number(global_obj_im_coordinates->at(i).at(4),'f',3));
+        //sph_s->set_list(QString::number(i) + ". Spheroid"
+        //            +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
+        //            +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
+        //            +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
+        sph_s->set_list(QString::number(i)+". "
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3)
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(7),'f',3));
 
 
         sph_props c = {i,global_obj_im_coordinates->at(i).at(4),
@@ -1518,10 +1642,134 @@ void MainWindow::screen_area(float plate_w_mm,float plate_h_mm)
     scan_finished();
 }
 
+/*old
+
+void MainWindow::create_mosaic() {
+    using namespace cv;
+    if (scanvector.size() > 0 && !m_s_t_acitive) {
+        const float platesize_x = ui->set_plate_size_spinbox->value() * C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value() * C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        int wmax = static_cast<int>(platesize_x / m_img_width);
+        int hmax = static_cast<int>(platesize_y / m_img_height);
+        QTextStream(stdout) << m_img_width << ":" << wmax << " : " << platesize_x << "\n";
+
+        if (Mimage != nullptr) {
+            delete Mimage;
+            Mimage = nullptr;
+        }
+
+        // Calculate overlap
+        const int overlap_x = static_cast<int>(m_img_width * 0.1);
+        const int overlap_y = static_cast<int>(m_img_height * 0.1);
+
+        // Create mosaic image with overlap adjustments
+        Mimage = new cv::Mat(cv::Mat::zeros((hmax * (m_img_height - overlap_y) + overlap_y),
+                                            (wmax * (m_img_width - overlap_x) + overlap_x), CV_8UC3));
+
+        float p_v = 0.0f;
+
+        for (int i = 0; i < hmax; ++i) {
+            for (int j = 0; j < wmax; ++j) {
+                QTextStream(stdout) << i << " : " << j << "\n";
+                p_v = (static_cast<float>((wmax) * i + j) / static_cast<float>((hmax) * (wmax))) * 100;
+                emit stich_prog_changed(static_cast<int>(p_v));
+
+                // Adjusted rows and cols for overlapping
+                int rows = scanvector.at(i * wmax + j).rows;
+                int cols = scanvector.at(i * wmax + j).cols;
+
+                for (int jj = 0; jj < rows - overlap_y; ++jj) {
+                    for (int ii = 0; ii < cols - overlap_x; ++ii) {
+                        int dst_y = jj + i * (m_img_height - overlap_y);
+                        int dst_x = ii + j * (m_img_width - overlap_x);
+
+                        if (dst_y < Mimage->rows && dst_x < Mimage->cols) {
+                            Mimage->at<Vec3b>(dst_y, dst_x) = scanvector.at(i * wmax + j).at<Vec3b>(jj, ii);
+                        }
+                    }
+                }
+            }
+        }
+
+        m_stich_prog->setLabelText("Done");
+        m_stich_prog->setValue(100);
+        m_stich_prog = nullptr;
+
+        // Save the mosaic image
+        imtools->saveImg(Mimage, "mosaic");
+        scanvector.clear();
+        emit stiched_img_rdy();
+    }
+}
+
+*/
 /*!
  * creating a stiched image sequence of analyzed images
- */
 
+
+void MainWindow::create_mosaic2(){
+    using namespace  cv;
+    if (scanvector.size()>0 && !m_s_t_acitive)
+    {
+        const float platesize_x = ui->set_plate_size_spinbox->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        const float platesize_y = ui->set_plate_size_spinbox_2->value()*C_MM_TO_UMx0p1; // convert mm to STAGE 0.1um unit
+        int wmax = static_cast<int>(platesize_x / m_img_width);
+        int hmax = static_cast<int>(platesize_y / m_img_height);
+        QTextStream(stdout) << m_img_width <<":"<<wmax<<" : "<<platesize_x<< "\n";
+        if(Mimage != nullptr){delete Mimage;Mimage= nullptr;}
+
+
+        float p_v=0.0f;
+        // Calculate overlap
+        const int overlap_x = static_cast<int>(m_img_width * 0.1);
+        const int overlap_y = static_cast<int>(m_img_height * 0.1);
+        Mimage = new cv::Mat(cv::Mat::zeros((hmax * (m_img_height - overlap_y)), (wmax * (m_img_width - overlap_x)), CV_8UC3));
+        for (int i = 0; i < hmax; ++i)
+        {
+            for (int j = 0; j < wmax; ++j)
+            {
+                QTextStream(stdout) << i <<" : "<<j<< "\n";
+                p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
+                //  QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
+                emit stich_prog_changed(static_cast<int>(p_v));
+                // Adjusted rows and cols for overlapping
+                int rows = scanvector.at(i * wmax + j).rows - overlap_y;
+                int cols = scanvector.at(i * wmax + j).cols - overlap_x;
+                std::cout << "cols"  << cols <<std::endl;
+                for (int ii = 0; ii < cols; ++ii) //- FULL_HD_IMAGE_WIDTH*0.1
+                {
+                    std::cout << "rows"  << rows <<std::endl;
+                    for (int jj = 0; jj < rows; ++jj)  //-FULL_HD_IMAGE_HEIGHT*0.1
+                    {
+                        int dst_y = jj + i * (FULL_HD_IMAGE_HEIGHT - overlap_y);
+                        int dst_x = ii + j * (FULL_HD_IMAGE_WIDTH - overlap_x);
+                        std::cout << "dst_x"  << dst_x <<" : "<< "dst_y"  << dst_y <<std::endl;
+                        Mimage->at<Vec3b>(dst_y, dst_x)[0] = scanvector.at(i * wmax + j).at<Vec3b>(jj, ii)[0];
+                        Mimage->at<Vec3b>(dst_y, dst_x)[1] = scanvector.at(i * wmax + j).at<Vec3b>(jj, ii)[1];
+                        Mimage->at<Vec3b>(dst_y, dst_x)[2] = scanvector.at(i * wmax + j).at<Vec3b>(jj, ii)[2];
+                        // Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
+                        // Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[1] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[1];
+                        // Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[2] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[2];
+
+                    }
+                }
+            }
+        }
+
+        m_stich_prog->setLabelText("Done");
+        m_stich_prog->setValue(100);
+        m_stich_prog = nullptr;
+        // CV cell label txt
+        imtools->saveImg(Mimage,"mozaic");
+        scanvector.clear();
+        emit stiched_img_rdy();
+    }
+
+}
+
+*/
+
+/* This was the original
 void MainWindow::create_mosaic(){
     using namespace  cv;
     if (scanvector.size()>0 && !m_s_t_acitive)
@@ -1543,13 +1791,13 @@ void MainWindow::create_mosaic(){
             {
                 QTextStream(stdout) << i <<" : "<<j<< "\n";
                 p_v= (static_cast<float>((wmax)*i+j)/static_cast<float>((hmax)*(wmax)))*100;
-              //  QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
-               emit stich_prog_changed(static_cast<int>(p_v));
-               QTextStream(stdout)  <<"11:"<< "\n";
-                for (int ii = 0; ii < scanvector.at(i*wmax + j).cols ; ++ii) //- FULL_HD_IMAGE_WIDTH*0.1
+                //  QTextStream(stdout)<<"progvalue"<< p_v<< "\n";
+                emit stich_prog_changed(static_cast<int>(p_v));
+
+                for (int ii = 0; ii < scanvector.at(i*wmax + j).cols - scanvector.at(i*wmax + j).cols*0.1; ++ii) //- FULL_HD_IMAGE_WIDTH*0.1
                 {
-                    QTextStream(stdout)  <<"12:"<< "\n";
-                    for (int jj = 0; jj < scanvector.at(i*wmax + j).rows; ++jj)  //-FULL_HD_IMAGE_HEIGHT*0.1
+                    std::cout << ""  << scanvector.at(i*wmax + j).rows <<std::endl;
+                    for (int jj = 0; jj < scanvector.at(i*wmax + j).rows * scanvector.at(i*wmax + j).rows; ++jj)  //-FULL_HD_IMAGE_HEIGHT*0.1
                     {
 
                         Mimage->at<Vec3b>((jj + (i * FULL_HD_IMAGE_HEIGHT)), (ii + (j * FULL_HD_IMAGE_WIDTH)))[0] = scanvector.at(i*wmax + j).at<Vec3b>(jj, ii)[0];
@@ -1572,10 +1820,18 @@ void MainWindow::create_mosaic(){
 
 }
 
+*/
 void MainWindow::show_on_view_2()
 {
     delete qfrm_t2;
-    qfrm_t2 = new QImage(const_cast< unsigned char*>(Mimage->data),Mimage->cols,Mimage->rows, QImage::Format_RGB888);
+
+    if (Mimage != nullptr) {
+        // Create QImage using Mimage data
+        qfrm_t2 = new QImage(const_cast<unsigned char*>(Mimage->data), Mimage->cols, Mimage->rows, QImage::Format_RGB888);
+    } else {
+        std::cerr << "Error: Mimage is nullptr." << std::endl;
+        // Handle the error appropriately
+    }
     im_view_pxmi.setPixmap( QPixmap::fromImage(*qfrm_t2) );
 
     ui->graphicsView_2->fitInView(&im_view_pxmi, Qt::KeepAspectRatio);
@@ -1933,7 +2189,7 @@ void MainWindow::get_selected_source_plate()
 void MainWindow::on_actionExport_object_properties_triggered()
 {
     this->export_csv();
-   // this->export_bias_xml();
+    // this->export_bias_xml();
     QTextStream(stdout)<< "exporting object props\n";
 }
 
@@ -1978,7 +2234,7 @@ void MainWindow::export_bias_xml(){
                 yval =(m_img_height*0.05);
             }else{
                 yval = yval + m_img_height*0.1 - m_img_height*0.01;
-               // yval = ((m_img_height*0.5)+i*m_img_height-m_img_height*0.1)*0.1;
+                // yval = ((m_img_height*0.5)+i*m_img_height-m_img_height*0.1)*0.1;
             }
             for (int j = 0; j < wmax; ++j)
             {
@@ -1998,7 +2254,7 @@ void MainWindow::export_bias_xml(){
                     xval = m_img_width*0.05;}
                 else{
                     xval = xval + m_img_width*0.1 - m_img_width*0.01 ;
-                   // xval = ((m_img_width*0.5)+j*m_img_width-m_img_width*0.1)*0.1;
+                    // xval = ((m_img_width*0.5)+j*m_img_width-m_img_width*0.1)*0.1;
                 }
 
                 center.setAttribute("x", xval);
@@ -2028,4 +2284,25 @@ void MainWindow::on_open_spheroid_selector_pushButton_clicked()
     sph_s->show();
     sph_s->activateWindow();
 }
+
+// Custom deleter for cv::Mat
+struct MatDeleter {
+    void operator()(cv::Mat* ptr) const {
+        delete ptr;
+    }
+};
+
+
+QSharedPointer<cv::Mat> matToSharedPointer(cv::Mat* mat) {
+    return QSharedPointer<cv::Mat>(mat, MatDeleter());
+}
+
+void MainWindow::on_actionLoad_an_image_and_predict_triggered()
+{
+    testimage =  new cv::Mat(this->openImageWithFileDialog());
+    QSharedPointer<cv::Mat> sharedImage = matToSharedPointer(testimage);
+    this->predict_sph(sharedImage);
+}
+
+
 

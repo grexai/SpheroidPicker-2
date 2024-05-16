@@ -55,7 +55,7 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     Circulartylabel.setParent(this);
     maxdialabel.setParent(this);
 
-
+    this->set_list("");
     tableWidget = new QTableWidget(this);
     //tableWidget->setParent(this);
     /*

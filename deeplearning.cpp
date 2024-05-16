@@ -617,9 +617,20 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             outcoors.push_back(by);   // Top    1
             outcoors.push_back(bb_x); // Right  2
             outcoors.push_back(bb_y); // Bottom 3
-            imagetools asd;
+            imagetools imtools;
 
-            std::vector<float> features = asd.getobjectprops(label);
+            std::vector<float> features = imtools.getobjectprops(label);
+            // filter corner close spheroids
+            if (features.at(3)*nx + bx > 1920-192 || features.at(4)*nx + by > 1080-108)
+            {
+                std::cout<< "dropped this" <<features.at(3)<<features.at(4) <<std::endl;
+                continue;
+            }
+            if (features.at(3)*nx + bx < 192 || features.at(4)*nx + by <108)
+            {
+                std::cout<< "dropped this" <<features.at(3)<<features.at(4) <<std::endl;
+                continue;
+            }
             outcoors.push_back(features.at(0)*nx);//length 4
             outcoors.push_back(features.at(1)*nx*nx);//area 5
             outcoors.push_back(features.at(2));//circularity 6
@@ -628,6 +639,8 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             outcoors.push_back(features.at(5)*nx); //radius
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
+
+
             label.copyTo(roi);
 
             //cv::Rect rect(cv::Point(bb[0], bb[1]), cv::Point(bb[2], bb[3]));
