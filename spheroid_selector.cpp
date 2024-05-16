@@ -43,35 +43,17 @@ spheroid_selector::spheroid_selector(QWidget *parent) :
     featureMap["Perimeter"] = {&sph_props::perimeter, MemberPointer::FLOAT};
     featureMap["Maximum Diameter"] = {&sph_props::maxdiameter, MemberPointer::FLOAT};
     featureMap["Circularity"] = {&sph_props::circularity, MemberPointer::FLOAT};
+    featureMap["Sphericity"] = {&sph_props::sphericity, MemberPointer::FLOAT};
     //featureMap["idx"] = {&sph_props::idx, MemberPointer::INT}; // Adding "idx" feature
     // Initialize the featureMap entries
+
     MemberPointer idxPointer;
     idxPointer.intMemberPtr = &sph_props::idx;
     idxPointer.type = MemberPointer::INT;
     featureMap["idx"] = idxPointer;
     // Set parent for QLabel objects
-    Arealabel.setParent(this);
-    Perimeterlabel.setParent(this);
-    Circulartylabel.setParent(this);
-    maxdialabel.setParent(this);
-
     this->set_list("");
     tableWidget = new QTableWidget(this);
-    //tableWidget->setParent(this);
-    /*
-     *
-     *     //int width_of_labels = 500;
-    //int area_pos_y = 330;
-    //int area_pos_x = 10;
-    Arealabel.move(area_pos_x,area_pos_y);
-    Perimeterlabel.move(area_pos_x,area_pos_y+20);
-    Circulartylabel.move(area_pos_x,area_pos_y+40);
-    maxdialabel.move(area_pos_x,area_pos_y+60);
-    Arealabel.resize(width_of_labels,20);
-    Perimeterlabel.resize(width_of_labels,20);
-    Circulartylabel.resize(width_of_labels,20);
-    maxdialabel.resize(width_of_labels,20);
-    */
 
 }
 
@@ -387,15 +369,16 @@ void spheroid_selector::get_statistics_of_spheroids() {
         sumFeatures[feature] = 0.0;
         minFeatures[feature] = std::numeric_limits<float>::max();
         maxFeatures[feature] = std::numeric_limits<float>::lowest();
-
+        std::cout << feature.toStdString()<< std::endl;
         // Iterate over each spheroid
         for (int idx = 0; idx < ui->Object_list->count(); ++idx) {
+
             auto it = featureMap.find(QString(feature));
             if (it != featureMap.end()) {
                 // Compute the feature value for the current spheroid
                 float featureValue = current_spheroid_data->at(idx).*it->second.floatMemberPtr;
                 // Ignore NaN values
-                if (!std::isnan(featureValue) &&  featureValue>0) {
+                if (!std::isnan(featureValue) &&  featureValue>0.0) {
 
                     // Add the feature value to the sum
                     sumFeatures[feature] += featureValue;
@@ -410,6 +393,7 @@ void spheroid_selector::get_statistics_of_spheroids() {
                 }
             }
         }
+        std::cout <<  "total spheroids  " <<  totalSpheroids  <<  std::  endl;
 
     }
 
@@ -439,36 +423,37 @@ void spheroid_selector::get_statistics_of_spheroids() {
         }
 
         // Update the corresponding QLabel with the statistics
-        std::map<QString, QLabel*> labelMap = {
-            {"Area", &Arealabel},
-            {"Perimeter", &Perimeterlabel},
-            {"Circularity", &Circulartylabel},
-            {"Maximum Diameter", &maxdialabel}
-        };
-        auto it = labelMap.find(feature);
-        if (it != labelMap.end()) {
+        //        std::map<QString, QLabel*> labelMap = {
+        //            {"Area", &Arealabel},
+        //            {"Perimeter", &Perimeterlabel},
+        //            {"Circularity", &Circulartylabel},
+        //            {"Maximum Diameter", &maxdialabel},
+        //            {"Sphericity", &sphericitylabel}
+        //        };
+        //        auto it = labelMap.find(feature);
+        //        if (it != labelMap.end()) {
 
-            // Populate the QTableWidgetItem with the statistics
-            QTableWidgetItem* featureItem = new QTableWidgetItem(feature);
-            QTableWidgetItem* avgItem = new QTableWidgetItem(QString::number(averageFeatures[feature], 'f', 3));
-            QTableWidgetItem* medItem = new QTableWidgetItem(QString::number(median, 'f', 3));
-            QTableWidgetItem* minItem = new QTableWidgetItem(QString::number(minFeatures[feature], 'f', 3));
-            QTableWidgetItem* maxItem = new QTableWidgetItem(QString::number(maxFeatures[feature], 'f', 3));
-            this->tableWidget->setItem(row, 0, featureItem);
-            // Set the QTableWidgetItem objects to the table
-            this->tableWidget->setItem(row, 1, avgItem);
-            this->tableWidget->setItem(row, 2, medItem);
-            this->tableWidget->setItem(row, 3, minItem);
-            this->tableWidget->setItem(row, 4, maxItem);
+        // Populate the QTableWidgetItem with the statistics
+        QTableWidgetItem* featureItem = new QTableWidgetItem(feature);
+        QTableWidgetItem* avgItem = new QTableWidgetItem(QString::number(averageFeatures[feature], 'f', 3));
+        QTableWidgetItem* medItem = new QTableWidgetItem(QString::number(median, 'f', 3));
+        QTableWidgetItem* minItem = new QTableWidgetItem(QString::number(minFeatures[feature], 'f', 3));
+        QTableWidgetItem* maxItem = new QTableWidgetItem(QString::number(maxFeatures[feature], 'f', 3));
+        this->tableWidget->setItem(row, 0, featureItem);
+        // Set the QTableWidgetItem objects to the table
+        this->tableWidget->setItem(row, 1, avgItem);
+        this->tableWidget->setItem(row, 2, medItem);
+        this->tableWidget->setItem(row, 3, minItem);
+        this->tableWidget->setItem(row, 4, maxItem);
 
-            ++row;
-            //QLabel* label = it->second;
-            //label->setText(QString(feature+"\t Avg: %1\t Med: %2\t Min: %3\t Max: %4")
-            //               .arg(averageFeatures[feature])
-            //               .arg(median)
-            //               .arg(minFeatures[feature])
-            //               .arg(maxFeatures[feature]));
-        }
+        ++row;
+        //QLabel* label = it->second;
+        //label->setText(QString(feature+"\t Avg: %1\t Med: %2\t Min: %3\t Max: %4")
+        //               .arg(averageFeatures[feature])
+        //               .arg(median)
+        //               .arg(minFeatures[feature])
+        //               .arg(maxFeatures[feature]));
+        // }
     }
     this->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 

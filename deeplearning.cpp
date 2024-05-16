@@ -366,20 +366,15 @@ void matterport_mrcnn::create_session(){
     m_session = TF_NewSession(m_graph, m_options, m_status);
     if (TF_GetCode(m_status) != 0) throw std::runtime_error(std::string("Cannot establish session: ") + TF_Message(m_status));
 }
-QMutex mutex;
+
 std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes, float det_conf, float mask_conf){
     std::cout<< "start matterport mrcnn inference" << std::endl;
 
-    if (!mutex.tryLock()) {
-        std::cerr << "Resource is currently in use." << std::endl;
-        std::vector<std::vector<float>> objpos;
-        objpos.push_back({0,0,0,0,0,0,0,0,0});
-        return objpos;
-    }
-
-    QMutexLocker locker(&mutex); // Ensures mutex is unlocked at the end of the scope
 
 
+// Ensures mutex is unlocked at the end of the scope
+
+    m_isruning = true;
     if (input.empty()) {
         std::cerr << "Error: Input image is empty." << std::endl;
         cv::Mat image(1080, 1920, CV_8UC3, cv::Scalar(0, 0, 0));
@@ -651,6 +646,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
             outcoors.push_back((features.at(3)*nx) + bx); //mx 7// resize and recoordinate
             outcoors.push_back((features.at(4)*nx) + by); //my 8
             outcoors.push_back(features.at(5)*nx); //radius
+            outcoors.push_back(features.at(6)); //sphericity
             objpos.push_back(outcoors);
             cv::Mat roi = labels(rect);
 
@@ -701,6 +697,7 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
      // cv::imshow("rect",maskImage);
     //  cv::waitKey(0);
     }
+    m_isruning = false;
     return objpos;
 }
 

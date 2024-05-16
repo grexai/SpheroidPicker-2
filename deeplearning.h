@@ -41,6 +41,7 @@ class i_deeplearning
 public:
     i_deeplearning(){}
     virtual ~i_deeplearning()= 0;
+    bool m_isruning = false;
     virtual void setup_dnn_network(const char* cf, const char* model_w, const char* t_g) = 0;
     virtual std::vector<std::vector<float>> dnn_inference(cv::Mat& input,cv::Mat& output,cv::Mat& maskimage,std::vector<cv::Mat>& bboxes,float det_conf, float mask_conf)= 0;
 };
@@ -87,7 +88,7 @@ protected:
 public:
     matterport_mrcnn(){}
     ~matterport_mrcnn() override;
-
+    bool m_isruning = false;
     #define TF_DELETER(X) typedef void(*TF_Delete ## X ## _Func)(TF_ ## X *);
     #define TF_POINTER(X) typedef std::unique_ptr< TF_ ## X , TF_Delete ## X ## _Func> TF_ ## X ## _Ptr;
 

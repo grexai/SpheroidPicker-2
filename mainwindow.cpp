@@ -559,6 +559,10 @@ void MainWindow::on_actionCalibrate_Pipette_triggered()
 void MainWindow::on_predict_sph_clicked()
 {
     // m_predict_thread = new std::thread(&MainWindow::predict_sph,this);
+    if (!dl->m_isruning)
+    {
+
+
     if (sph_s) {
         sph_s->clear_list();
     } else {
@@ -569,6 +573,11 @@ void MainWindow::on_predict_sph_clicked()
     }
     //  auto cfrm = camer
     this->predict_sph(cameracv->get_current_frm());
+     }
+    else{
+
+        std::cerr << "inference is runing" << std::endl;
+    }
 }
 
 
@@ -1415,9 +1424,10 @@ void MainWindow::predict_sph(QSharedPointer<cv::Mat> input){
                             +"\t " + QString::number(im_obj.at(idx).at(4),'f',1)
                             +"\t " + QString::number(im_obj.at(idx).at(5),'f',1)
                             +"\t " + QString::number(im_obj.at(idx).at(6),'f',3)
-                            +"\t " + QString::number(im_obj.at(idx).at(7),'f',3));
+                            +"\t " + QString::number(im_obj.at(idx).at(9),'f',3)
+                            +"\t " + QString::number(im_obj.at(idx).at(10),'f',3));
 
-            sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6),im_obj.at(idx).at(7)};
+            sph_props c = {idx,im_obj.at(idx).at(4),im_obj.at(idx).at(5),im_obj.at(idx).at(6),im_obj.at(idx).at(9),im_obj.at(idx).at(10)};
             m_current_detections->push_back(c);
 
             const QRect rectangle = QRect(im_obj.at(idx).at(0),im_obj.at(idx).at(1), 100, 100);

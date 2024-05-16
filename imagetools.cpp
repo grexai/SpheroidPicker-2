@@ -89,7 +89,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         cv::Mat c_input;
         input.convertTo(c_input,CV_8UC1);
     //	waitKey(0);
-        std::vector<float> object_features(6,0.0f);
+        std::vector<float> object_features(7,0.0f);
         Mat canny_output;
         RNG rng(12345);
         vector<vector<Point> > contours;
@@ -126,20 +126,23 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         double area = contourArea(contours[i]);
         double arclength = arcLength(contours[i], true);
         double circularity = (4 * CV_PI * area / (arclength * arclength));
+
         drawContours(drawing, contours, i, Scalar(255,  255, 255), 1, 8, hierarchy, 0, Point());
         minEnclosingCircle(contours[0],center,radius);
-
+        double sphericity = (4 * CV_PI * area / (arclength));
         object_features.at(0) = (static_cast <float>(arclength));
         object_features.at(1) =  static_cast <float>(area);
         object_features.at(2)= static_cast <float>(circularity);
         object_features.at(3) = mc[0].x;
         object_features.at(4) = mc[0].y;
         object_features.at(5) = radius;
+        object_features.at(6) = sphericity;
 
         //  fitEllipse(contours[i]);
-        cout << i << "object perimeter raw " << object_features.at(0) << std::endl;
+        cout << "object perimeter raw " << object_features.at(0) << std::endl;
 
-        cout << i << "object max radius raw" << radius << std::endl;
+        cout << "object max radius raw" << radius << std::endl;
+        cout << "object max radius raw" << sphericity << std::endl;
 
      //   input = drawing;
         return object_features;

@@ -25,6 +25,7 @@ struct sph_props{
     float area;
     float circularity;
     float maxdiameter;
+    float sphericity;
 };
 
 // Struct to hold either float or int member pointer
@@ -110,14 +111,11 @@ private:
 
     QMap<QString, QLabel*> featureLabels;
     QMap<QString, QDoubleSpinBox*> featureSpinBoxes;
-    QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter"};
+    QStringList availableFeatures = {"Area", "Perimeter", "Circularity", "Maximum Diameter","Sphericity"};
     QStringList featuresAdded = {};
     QTableWidget* tableWidget=nullptr;
     QListWidget *availableFeaturesList;
-    QLabel Arealabel;
-    QLabel Perimeterlabel;
-    QLabel Circulartylabel;
-    QLabel maxdialabel;
+
     QImage* qframe = nullptr;
     QGraphicsPixmapItem  im_view_pxmi;
     QGraphicsScene* scene= nullptr;
