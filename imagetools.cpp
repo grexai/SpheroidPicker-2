@@ -129,7 +129,7 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
 
         drawContours(drawing, contours, i, Scalar(255,  255, 255), 1, 8, hierarchy, 0, Point());
         minEnclosingCircle(contours[0],center,radius);
-        double sphericity = (4 * CV_PI * area / (arclength));
+        double sphericity = CV_PI*sqrt(4  * area/ CV_PI )/ (arclength);
         object_features.at(0) = (static_cast <float>(arclength));
         object_features.at(1) =  static_cast <float>(area);
         object_features.at(2)= static_cast <float>(circularity);

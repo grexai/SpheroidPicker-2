@@ -1589,7 +1589,7 @@ void MainWindow::screen_area(float plate_w_mm, float plate_h_mm)
                     //    continue;
                     //}
                     global_obj_im_coordinates->push_back( this->get_centered_coordinates(im_objects.at(k)));
-                    for (int idx = 2;idx<=9;++idx)
+                    for (int idx = 2;idx<=10;++idx)
                     {
                         global_obj_im_coordinates->at(object_counter).push_back(im_objects.at(k).at(idx));
                     }
@@ -1630,17 +1630,19 @@ void MainWindow::screen_area(float plate_w_mm, float plate_h_mm)
         //            +" Perimeter: " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
         //            +" Aera: " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
         //            +" Circularity: " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3));
-        sph_s->set_list(QString::number(i)+". "
+        sph_s->set_list(QString::number(i) +". "
                         +"\t " + QString::number(global_obj_im_coordinates->at(i).at(4),'f',1)
                         +"\t " + QString::number(global_obj_im_coordinates->at(i).at(5),'f',1)
                         +"\t " + QString::number(global_obj_im_coordinates->at(i).at(6),'f',3)
-                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(7),'f',3));
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(9),'f',3)
+                        +"\t " + QString::number(global_obj_im_coordinates->at(i).at(10),'f',3));
 
 
         sph_props c = {i,global_obj_im_coordinates->at(i).at(4),
                        global_obj_im_coordinates->at(i).at(5),
                        global_obj_im_coordinates->at(i).at(6),
-                       global_obj_im_coordinates->at(i).at(7)};
+                       global_obj_im_coordinates->at(i).at(9),
+                      global_obj_im_coordinates->at(i).at(10)};
         m_current_detections->push_back(c);
 
     }

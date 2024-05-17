@@ -635,11 +635,11 @@ std::vector<std::vector<float>> matterport_mrcnn::dnn_inference(cv::Mat &input,c
                 std::cout<< "dropped this" <<features.at(3)<<features.at(4) <<std::endl;
                 continue;
             }
-            if (features.at(3)*nx + bx < 192 || features.at(4)*nx + by <108)
+            /*if (features.at(3)*nx + bx < 192 || features.at(4)*nx + by <108)
             {
                 std::cout<< "dropped this" <<features.at(3)<<features.at(4) <<std::endl;
                 continue;
-            }
+            }*/
             outcoors.push_back(features.at(0)*nx);//length 4
             outcoors.push_back(features.at(1)*nx*nx);//area 5
             outcoors.push_back(features.at(2));//circularity 6
