@@ -1,4 +1,4 @@
-# Project ASP
+# Automatic SpheroidPicker
 
 This project is a Qt-based application configured to use multiple libraries and dependencies. Below are the requirements and setup instructions.
 
