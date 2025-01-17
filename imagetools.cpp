@@ -137,8 +137,10 @@ std::vector<float> imagetools::getobjectprops(cv::Mat& input){
         object_features.at(4) = mc[0].y;
         object_features.at(5) = radius;
         object_features.at(6) = sphericity;
+        // ADD solidity
 
-        //  fitEllipse(contours[i]);
+        // area/convex area
+        //
         cout << "object perimeter raw " << object_features.at(0) << std::endl;
 
         cout << "object max radius raw" << radius << std::endl;

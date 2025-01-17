@@ -1289,7 +1289,7 @@ void MainWindow::put_to_target_plate(int x,int y, int type)
 
     // do a thread test :D
     ctrl->stage_set_speed(ui->s_collect_speed_box->value());   // akos changed the speed
-    QTextStream(stdout)<< "stage move xy";
+    QTextStream(stdout)<< "stage move xy  , selected target plate "<< p_s->m_selected_target;
     move_to_t_plate(x, y , p_s->m_selected_target);
     // std::this_thread::sleep_for(std::chrono::milliseconds(4000));
     QTextStream(stdout)<< "pip move blocking x";
@@ -1366,7 +1366,6 @@ void MainWindow::pick_and_put()
 }
 
 void MainWindow::predict_sph(QSharedPointer<cv::Mat> input){
-
     try {
     //auto cfrm = cameracv->get_current_frm();
 
